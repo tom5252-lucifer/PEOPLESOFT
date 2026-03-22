@@ -1,0 +1,2928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PSLearn — Master PeopleSoft from Zero to Expert</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+/* ═══════════════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════════════ */
+/* ── DARK THEME (default) ── */
+:root{
+  --void:#050710;--base:#080c18;--s0:#0c1020;--s1:#101428;
+  --s2:#161b32;--s3:#1d2340;--border:#232a48;--border-hi:#2e3760;
+  --gold:#f0a500;--gold-hi:#ffc840;--gold-lo:#b07800;
+  --gold-glow:rgba(240,165,0,0.16);
+  --indigo:#6366f1;--indigo-hi:#818cf8;--indigo-lo:#4338ca;
+  --green:#22c55e;--amber:#f59e0b;--red:#ef4444;--cyan:#22d3ee;
+  --text:#e8edf8;--soft:#9ba8c4;--faint:#4e5a7a;
+  --nav-bg:rgba(8,12,24,0.9);
+  --code-bg:#070911;--code-text:#a5f3fc;
+  --fd:'Syne',sans-serif;--fb:'IBM Plex Sans',sans-serif;--fm:'IBM Plex Mono',monospace;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+}
+/* ── LIGHT THEME ── */
+[data-theme="light"]{
+  --void:#f0f2f8;--base:#ffffff;--s0:#f5f7fc;--s1:#eef1f8;
+  --s2:#e4e8f4;--s3:#d6dcef;--border:#c8d0e8;--border-hi:#a8b4d4;
+  --gold:#c47d00;--gold-hi:#e09000;--gold-lo:#a06500;
+  --gold-glow:rgba(196,125,0,0.12);
+  --indigo:#4f52d9;--indigo-hi:#5558e8;--indigo-lo:#3730b0;
+  --green:#16a34a;--amber:#d97706;--red:#dc2626;--cyan:#0891b2;
+  --text:#111827;--soft:#374151;--faint:#9ca3af;
+  --nav-bg:rgba(255,255,255,0.92);
+  --code-bg:#1e2340;--code-text:#a5f3fc;
+}
+[data-theme="light"] .bg-canvas__dots{
+  background-image:radial-gradient(circle,rgba(99,102,241,0.1) 1px,transparent 1px);
+}
+[data-theme="light"] .bg-canvas__orb--1{opacity:0.15}
+[data-theme="light"] .bg-canvas__orb--2{opacity:0.12}
+[data-theme="light"] .bg-canvas__orb--3{opacity:0.08}
+[data-theme="light"] .hero{background:transparent}
+[data-theme="light"] .sidebar{background:#f0f4fb;border-right-color:#c8d0e8}
+[data-theme="light"] .sidebar__topic:hover{background:#e4e8f4}
+[data-theme="light"] .sidebar__topic.active{background:rgba(79,82,217,0.08)}
+[data-theme="light"] .topic-content{background:#ffffff}
+[data-theme="light"] .section-block{background:#f5f7fc}
+[data-theme="light"] .key-points-box{background:#eef1f8}
+[data-theme="light"] .section-code{background:#1e2340}
+[data-theme="light"] .stat-item__number{background:linear-gradient(135deg,#e09000,#c47d00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+/* Theme button */
+.theme-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 14px;border-radius:8px;
+  border:1.5px solid var(--border-hi);
+  background:var(--s2);color:var(--text);
+  font-family:var(--fm);font-size:12px;font-weight:600;
+  cursor:pointer;transition:all .22s var(--ease);
+  letter-spacing:0.04em;
+}
+.theme-btn:hover{border-color:var(--gold);color:var(--gold);background:var(--s3)}
+[data-theme="light"] .theme-btn{background:#e4e8f4;border-color:#a8b4d4;color:#374151}
+[data-theme="light"] .theme-btn:hover{border-color:var(--gold);color:var(--gold)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--fb);background:var(--base);color:var(--text);line-height:1.6;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+::selection{background:var(--gold);color:var(--void)}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--s0)}
+::-webkit-scrollbar-thumb{background:var(--border-hi);border-radius:99px}
+
+/* ═══════════════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════════════ */
+.container{width:100%;max-width:1160px;margin:0 auto;padding:0 24px}
+.section{padding:96px 0}.section--tight{padding:64px 0}
+
+/* ═══════════════════════════════════════════════
+   BG CANVAS
+═══════════════════════════════════════════════ */
+.bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.bg-canvas__dots{position:absolute;inset:0;background-image:radial-gradient(circle,rgba(99,102,241,0.18) 1px,transparent 1px);background-size:32px 32px;mask-image:radial-gradient(ellipse 80% 60% at 50% 0%,black 40%,transparent 100%)}
+.bg-canvas__orb{position:absolute;border-radius:50%;filter:blur(100px);opacity:0.45}
+.bg-canvas__orb--1{width:700px;height:500px;top:-200px;left:-200px;background:radial-gradient(circle,rgba(240,165,0,0.22) 0%,transparent 70%);animation:orb1 18s ease-in-out infinite alternate}
+.bg-canvas__orb--2{width:600px;height:600px;top:0;right:-150px;background:radial-gradient(circle,rgba(99,102,241,0.2) 0%,transparent 70%);animation:orb2 22s ease-in-out infinite alternate}
+.bg-canvas__orb--3{width:400px;height:400px;top:60%;left:40%;background:radial-gradient(circle,rgba(34,211,238,0.08) 0%,transparent 70%);animation:orb3 26s ease-in-out infinite alternate}
+@keyframes orb1{from{transform:translate(0,0)scale(1)}to{transform:translate(80px,60px)scale(1.15)}}
+@keyframes orb2{from{transform:translate(0,0)scale(1)}to{transform:translate(-60px,80px)scale(0.9)}}
+@keyframes orb3{from{transform:translate(0,0)}to{transform:translate(-100px,-60px)}}
+
+/* ═══════════════════════════════════════════════
+   NAV
+═══════════════════════════════════════════════ */
+.nav{position:fixed;top:0;left:0;right:0;z-index:200;height:60px;background:var(--nav-bg);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);transition:border-color .3s,background .3s}
+.nav__inner{display:flex;align-items:center;height:100%;gap:32px}
+.nav__logo{display:flex;align-items:center;gap:10px;flex-shrink:0;cursor:pointer}
+.nav__logo-mark{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,var(--gold) 0%,#e06c00 100%);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:15px;color:var(--void);box-shadow:0 0 18px rgba(240,165,0,0.28)}
+.nav__logo-text{font-family:var(--fd);font-weight:700;font-size:17px;color:var(--text)}
+.nav__logo-text span{color:var(--gold)}
+.nav__links{display:flex;align-items:center;gap:4px;margin-left:24px;flex:1}
+.nav__link{font-size:14px;font-weight:500;color:var(--soft);padding:6px 14px;border-radius:8px;border:none;background:none;transition:color .2s,background .2s}
+.nav__link:hover{color:var(--text);background:var(--s2)}
+.nav__link--active{color:var(--gold)}
+.nav__actions{display:flex;align-items:center;gap:12px;margin-left:auto}
+.nav__badge{font-family:var(--fm);font-size:11px;color:var(--gold);background:var(--gold-glow);border:1px solid rgba(240,165,0,0.25);border-radius:999px;padding:3px 10px}
+
+/* ═══════════════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════════════ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:var(--fd);font-weight:600;border-radius:8px;border:none;transition:all .22s var(--ease);white-space:nowrap;cursor:pointer}
+.btn--lg{font-size:15px;padding:13px 26px}.btn--md{font-size:14px;padding:9px 18px}.btn--sm{font-size:13px;padding:6px 13px}
+.btn--gold{background:linear-gradient(135deg,var(--gold) 0%,#d08a00 100%);color:var(--void)}
+.btn--gold:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(240,165,0,0.35);filter:brightness(1.08)}
+.btn--ghost{background:transparent;color:var(--soft);border:1px solid var(--border-hi)}
+.btn--ghost:hover{color:var(--text);border-color:var(--soft);background:var(--s2)}
+.btn--indigo{background:linear-gradient(135deg,var(--indigo) 0%,var(--indigo-lo) 100%);color:#fff}
+.btn--indigo:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(99,102,241,0.4)}
+
+/* ═══════════════════════════════════════════════
+   PILLS & CHIPS
+═══════════════════════════════════════════════ */
+.code-chip{font-family:var(--fm);font-size:12px;background:var(--s3);color:var(--cyan);border:1px solid var(--border-hi);border-radius:6px;padding:2px 8px;display:inline-block}
+.pill{display:inline-flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;font-weight:500;border-radius:999px;padding:3px 10px;text-transform:uppercase;letter-spacing:0.08em}
+.pill--green{background:rgba(34,197,94,0.12);color:var(--green);border:1px solid rgba(34,197,94,0.2)}
+.pill--amber{background:rgba(245,158,11,0.12);color:var(--amber);border:1px solid rgba(245,158,11,0.2)}
+.pill--red{background:rgba(239,68,68,0.12);color:var(--red);border:1px solid rgba(239,68,68,0.2)}
+
+/* ═══════════════════════════════════════════════
+   ANIMATIONS
+═══════════════════════════════════════════════ */
+@keyframes fade-up{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
+@keyframes bounce-y{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+@keyframes marquee-scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .65s var(--ease),transform .65s var(--ease)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* ═══════════════════════════════════════════════
+   ██ HOMEPAGE
+═══════════════════════════════════════════════ */
+#homepageView{display:block}
+#appView{display:none}
+
+/* HERO */
+.hero{position:relative;z-index:1;padding-top:calc(60px + 80px);padding-bottom:80px;text-align:center}
+.hero__eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:var(--fm);font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:0.12em;color:var(--gold);background:var(--gold-glow);border:1px solid rgba(240,165,0,0.2);border-radius:999px;padding:5px 16px;margin-bottom:24px;animation:fade-up .7s var(--ease) both}
+.hero__eyebrow::before{content:'';display:block;width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulse-dot 2s ease infinite}
+.hero__headline{font-family:var(--fd);font-size:clamp(42px,7vw,78px);font-weight:800;line-height:1.0;letter-spacing:-2px;color:var(--text);margin-bottom:24px;animation:fade-up .7s var(--ease) .1s both}
+.hero__headline em{font-style:normal;background:linear-gradient(135deg,var(--gold-hi) 0%,var(--gold) 50%,#e06c00 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero__headline .line-2{display:block;color:var(--soft);font-size:.72em;font-weight:600;letter-spacing:-1px;margin-top:8px}
+.hero__sub{font-size:18px;line-height:1.7;color:var(--soft);max-width:600px;margin:0 auto 40px;animation:fade-up .7s var(--ease) .2s both}
+.hero__actions{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:16px;margin-bottom:56px;animation:fade-up .7s var(--ease) .3s both}
+.hero__scroll-hint{display:flex;align-items:center;justify-content:center;gap:8px;font-size:12px;color:var(--faint);font-family:var(--fm);letter-spacing:.06em;animation:fade-up .7s var(--ease) .5s both}
+.scroll-arrow{animation:bounce-y 1.8s ease infinite}
+
+/* STATS */
+.stats-bar{position:relative;z-index:1;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:rgba(12,16,32,.7);backdrop-filter:blur(8px);padding:24px 0}
+.stats-bar__grid{display:grid;grid-template-columns:repeat(4,1fr)}
+.stat-item{display:flex;flex-direction:column;align-items:center;gap:4px;padding:16px 24px;border-right:1px solid var(--border)}
+.stat-item:last-child{border-right:none}
+.stat-item__number{font-family:var(--fd);font-size:34px;font-weight:800;line-height:1;letter-spacing:-1.5px;background:linear-gradient(135deg,var(--gold-hi),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.stat-item__label{font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.1em;font-family:var(--fm)}
+
+/* MARQUEE */
+.marquee-wrap{overflow:hidden;position:relative;z-index:1;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:rgba(12,16,32,.6);padding:11px 0}
+.marquee-track{display:flex;width:max-content;animation:marquee-scroll 42s linear infinite}
+.marquee-item{white-space:nowrap;padding:0 24px;font-family:var(--fm);font-size:12px;color:var(--faint);letter-spacing:.04em;display:flex;align-items:center;gap:12px}
+.marquee-item span{color:var(--gold)}
+
+/* SECTION HEADER */
+.section-header{text-align:center;margin-bottom:48px}
+.section-header__tag{display:inline-block;font-family:var(--fm);font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.14em;color:var(--indigo-hi);margin-bottom:16px}
+.section-header__title{font-family:var(--fd);font-size:clamp(28px,4vw,42px);font-weight:800;line-height:1.1;letter-spacing:-1.5px;color:var(--text);margin-bottom:16px}
+.section-header__title em{font-style:normal;color:var(--gold)}
+.section-header__sub{font-size:16px;color:var(--soft);max-width:520px;margin:0 auto;line-height:1.7}
+
+/* INTRO STRIP */
+.intro-strip{position:relative;z-index:1;background:var(--s0);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.intro-strip__grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+.intro-strip__label{font-family:var(--fm);font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--gold);margin-bottom:16px}
+.intro-strip__title{font-family:var(--fd);font-size:clamp(24px,3.5vw,36px);font-weight:800;line-height:1.1;letter-spacing:-1.5px;color:var(--text);margin-bottom:20px}
+.intro-strip__title em{font-style:normal;color:var(--gold)}
+.intro-strip__body{font-size:15px;color:var(--soft);line-height:1.8;margin-bottom:20px}
+.intro-strip__facts{display:flex;flex-direction:column;gap:12px}
+.intro-fact{display:flex;align-items:flex-start;gap:12px;background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;transition:border-color .2s,transform .2s var(--ease)}
+.intro-fact:hover{border-color:var(--border-hi);transform:translateX(4px)}
+.intro-fact__icon{width:34px;height:34px;border-radius:7px;background:rgba(240,165,0,.1);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.intro-fact__text strong{display:block;font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px}
+.intro-fact__text span{font-size:12px;color:var(--soft);line-height:1.5}
+
+/* ARCH DIAGRAM */
+.arch-diagram{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap;margin-top:40px}
+.arch-node{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:20px 22px;text-align:center;min-width:155px;position:relative;transition:transform .25s var(--ease),border-color .25s,box-shadow .25s}
+.arch-node:hover{transform:translateY(-4px);border-color:var(--gold);box-shadow:0 0 26px rgba(240,165,0,.1)}
+.arch-node__icon{font-size:26px;margin-bottom:7px}
+.arch-node__title{font-family:var(--fd);font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px}
+.arch-node__sub{font-size:11px;color:var(--faint);font-family:var(--fm);line-height:1.5}
+.arch-node__tag{position:absolute;top:-10px;left:50%;transform:translateX(-50%);font-family:var(--fm);font-size:10px;font-weight:500;border-radius:999px;padding:2px 10px;white-space:nowrap}
+.tag--browser{background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.3)}
+.tag--web{background:rgba(99,102,241,.15);color:var(--indigo-hi);border:1px solid rgba(99,102,241,.3)}
+.tag--app{background:rgba(240,165,0,.15);color:var(--gold);border:1px solid rgba(240,165,0,.3)}
+.tag--db{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+.arch-arrow{display:flex;flex-direction:column;align-items:center;gap:4px;padding:0 10px}
+.arch-arrow__line{width:44px;height:2px;background:linear-gradient(90deg,var(--border-hi),var(--gold),var(--border-hi))}
+.arch-arrow__label{font-family:var(--fm);font-size:10px;color:var(--faint);white-space:nowrap}
+
+/* PATH CARDS */
+.path-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.path-card{position:relative;border-radius:20px;overflow:hidden;background:var(--s1);border:1px solid var(--border);padding:32px 24px;transition:transform .3s var(--ease),box-shadow .3s}
+.path-card:hover{transform:translateY(-6px);box-shadow:0 4px 32px rgba(0,0,0,.5)}
+.path-card__glow{position:absolute;inset:0;border-radius:inherit;opacity:0;transition:opacity .35s;pointer-events:none}
+.path-card:hover .path-card__glow{opacity:1}
+.path-card--b .path-card__glow{background:radial-gradient(circle at 50% 0%,rgba(34,197,94,.1) 0%,transparent 70%)}
+.path-card--i .path-card__glow{background:radial-gradient(circle at 50% 0%,rgba(245,158,11,.1) 0%,transparent 70%)}
+.path-card--a .path-card__glow{background:radial-gradient(circle at 50% 0%,rgba(239,68,68,.1) 0%,transparent 70%)}
+.path-card__top-bar{position:absolute;top:0;left:0;right:0;height:3px}
+.path-card--b .path-card__top-bar{background:linear-gradient(90deg,var(--green),transparent)}
+.path-card--i .path-card__top-bar{background:linear-gradient(90deg,var(--amber),transparent)}
+.path-card--a .path-card__top-bar{background:linear-gradient(90deg,var(--red),transparent)}
+.path-card__icon{font-size:34px;margin-bottom:16px;display:block}
+.path-card__level{font-family:var(--fm);font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px}
+.path-card--b .path-card__level{color:var(--green)}.path-card--i .path-card__level{color:var(--amber)}.path-card--a .path-card__level{color:var(--red)}
+.path-card__title{font-family:var(--fd);font-size:21px;font-weight:700;color:var(--text);margin-bottom:10px;line-height:1.2}
+.path-card__desc{font-size:14px;color:var(--soft);line-height:1.7;margin-bottom:22px}
+.path-card__topics{display:flex;flex-direction:column;gap:7px;margin-bottom:22px}
+.path-card__topic{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--soft)}
+.path-card__topic::before{content:'';display:block;width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.path-card--b .path-card__topic::before{background:var(--green)}.path-card--i .path-card__topic::before{background:var(--amber)}.path-card--a .path-card__topic::before{background:var(--red)}
+.path-card__count{font-family:var(--fm);font-size:12px;color:var(--faint)}
+
+/* CURRICULUM */
+.curriculum-section{position:relative;z-index:1;background:var(--s0);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.curriculum-tabs{display:flex;gap:8px;margin-bottom:24px;border-bottom:1px solid var(--border)}
+.curriculum-tab{font-family:var(--fd);font-size:14px;font-weight:600;padding:10px 18px;border:none;background:none;color:var(--faint);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .2s,border-color .2s}
+.curriculum-tab.ab{color:var(--green);border-bottom-color:var(--green)}
+.curriculum-tab.ai{color:var(--amber);border-bottom-color:var(--amber)}
+.curriculum-tab.aa{color:var(--red);border-bottom-color:var(--red)}
+.curriculum-panel{display:none}.curriculum-panel.active{display:block}
+.topic-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.topic-item{display:flex;align-items:center;gap:14px;background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:14px 18px;font-size:14px;color:var(--soft);cursor:pointer;transition:all .2s}
+.topic-item:hover{background:var(--s2);color:var(--text);border-color:var(--border-hi);transform:translateX(4px)}
+.topic-item__num{font-family:var(--fm);font-size:11px;color:var(--faint);width:20px;flex-shrink:0;text-align:right}
+.topic-item__dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.dot--b{background:var(--green)}.dot--i{background:var(--amber)}.dot--a{background:var(--red)}
+.topic-item__arrow{margin-left:auto;color:var(--faint);font-size:15px}
+
+/* CONCEPTS GRID */
+.concepts-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.concept-card{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:22px;transition:border-color .25s,transform .25s var(--ease);position:relative;overflow:hidden}
+.concept-card:hover{border-color:var(--indigo);transform:translateY(-3px);box-shadow:0 0 28px rgba(99,102,241,.1)}
+.concept-card__num{font-family:var(--fm);font-size:26px;font-weight:800;color:var(--s3);position:absolute;top:14px;right:18px;line-height:1;letter-spacing:-2px}
+.concept-card__icon{font-size:22px;margin-bottom:14px}
+.concept-card__title{font-family:var(--fd);font-size:14px;font-weight:700;color:var(--text);margin-bottom:7px}
+.concept-card__desc{font-size:12px;color:var(--soft);line-height:1.6}
+
+/* FEATURES */
+.features-section{position:relative;z-index:1}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.feature-card{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:24px;transition:border-color .25s,transform .25s var(--ease)}
+.feature-card:hover{border-color:var(--gold);transform:translateY(-3px);box-shadow:0 0 36px rgba(240,165,0,.08)}
+.feature-card__icon-wrap{width:46px;height:46px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:18px}
+.fw-gold{background:rgba(240,165,0,.12)}.fw-indigo{background:rgba(99,102,241,.12)}.fw-cyan{background:rgba(34,211,238,.12)}.fw-green{background:rgba(34,197,94,.12)}.fw-amber{background:rgba(245,158,11,.12)}.fw-red{background:rgba(239,68,68,.12)}
+.feature-card__title{font-family:var(--fd);font-size:16px;font-weight:700;color:var(--text);margin-bottom:7px;line-height:1.3}
+.feature-card__desc{font-size:13px;color:var(--soft);line-height:1.7}
+
+/* CTA */
+.cta-section{position:relative;z-index:1;text-align:center;background:var(--s0);overflow:hidden}
+.cta-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 50% 50%,rgba(240,165,0,.07) 0%,transparent 70%),radial-gradient(ellipse 40% 60% at 80% 20%,rgba(99,102,241,.06) 0%,transparent 60%)}
+.cta-inner{position:relative;z-index:1}
+.cta-tag{font-family:var(--fm);font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--gold);margin-bottom:20px}
+.cta-title{font-family:var(--fd);font-size:clamp(28px,5vw,50px);font-weight:800;letter-spacing:-2px;line-height:1.1;color:var(--text);margin-bottom:20px}
+.cta-title em{font-style:normal;color:var(--gold)}
+.cta-sub{font-size:15px;color:var(--soft);max-width:460px;margin:0 auto 40px;line-height:1.7}
+.cta-actions{display:flex;justify-content:center;flex-wrap:wrap;gap:16px}
+.cta-note{margin-top:20px;font-size:12px;color:var(--faint);font-family:var(--fm)}
+
+/* FOOTER */
+.footer{position:relative;z-index:1;background:var(--void);border-top:1px solid var(--border);padding:40px 0 32px}
+.footer__inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:24px}
+.footer__brand{display:flex;align-items:center;gap:10px}
+.footer__copy{font-size:13px;color:var(--faint)}
+.footer__links{display:flex;gap:20px}
+.footer__link{font-size:13px;color:var(--faint);transition:color .2s}
+.footer__link:hover{color:var(--soft)}
+
+/* ═══════════════════════════════════════════════
+   ██ APP VIEW — LEARNING PLATFORM
+═══════════════════════════════════════════════ */
+.app-layout{display:flex;height:calc(100vh - 60px);margin-top:60px;position:relative;z-index:1}
+
+/* SIDEBAR */
+.sidebar{width:290px;flex-shrink:0;background:#080c18;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.sidebar__header{padding:16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.sidebar__search{width:100%;background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:13px;font-family:var(--fb);outline:none;transition:border-color .2s}
+.sidebar__search:focus{border-color:var(--indigo)}
+.sidebar__search::placeholder{color:var(--faint)}
+.sidebar__body{flex:1;overflow-y:auto;padding:8px 0}
+.sidebar__module-header{padding:10px 16px 5px;font-family:var(--fm);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--faint);display:flex;align-items:center;gap:7px}
+.sidebar__topic{width:100%;text-align:left;background:transparent;border:none;border-left:3px solid transparent;color:var(--soft);padding:9px 16px 9px 20px;cursor:pointer;font-size:13px;transition:all .15s;display:flex;align-items:center;gap:8px}
+.sidebar__topic:hover{background:var(--s1);color:var(--text);border-left-color:var(--border-hi)}
+.sidebar__topic.active{background:rgba(99,102,241,.08);color:var(--text);border-left-color:var(--indigo)}
+.sidebar__topic-num{font-family:var(--fm);font-size:10px;color:var(--faint);flex-shrink:0;width:16px}
+.sidebar__progress{padding:14px 16px;border-top:1px solid var(--border);flex-shrink:0}
+.sidebar__progress-label{font-family:var(--fm);font-size:11px;color:var(--faint);margin-bottom:7px;display:flex;justify-content:space-between}
+.sidebar__progress-bar{height:4px;background:var(--s3);border-radius:99px;overflow:hidden}
+.sidebar__progress-fill{height:100%;background:linear-gradient(90deg,var(--indigo),var(--gold));border-radius:99px;transition:width .4s var(--ease)}
+
+/* TOPIC CONTENT */
+.topic-content{flex:1;overflow-y:auto;padding:40px 48px}
+.topic-content::-webkit-scrollbar{width:5px}
+.topic-content::-webkit-scrollbar-thumb{background:var(--border-hi);border-radius:99px}
+
+.topic-header{margin-bottom:28px}
+.topic-module-badge{display:inline-flex;align-items:center;gap:7px;background:var(--s2);border:1px solid var(--border);border-radius:999px;padding:4px 12px;font-family:var(--fm);font-size:11px;color:var(--soft);margin-bottom:12px}
+.topic-title{font-family:var(--fd);font-size:clamp(24px,3vw,34px);font-weight:800;letter-spacing:-1px;color:var(--text);margin-bottom:12px;line-height:1.2}
+.topic-summary{font-size:16px;color:var(--soft);line-height:1.7;max-width:720px}
+
+.key-points-box{background:var(--s1);border:1px solid var(--border-hi);border-radius:12px;padding:20px 24px;margin-bottom:28px}
+.key-points-box h3{font-family:var(--fm);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--indigo-hi);margin-bottom:14px}
+.key-point{display:flex;gap:10px;margin-bottom:10px;align-items:flex-start}
+.key-point-arrow{color:var(--indigo);font-weight:700;flex-shrink:0;margin-top:1px}
+.key-point-text{font-size:14px;color:var(--text);line-height:1.6}
+
+.section-block{background:var(--s0);border:1px solid var(--border);border-radius:12px;margin-bottom:14px;overflow:hidden}
+.section-block__header{width:100%;text-align:left;background:none;border:none;color:var(--text);padding:16px 22px;cursor:pointer;font-size:15px;font-weight:600;font-family:var(--fd);display:flex;justify-content:space-between;align-items:center}
+.section-block__chevron{color:var(--indigo);font-size:18px;transition:transform .25s}
+.section-block__chevron.open{transform:rotate(90deg)}
+.section-block__body{padding:0 22px 20px;border-top:1px solid var(--border)}
+.section-block__preview{padding:0 22px 14px;font-size:13px;color:var(--faint)}
+
+.section-para{color:var(--soft);font-size:15px;line-height:1.8;margin-top:14px}
+.section-code{background:#070911;border:1px solid var(--border);border-radius:8px;padding:16px;font-family:var(--fm);font-size:13px;color:#a5f3fc;overflow-x:auto;line-height:1.75;margin-top:14px;white-space:pre}
+.section-list{margin-top:14px;padding-left:0;list-style:none}
+.section-list li{display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;font-size:14px;color:var(--soft);line-height:1.6}
+.section-list li::before{content:'→';color:var(--gold);flex-shrink:0}
+
+.topic-nav{display:flex;justify-content:space-between;margin-top:40px;padding-top:24px;border-top:1px solid var(--border)}
+.topic-nav-btn{display:flex;align-items:center;gap:10px;background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:12px 18px;cursor:pointer;font-size:13px;color:var(--soft);transition:all .2s;max-width:240px}
+.topic-nav-btn:hover{background:var(--s2);color:var(--text);border-color:var(--border-hi)}
+.topic-nav-btn--next{background:linear-gradient(135deg,var(--indigo),var(--indigo-lo));border:none;color:#fff;font-weight:600}
+.topic-nav-btn--next:hover{box-shadow:0 4px 20px rgba(99,102,241,.4);transform:translateY(-1px)}
+.topic-nav-label{font-size:10px;font-family:var(--fm);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:2px;opacity:.6}
+.topic-nav-title{font-size:13px;font-weight:500}
+
+/* PEOPLEBOOKS LINK */
+.pb-link{
+  display:inline-flex;align-items:center;gap:8px;margin-top:18px;
+  background:var(--s2);border:1px solid var(--border-hi);border-radius:8px;
+  padding:10px 16px;font-size:13px;color:var(--indigo-hi);
+  text-decoration:none;transition:all .2s var(--ease);font-family:var(--fb);font-weight:500;
+}
+.pb-link:hover{background:var(--indigo-lo);color:#fff;border-color:var(--indigo);transform:translateX(3px)}
+.pb-link__icon{font-size:16px;flex-shrink:0}
+.pb-link__text{display:flex;flex-direction:column;gap:1px}
+.pb-link__title{font-weight:600;font-size:13px}
+.pb-link__sub{font-size:11px;opacity:.7;font-family:var(--fm)}
+
+/* FLOW DIAGRAM */
+.flow-diagram{margin:20px 0;padding:20px;background:var(--s0);border:1px solid var(--border);border-radius:12px;overflow-x:auto}
+.flow-diagram svg{display:block;margin:0 auto}
+
+/* VISUAL DIAGRAM CARD */
+.diagram-card{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:20px;margin:16px 0;overflow:hidden}
+.diagram-card__title{font-family:var(--fm);font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);margin-bottom:14px}
+
+/* RESPONSIVE */
+@media(max-width:1024px){.concepts-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:900px){
+  .path-grid{grid-template-columns:1fr}.features-grid{grid-template-columns:1fr 1fr}
+  .stats-bar__grid{grid-template-columns:repeat(2,1fr)}.topic-grid{grid-template-columns:1fr}
+  .intro-strip__grid{grid-template-columns:1fr;gap:40px}.arch-arrow{display:none}
+  .sidebar{width:250px}.topic-content{padding:28px 24px}
+}
+@media(max-width:600px){
+  .features-grid{grid-template-columns:1fr}.concepts-grid{grid-template-columns:1fr}
+  .nav__links{display:none}.stat-item{border-right:none;border-bottom:1px solid var(--border)}
+  .sidebar{display:none}.topic-content{padding:20px 16px}
+}
+</style>
+</head>
+<body>
+
+<!-- BG -->
+<div class="bg-canvas" aria-hidden="true">
+  <div class="bg-canvas__dots"></div>
+  <div class="bg-canvas__orb bg-canvas__orb--1"></div>
+  <div class="bg-canvas__orb bg-canvas__orb--2"></div>
+  <div class="bg-canvas__orb bg-canvas__orb--3"></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav" id="mainNav">
+  <div class="container">
+    <div class="nav__inner">
+      <div class="nav__logo" onclick="showHome()">
+        <div class="nav__logo-mark">PS</div>
+        <span class="nav__logo-text">PS<span>Learn</span></span>
+      </div>
+      <div class="nav__links">
+        <button class="nav__link nav__link--active" onclick="showHome()">Home</button>
+        <button class="nav__link" onclick="openTopic(0)">Learn</button>
+        <button class="nav__link">Quiz</button>
+        <button class="nav__link">Interview Prep</button>
+      </div>
+      <div class="nav__actions">
+        <span class="nav__badge">✦ Free Platform</span>
+        <button class="theme-btn" id="themeToggle" onclick="toggleTheme()">
+          <span id="themeKnob">🌙</span>
+          <span id="themeLabel">Night</span>
+        </button>
+        <button class="btn btn--gold btn--sm" onclick="openTopic(0)">Start Learning →</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════
+     HOMEPAGE VIEW
+═══════════════════════════════════════════════ -->
+<div id="homepageView">
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero__eyebrow">The Complete PeopleSoft Learning Platform</div>
+    <h1 class="hero__headline">
+      Master <em>PeopleSoft</em>
+      <span class="line-2">from Zero to Enterprise Expert</span>
+    </h1>
+    <p class="hero__sub">Structured learning paths built from Oracle PeopleBooks and real-world enterprise implementation experience. Learn PeopleCode, Fluid UI, Application Engine, Integration Broker and more.</p>
+    <div class="hero__actions">
+      <button class="btn btn--gold btn--lg" onclick="openTopic(0)">🚀 Start Learning Free</button>
+      <button class="btn btn--ghost btn--lg" onclick="document.getElementById('curriculum').scrollIntoView({behavior:'smooth'})">Browse Curriculum →</button>
+    </div>
+    <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:40px;animation:fade-up .7s ease .4s both">
+      <span class="pill pill--green">🌱 Beginner</span>
+      <span class="code-chip">PeopleCode</span><span class="code-chip">App Engine</span><span class="code-chip">Fluid UI</span>
+      <span class="code-chip">Integration Broker</span><span class="code-chip">PS Query</span>
+      <span class="pill pill--amber">⚡ Intermediate</span>
+      <span class="code-chip">REST APIs</span><span class="code-chip">Event Mapping</span><span class="code-chip">BI Publisher</span>
+      <span class="pill pill--red">🔥 Advanced</span>
+    </div>
+    <div class="hero__scroll-hint">scroll to explore <span class="scroll-arrow">↓</span></div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="container">
+    <div class="stats-bar__grid">
+      <div class="stat-item"><span class="stat-item__number">20+</span><span class="stat-item__label">Beginner Topics</span></div>
+      <div class="stat-item"><span class="stat-item__number">60+</span><span class="stat-item__label">Quiz Questions</span></div>
+      <div class="stat-item"><span class="stat-item__number">40+</span><span class="stat-item__label">Interview Q&As</span></div>
+      <div class="stat-item"><span class="stat-item__number">100%</span><span class="stat-item__label">Free Access</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap" aria-hidden="true"><div class="marquee-track" id="marqueeTrack"></div></div>
+
+<!-- WHAT IS PEOPLESOFT -->
+<section class="section intro-strip">
+  <div class="container">
+    <div class="intro-strip__grid">
+      <div class="reveal">
+        <div class="intro-strip__label">// What is PeopleSoft?</div>
+        <h2 class="intro-strip__title">An <em>Enterprise Platform</em><br>Built on Metadata</h2>
+        <p class="intro-strip__body">PeopleSoft is Oracle's enterprise application suite powering HR, Finance, Supply Chain, and Campus Solutions for thousands of organizations worldwide. Founded in 1987 and acquired by Oracle in 2005, it is one of the most widely deployed ERP platforms in the world.</p>
+        <p class="intro-strip__body">What makes PeopleSoft unique is its <strong style="color:var(--gold)">metadata-driven architecture</strong> — every form, field, workflow, and report is stored as metadata in system tables. Developers work in Application Designer to define objects that the runtime engine renders into working pages and reports. No raw HTML. No hardcoded SQL.</p>
+        <button class="btn btn--gold btn--md" onclick="openTopic(0)" style="margin-top:8px">Start with the Basics →</button>
+      </div>
+      <div class="reveal" style="transition-delay:.1s">
+        <div class="intro-strip__facts">
+          <div class="intro-fact"><div class="intro-fact__icon">🏢</div><div class="intro-fact__text"><strong>8 Major Product Lines · 201 Modules</strong><span>HCM, FSCM, Campus Solutions, ELM, CRM, EPM, SRM, Supply Chain Management</span></div></div>
+          <div class="intro-fact"><div class="intro-fact__icon">🗄️</div><div class="intro-fact__text"><strong>Multi-Database, Multi-Platform</strong><span>Runs on Oracle DB, Microsoft SQL Server, IBM DB2 — PeopleTools Meta-SQL abstracts all platform differences</span></div></div>
+          <div class="intro-fact"><div class="intro-fact__icon">🌐</div><div class="intro-fact__text"><strong>Pure Internet Architecture (PIA)</strong><span>Three-tier architecture — browser, Tuxedo application server, database. Any supported browser can access PeopleSoft</span></div></div>
+          <div class="intro-fact"><div class="intro-fact__icon">🔧</div><div class="intro-fact__text"><strong>PeopleTools — The Development Layer</strong><span>Application Designer, PeopleCode, App Engine, Integration Broker, PS Query, BI Publisher — all built into PeopleTools</span></div></div>
+          <div class="intro-fact"><div class="intro-fact__icon">☁️</div><div class="intro-fact__text"><strong>On-Premise or Oracle Cloud (OCI)</strong><span>Deploy on your own servers or Oracle Cloud Infrastructure — DPK bundles and PUM make setup and patching streamlined</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ARCHITECTURE -->
+<section class="section" style="position:relative;z-index:1">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-header__tag">// PeopleSoft Internet Architecture</div>
+      <h2 class="section-header__title">How PeopleSoft <em>Actually Works</em></h2>
+      <p class="section-header__sub">Every request travels Browser → WebLogic → Tuxedo App Server → Database. No business logic runs in the browser — it all executes server-side.</p>
+    </div>
+    <div class="arch-diagram reveal" style="transition-delay:.1s">
+      <div class="arch-node"><div class="arch-node__tag tag--browser">Client</div><div class="arch-node__icon">🌐</div><div class="arch-node__title">Browser</div><div class="arch-node__sub">Chrome/Firefox/Edge<br>HTTP/HTTPS</div></div>
+      <div class="arch-arrow"><div class="arch-arrow__line"></div><div class="arch-arrow__label">HTTP/S</div></div>
+      <div class="arch-node"><div class="arch-node__tag tag--web">Tier 1</div><div class="arch-node__icon">⚙️</div><div class="arch-node__title">Web Server</div><div class="arch-node__sub">Oracle WebLogic<br>Presentation only</div></div>
+      <div class="arch-arrow"><div class="arch-arrow__line"></div><div class="arch-arrow__label">JOLT</div></div>
+      <div class="arch-node"><div class="arch-node__tag tag--app">Tier 2</div><div class="arch-node__icon">🧠</div><div class="arch-node__title">App Server</div><div class="arch-node__sub">Oracle Tuxedo<br>PeopleCode · Logic</div></div>
+      <div class="arch-arrow"><div class="arch-arrow__line"></div><div class="arch-arrow__label">SQL</div></div>
+      <div class="arch-node"><div class="arch-node__tag tag--db">Tier 3</div><div class="arch-node__icon">🗃️</div><div class="arch-node__title">Database</div><div class="arch-node__sub">Oracle/SQL Server/DB2<br>Data + Metadata</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:40px">
+      <div class="concept-card reveal"><div class="concept-card__num">01</div><div class="concept-card__icon">⚙️</div><div class="concept-card__title">Web Server — WebLogic</div><div class="concept-card__desc">Handles HTTP/HTTPS. Zero business logic — purely presentation layer. Forwards all requests to the App Server via the JOLT port.</div></div>
+      <div class="concept-card reveal" style="transition-delay:.1s"><div class="concept-card__num">02</div><div class="concept-card__icon">🧠</div><div class="concept-card__title">App Server — Tuxedo</div><div class="concept-card__desc">The brain of PeopleSoft. Runs PSAPPSRV, PSQRYSRV, PSSAMSRV. All PeopleCode, Component Processor, and business rules execute here.</div></div>
+      <div class="concept-card reveal" style="transition-delay:.2s"><div class="concept-card__num">03</div><div class="concept-card__icon">🗃️</div><div class="concept-card__title">Database — Three Layers</div><div class="concept-card__desc">RDBMS system tables, PeopleTools metadata (record/field/page definitions), and application data (PS_JOB, PS_PERSONAL_DATA, etc.).</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- LEARNING PATHS -->
+<section class="section" style="position:relative;z-index:1;background:var(--s0);border-top:1px solid var(--border)">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-header__tag">// Curriculum Structure</div>
+      <h2 class="section-header__title">Three Paths. <em>One Goal.</em></h2>
+      <p class="section-header__sub">Whether you are starting from scratch or sharpening advanced skills, the curriculum is designed to take you exactly where you need to go.</p>
+    </div>
+    <div class="path-grid">
+      <div class="path-card path-card--b reveal" onclick="openTopic(0)" style="cursor:pointer">
+        <div class="path-card__top-bar"></div><div class="path-card__glow"></div>
+        <span class="path-card__icon">🌱</span>
+        <div class="path-card__level">Beginner — 7 Modules · 20 Topics</div>
+        <h3 class="path-card__title">PeopleSoft Foundations</h3>
+        <p class="path-card__desc">No prior experience needed. Understand the platform from the ground up — history, architecture, PeopleTools, records, pages, PeopleCode, and PS Query.</p>
+        <div class="path-card__topics">
+          <span class="path-card__topic">Module 1 — Foundations (History, Intro, Tools, Glossary)</span>
+          <span class="path-card__topic">Module 2 — Architecture & Cloud (PIA, OCI)</span>
+          <span class="path-card__topic">Module 3 — UI & Navigation (Pages, Components, Search)</span>
+          <span class="path-card__topic">Module 4 — App Designer & Data Model (Records, Eff Dating)</span>
+          <span class="path-card__topic">Module 5 — Development Basics (PeopleCode, Buffer)</span>
+          <span class="path-card__topic">Module 6 — Data & Query · Module 7 — Process & Security</span>
+        </div>
+        <button class="btn btn--gold btn--sm" style="margin-top:8px">Start Beginner Path →</button>
+      </div>
+      <div class="path-card path-card--i reveal" style="transition-delay:.1s">
+        <div class="path-card__top-bar"></div><div class="path-card__glow"></div>
+        <span class="path-card__icon">⚡</span>
+        <div class="path-card__level">Intermediate — Coming Next</div>
+        <h3 class="path-card__title">Core Development Skills</h3>
+        <p class="path-card__desc">Application Engine, Component Interface, Integration Broker, BI Publisher, Security, Process Scheduler, Data Mover, and PUM.</p>
+        <div class="path-card__topics">
+          <span class="path-card__topic">Application Engine — batch framework & Meta-SQL</span>
+          <span class="path-card__topic">Component Interface — programmatic APIs</span>
+          <span class="path-card__topic">Integration Broker — messaging & web services</span>
+          <span class="path-card__topic">BI Publisher — formatted PDF/Excel reports</span>
+          <span class="path-card__topic">Security — Roles, Permission Lists, Row-level</span>
+        </div>
+        <span class="path-card__count">10 Topics · ~8 hrs · Coming Soon</span>
+      </div>
+      <div class="path-card path-card--a reveal" style="transition-delay:.2s">
+        <div class="path-card__top-bar"></div><div class="path-card__glow"></div>
+        <span class="path-card__icon">🔥</span>
+        <div class="path-card__level">Advanced — Coming Next</div>
+        <h3 class="path-card__title">Expert-Level Mastery</h3>
+        <p class="path-card__desc">Fluid UI, Application Packages (OOP), REST/SOAP services, Performance Tuning, Event Mapping, Activity Guides, and Elasticsearch.</p>
+        <div class="path-card__topics">
+          <span class="path-card__topic">Fluid UI — responsive HTML5, tiles & homepages</span>
+          <span class="path-card__topic">Application Packages — OOP in PeopleCode</span>
+          <span class="path-card__topic">REST & SOAP via Integration Broker</span>
+          <span class="path-card__topic">Event Mapping — upgrade-safe customization</span>
+          <span class="path-card__topic">Performance Tuning — trace, SQL, caching</span>
+        </div>
+        <span class="path-card__count">10 Topics · ~10 hrs · Coming Soon</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CURRICULUM -->
+<section id="curriculum" class="section--tight curriculum-section">
+  <div class="container">
+    <div class="section-header reveal" style="margin-bottom:28px">
+      <div class="section-header__tag">// Full Topic List</div>
+      <h2 class="section-header__title">Browse the <em>Curriculum</em></h2>
+    </div>
+    <div class="curriculum-tabs reveal">
+      <button class="curriculum-tab ab" onclick="switchTab(this,'b')">🌱 Beginner</button>
+      <button class="curriculum-tab" onclick="switchTab(this,'i')">⚡ Intermediate</button>
+      <button class="curriculum-tab" onclick="switchTab(this,'a')">🔥 Advanced</button>
+    </div>
+    <div class="curriculum-panel active" id="panel-b"><div class="topic-grid" id="topics-b"></div></div>
+    <div class="curriculum-panel" id="panel-i"><div class="topic-grid" id="topics-i"></div></div>
+    <div class="curriculum-panel" id="panel-a"><div class="topic-grid" id="topics-a"></div></div>
+  </div>
+</section>
+
+<!-- CONCEPTS -->
+<section class="section" style="position:relative;z-index:1">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-header__tag">// Core Concepts You Will Master</div>
+      <h2 class="section-header__title">The Building Blocks of <em>PeopleSoft</em></h2>
+    </div>
+    <div class="concepts-grid">
+      <div class="concept-card reveal"><div class="concept-card__num">01</div><div class="concept-card__icon">🗂️</div><div class="concept-card__title">Component Processor</div><div class="concept-card__desc">The runtime engine managing data flow — loading the buffer, firing PeopleCode events in sequence (RowInit → PostBuild → SaveEdit), writing back to DB.</div></div>
+      <div class="concept-card reveal" style="transition-delay:.06s"><div class="concept-card__num">02</div><div class="concept-card__icon">📅</div><div class="concept-card__title">Effective Dating</div><div class="concept-card__desc">Instead of overwriting records, new rows are inserted with EFFDT and EFFSEQ — enabling full historical reporting and retroactive payroll processing.</div></div>
+      <div class="concept-card reveal" style="transition-delay:.12s"><div class="concept-card__num">03</div><div class="concept-card__icon">⚡</div><div class="concept-card__title">PeopleCode Events</div><div class="concept-card__desc">PeopleCode attaches to a specific event — FieldDefault, RowInit, PostBuild, SaveEdit, SavePostChange. The event determines when your code fires.</div></div>
+      <div class="concept-card reveal" style="transition-delay:.18s"><div class="concept-card__num">04</div><div class="concept-card__icon">🏗️</div><div class="concept-card__title">Metadata Architecture</div><div class="concept-card__desc">Every record, page, component, and PeopleCode program is metadata stored in PeopleTools system tables — not files on disk.</div></div>
+      <div class="concept-card reveal" style="transition-delay:.24s"><div class="concept-card__num">05</div><div class="concept-card__icon">🔒</div><div class="concept-card__title">Role-Based Security</div><div class="concept-card__desc">User → Roles → Permission Lists → Row-Level Security. Permission Lists define which pages, processes, and data rows each user can access.</div></div>
+      <div class="concept-card reveal" style="transition-delay:.30s"><div class="concept-card__num">06</div><div class="concept-card__icon">🔄</div><div class="concept-card__title">Integration Broker</div><div class="concept-card__desc">Enterprise messaging platform for REST, SOAP, and async integrations. Service Operations, Nodes, Handlers, and Routing Rules form the full framework.</div></div>
+      <div class="concept-card reveal" style="transition-delay:.36s"><div class="concept-card__num">07</div><div class="concept-card__icon">📱</div><div class="concept-card__title">Fluid UI</div><div class="concept-card__desc">Responsive HTML5/CSS3 introduced in PT 8.53. Built on Oracle JET, works on mobile, tablet, and desktop with a modern grid-based layout system.</div></div>
+      <div class="concept-card reveal" style="transition-delay:.42s"><div class="concept-card__num">08</div><div class="concept-card__icon">🛡️</div><div class="concept-card__title">Event Mapping</div><div class="concept-card__desc">PT 8.55+ upgrade-safe customization. Attach custom App Class PeopleCode to delivered component events without touching Oracle's delivered objects.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section features-section" style="background:var(--s0);border-top:1px solid var(--border)">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-header__tag">// Platform Features</div>
+      <h2 class="section-header__title">Everything You Need to <em>Level Up</em></h2>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card reveal"><div class="feature-card__icon-wrap fw-gold">📚</div><h3 class="feature-card__title">Deep Topic Explanations</h3><p class="feature-card__desc">Every topic goes beyond surface syntax — why it exists, when to use it, how it connects to everything else. Based on PeopleBooks and real project experience.</p></div>
+      <div class="feature-card reveal" style="transition-delay:.08s"><div class="feature-card__icon-wrap fw-indigo">🧠</div><h3 class="feature-card__title">Interactive Quiz Engine</h3><p class="feature-card__desc">Randomized 10-question quizzes with questions from real PeopleSoft certification and interview material. Instant feedback with detailed explanations.</p></div>
+      <div class="feature-card reveal" style="transition-delay:.16s"><div class="feature-card__icon-wrap fw-cyan">💼</div><h3 class="feature-card__title">Interview Preparation</h3><p class="feature-card__desc">40+ expert Q&As covering PeopleCode, architecture, HCM, FSCM, integration, and security. Answers written at senior technical interview level.</p></div>
+      <div class="feature-card reveal" style="transition-delay:.08s"><div class="feature-card__icon-wrap fw-green">⚡</div><h3 class="feature-card__title">Real PeopleCode Examples</h3><p class="feature-card__desc">Runnable code — not pseudocode. SQLExec, CreateSQL, Rowsets, App Packages, Component Interface calls with context explaining each approach.</p></div>
+      <div class="feature-card reveal" style="transition-delay:.16s"><div class="feature-card__icon-wrap fw-amber">🗺️</div><h3 class="feature-card__title">Structured Learning Path</h3><p class="feature-card__desc">Topics are sequenced with intention. Architecture before development. Records before Pages. Component Processor before PeopleCode events.</p></div>
+      <div class="feature-card reveal" style="transition-delay:.24s"><div class="feature-card__icon-wrap fw-red">🎯</div><h3 class="feature-card__title">Real-World Scenarios</h3><p class="feature-card__desc">Every concept grounded in enterprise use cases — payroll batch runs, HR data migrations, REST integrations, PUM patching, upgrade-safe customizations.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="section cta-section">
+  <div class="cta-bg" aria-hidden="true"></div>
+  <div class="container cta-inner">
+    <div class="cta-tag reveal">// Start Today — No Account Needed</div>
+    <h2 class="cta-title reveal">Your PeopleSoft<br><em>Career Starts Here</em></h2>
+    <p class="cta-sub reveal">Free, structured, and built for real-world outcomes. Start with the foundations and work your way to senior consultant-level knowledge.</p>
+    <div class="cta-actions reveal">
+      <button class="btn btn--gold btn--lg" onclick="openTopic(0)">🚀 Begin Learning Now</button>
+      <button class="btn btn--ghost btn--lg">Test Your Knowledge 🧠</button>
+    </div>
+    <p class="cta-note reveal">No login required · 100% free · Learn at your own pace</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer__inner">
+      <div class="footer__brand">
+        <div class="nav__logo-mark" style="width:28px;height:28px;font-size:12px">PS</div>
+        <span style="font-family:var(--fd);font-weight:700;font-size:14px">PSLearn</span>
+      </div>
+      <p class="footer__copy">© 2025 PSLearn · All rights reserved</p>
+      <div class="footer__links">
+        <a href="#" class="footer__link">Learn</a>
+        <a href="#" class="footer__link">Quiz</a>
+        <a href="#" class="footer__link">Interview</a>
+        <a href="#" class="footer__link">Resources</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</div><!-- end homepageView -->
+
+<!-- ═══════════════════════════════════════════════
+     APP VIEW — LEARNING PLATFORM
+═══════════════════════════════════════════════ -->
+<div id="appView">
+  <div class="app-layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar__header">
+        <input class="sidebar__search" type="text" placeholder="Search topics..." oninput="filterTopics(this.value)" id="sidebarSearch"/>
+      </div>
+      <div class="sidebar__body" id="sidebarBody"></div>
+      <div class="sidebar__progress">
+        <div class="sidebar__progress-label">
+          <span>Progress</span>
+          <span id="progressText">0 / 20</span>
+        </div>
+        <div class="sidebar__progress-bar">
+          <div class="sidebar__progress-fill" id="progressFill" style="width:0%"></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- TOPIC CONTENT -->
+    <div class="topic-content" id="topicContent"></div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   TOPIC DATA — 20 BEGINNER TOPICS
+═══════════════════════════════════════════════ */
+const MODULES = [
+  { name:"Module 1: Foundations", icon:"🔰", color:"#818cf8" },
+  { name:"Module 2: Architecture & Environment", icon:"🏗️", color:"#f0a500" },
+  { name:"Module 3: UI & Navigation", icon:"🖥️", color:"#22c55e" },
+  { name:"Module 4: Application Designer & Data Model", icon:"🧱", color:"#22d3ee" },
+  { name:"Module 5: Development Basics", icon:"💻", color:"#8b5cf6" },
+  { name:"Module 6: Data & Query", icon:"📊", color:"#f59e0b" },
+  { name:"Module 7: Process & Security", icon:"⚙️", color:"#ef4444" },
+];
+
+const TOPICS = [
+  /* ── MODULE 1 ── */
+  {
+    id:"history", module:0, num:"01",
+    title:"PeopleSoft History & Evolution",
+    summary:"PeopleSoft started in 1987 as a simple HR payroll tool and grew into one of the world's largest enterprise software platforms. Understanding where it came from helps you understand why it's built the way it is.",
+    keyPoints:[
+      "Founded 1987 by Dave Duffield — originally focused on HR payroll and benefits",
+      "PeopleSoft 7 (1997) added Finance and Supply Chain modules",
+      "PeopleSoft 8 (2000) introduced Pure Internet Architecture — no more desktop client for users",
+      "Oracle acquired PeopleSoft in January 2005 after an 18-month hostile takeover battle",
+      "Oracle continues active development — PeopleTools 8.60+ and regular PUM updates",
+    ],
+    sections:[
+      {
+        title:"The Early Years (1987–1999)",
+        body:`PeopleSoft was founded in 1987 by Dave Duffield and Ken Morris in Pleasanton, California. Their first product was a client-server Human Resources application designed to replace green-screen mainframe HR systems that dominated corporate IT at the time.
+
+The name "PeopleSoft" reflected its purpose — software built to manage people. The early versions ran as thick Windows desktop clients connecting directly to an Oracle or Sybase database. Every user needed the PeopleSoft client installed on their workstation.
+
+**Key milestones in this era:**
+- 1987: First product launched — HR and Payroll for mid-sized companies
+- 1992: PeopleSoft went public (IPO), raising funds to expand product lines
+- 1994: First Financial Management module released (Accounts Payable, General Ledger)
+- 1997: PeopleSoft 7 released — added Supply Chain Management and expanded Finance. The company became a major ERP competitor to SAP and Oracle.`,
+      },
+      {
+        title:"The Web Revolution — PeopleSoft 8 (2000)",
+        body:`In 2000, PeopleSoft released version 8 with a completely redesigned architecture called Pure Internet Architecture (PIA). This was a landmark moment — users no longer needed to install anything on their computers. They could access PeopleSoft from any browser on any device.
+
+The PIA architecture introduced the three-tier model that still powers PeopleSoft today: browser → web server → application server → database. Only developers still needed to install Application Designer on their workstations.
+
+This shift was transformative for enterprise IT because it dramatically reduced the cost and complexity of deploying and maintaining PeopleSoft across thousands of users. Updates were applied on the server — not on thousands of desktops.`,
+      },
+      {
+        title:"The Oracle Acquisition (2003–2005)",
+        body:`In June 2003, Oracle Corporation launched a surprise hostile takeover bid for PeopleSoft at $5.1 billion. The PeopleSoft board and CEO Craig Conway rejected the offer repeatedly over 18 months. Oracle raised its offer multiple times, eventually reaching $10.3 billion.
+
+The battle was fiercely public — PeopleSoft offered customers a guarantee program promising refunds if Oracle destroyed the product. The US Department of Justice investigated the acquisition for antitrust concerns but ultimately allowed it.
+
+Oracle acquired PeopleSoft in January 2005 for $10.3 billion. Many in the industry feared Oracle would discontinue PeopleSoft in favor of Oracle E-Business Suite. Instead, Oracle committed to continuing PeopleSoft development — a commitment it has honored ever since.
+
+Dave Duffield left Oracle after the acquisition and went on to found Workday, which today is one of PeopleSoft's primary competitors in the cloud HCM space.`,
+      },
+      {
+        title:"PeopleSoft Under Oracle (2005–Present)",
+        body:`Under Oracle, PeopleSoft continued to evolve with major improvements:
+
+**2013 — Fluid UI introduced (PT 8.53):** The classic fixed-width desktop interface was replaced with a responsive HTML5 design that works on mobile and tablet.
+
+**2014 — PeopleSoft Update Manager (PUM):** Oracle replaced the old bundle patching model with a continuous delivery approach. Organizations can now pick and choose specific fixes and features from a PeopleSoft Image without waiting for a full bundle.
+
+**2015 — Elasticsearch integration (PT 8.55):** Full-text search replaced the older Verity search engine with modern Elasticsearch, giving users a Google-like search experience.
+
+**2019 — Selective Adoption:** Organizations can now adopt specific new features without taking all updates, giving them greater control over their upgrade cadence.
+
+**2023+ — AI Integration:** Oracle began integrating AI capabilities into PeopleSoft, including intelligent chatbots and AI-powered suggestions within HCM workflows.
+
+PeopleTools today is at version 8.60+ and PeopleSoft applications continue to receive regular quarterly updates via PUM Images.`,
+      },
+    ],
+  },
+  {
+    id:"intro", module:0, num:"02",
+    title:"Introduction to PeopleSoft",
+    summary:"PeopleSoft is Oracle's enterprise resource planning (ERP) platform that manages business operations across HR, Finance, Supply Chain, and Education. It is deployed by thousands of organizations worldwide across government, healthcare, universities, and large corporations.",
+    keyPoints:[
+      "PeopleSoft is a metadata-driven ERP — objects are defined in App Designer, not hardcoded",
+      "8 major product lines covering HR, Finance, Supply Chain, Campus, CRM, and more",
+      "Applications are built on top of PeopleTools — the development and runtime layer",
+      "Deployed on-premise, hosted, or on Oracle Cloud Infrastructure (OCI)",
+      "Runs on Oracle DB, Microsoft SQL Server, or IBM DB2",
+    ],
+    sections:[
+      {
+        title:"What is PeopleSoft?",
+        body:`PeopleSoft is not a single application — it is a platform. At its core is a technology layer called PeopleTools, on top of which Oracle has built multiple enterprise application suites. When someone says they "use PeopleSoft," they typically mean their organization runs one or more of these application suites.
+
+What makes PeopleSoft fundamentally different from traditional software is how it is built. In conventional software, developers write code that produces HTML pages, SQL statements, and business logic. In PeopleSoft, developers define metadata — objects like Records, Pages, and Components — using a tool called Application Designer. The PeopleSoft runtime engine reads this metadata and builds the actual pages, generates SQL, and enforces business rules at runtime.
+
+This means that when you look at a PeopleSoft page in your browser, you are not looking at static HTML files. You are looking at dynamically generated output produced by the Component Processor interpreting metadata stored in the database.`,
+      },
+      {
+        title:"The 8 PeopleSoft Product Lines",
+        body:`PeopleSoft is organized into 8 major product lines, each covering a different business domain:
+
+**1. Human Capital Management (HCM)**
+The most widely deployed PeopleSoft product. Manages the complete employee lifecycle: recruiting and onboarding, job data and position management, compensation and benefits, payroll processing, time and labor, absence management, and talent management. The core record is the employee (identified by EMPLID).
+
+**2. Financial Supply Chain Management (FSCM)**
+Covers all financial operations: General Ledger, Accounts Payable, Accounts Receivable, Asset Management, Purchasing, Inventory, Project Costing, and Billing. Financial data is organized using ChartFields (Account, Department, Business Unit, etc.).
+
+**3. Campus Solutions (CS)**
+Built specifically for higher education institutions. Manages student admissions, enrollment, scheduling, financial aid, student accounts, and academic records. Used by universities worldwide.
+
+**4. Enterprise Learning Management (ELM)**
+Online learning delivery, instructor-led training, certification tracking, and learning content management.
+
+**5. Customer Relationship Management (CRM)**
+Customer data management, service requests, help desk, and field service operations.
+
+**6. Enterprise Performance Management (EPM)**
+Business intelligence, analytics, budgeting, and financial reporting.
+
+**7. Supplier Relationship Management (SRM)**
+Procurement, sourcing, supplier contracts, and vendor management.
+
+**8. Supply Chain Management (SCM)**
+Inventory, order management, logistics, manufacturing, and demand planning.`,
+      },
+      {
+        title:"Why Organizations Choose PeopleSoft",
+        body:`Organizations choose PeopleSoft for several key reasons:
+
+**Deep configurability:** Unlike SaaS-only ERP systems, PeopleSoft allows organizations to build entirely custom objects, extend any delivered functionality, and configure the system to match their unique business processes.
+
+**Robust security model:** The multi-level security framework (users, roles, permission lists, row-level security) is battle-tested across government agencies and large enterprises with complex organizational structures.
+
+**On-premise or cloud flexibility:** Organizations that cannot or choose not to move to pure SaaS can still run PeopleSoft on their own infrastructure or on Oracle Cloud Infrastructure (OCI) while maintaining full control over their data and customizations.
+
+**Proven at scale:** PeopleSoft handles payroll for hundreds of thousands of employees in single implementations. It processes billions of financial transactions annually across its installed base.
+
+**However, PeopleSoft is complex.** The steep learning curve is real. Organizations need skilled technical consultants and developers to implement, maintain, and extend PeopleSoft. This complexity is precisely why PeopleSoft specialists command strong salaries and why there is consistent demand for those who truly understand the platform.`,
+      },
+    ],
+  },
+  {
+    id:"peopletools", module:0, num:"03",
+    title:"PeopleTools Overview",
+    summary:"PeopleTools is the complete development, administration, and runtime platform that powers every PeopleSoft application. All PeopleSoft applications — HCM, FSCM, Campus Solutions — are built, deployed, and maintained using PeopleTools.",
+    keyPoints:[
+      "PeopleTools is the foundation layer — HCM, FSCM, and all PS apps sit on top of it",
+      "Application Designer is the primary development IDE — Windows client only",
+      "Every PS object (records, pages, PeopleCode) is stored as metadata in the database",
+      "PeopleTools has its own version number separate from the application version",
+      "PT 8.53+ = Fluid UI · PT 8.55+ = Elasticsearch, Activity Guides, Event Mapping",
+    ],
+    sections:[
+      {
+        title:"What is PeopleTools?",
+        body:`PeopleTools is Oracle's proprietary development platform that sits underneath every PeopleSoft application. When you develop in PeopleSoft, you are always working inside PeopleTools. It provides all the development tools, runtime services, security infrastructure, and integration capabilities that PeopleSoft applications rely on.
+
+Think of PeopleTools as the operating system and PeopleSoft HCM or FSCM as the applications running on top of it. PeopleTools handles everything that is not specific to HR or Finance — the page rendering engine, the PeopleCode interpreter, the database communication layer, the security framework, and the integration platform.
+
+This separation means that Oracle can improve PeopleTools independently of the application — which is why a company can run HCM 9.2 on PeopleTools 8.57 or 8.60. PeopleTools upgrades bring new technology capabilities (like Fluid UI or Elasticsearch) without requiring an application upgrade.`,
+      },
+      {
+        title:"Core Tools Inside PeopleTools",
+        body:`PeopleTools contains a comprehensive set of development and administration tools:
+
+**Application Designer** — The primary IDE for all PeopleSoft development. A Windows desktop application that connects directly to the database. Used to create and modify Records, Fields, Pages, Components, Menus, PeopleCode, Application Packages, and many other object types. All objects created here are stored as metadata in the database.
+
+**PeopleCode** — The proprietary event-driven scripting language used to write business logic. Resembles a combination of Java and BASIC. Runs server-side within the Tuxedo App Server.
+
+**Application Engine (AE)** — Batch processing framework for large-scale data processing jobs. Runs outside the Component Processor and is managed by Process Scheduler.
+
+**Integration Broker (IB)** — Enterprise messaging platform for real-time and asynchronous integrations. Supports REST, SOAP, and internal PeopleSoft messaging.
+
+**PS Query / Query Manager** — Visual ad-hoc reporting tool that generates SQL. End users can build reports without writing code.
+
+**BI Publisher** — Oracle's formatted reporting engine. Separates data (from PS Query) from layout (RTF/Excel template) to produce PDF, Excel, HTML, and CSV output.
+
+**Data Mover** — Utility for migrating data between PeopleSoft environments using .DMS script files.
+
+**Process Scheduler** — Manages all batch job execution — application engines, SQR reports, BI Publisher reports, and COBOL programs.
+
+**Security Administrator** — Manages user profiles, roles, permission lists, and row-level security.
+
+**Approval Workflow Engine (AWE)** — Configurable workflow routing framework for transaction approvals.`,
+      },
+      {
+        title:"PeopleTools Versioning — Why It Matters",
+        body:`PeopleTools has its own version numbering that is completely separate from the application version. Understanding this distinction is critical.
+
+Example: A company might run **HCM 9.2** (the application) on **PeopleTools 8.59** (the development platform). The "9.2" refers to the PeopleSoft HCM feature set. The "8.59" determines which development and runtime capabilities are available.
+
+**Key version milestones:**
+- PT 8.52: Search Framework introduced (Verity engine)
+- PT 8.53: Fluid UI introduced — responsive HTML5 pages
+- PT 8.54: REST service support added to Integration Broker
+- PT 8.55: Elasticsearch replaces Verity, Activity Guides, Event Mapping
+- PT 8.56: Chatbot framework, Enhanced Fluid Navigation
+- PT 8.57: Improved Fluid Homepages and Tiles
+- PT 8.58: Drop Zone framework for customizations
+- PT 8.59: WebLogic only for web server, Oracle JET updates
+- PT 8.60+: Oracle Cloud Infrastructure enhancements, AI capabilities
+
+Why this matters in practice: if a developer writes documentation saying "use Event Mapping for this customization," that feature only exists in PT 8.55+. A client running PT 8.53 cannot use it. Always check what PeopleTools version your environment runs before implementing any solution.`,
+        pbLink:{title:"PeopleTools: Getting Started with PeopleTools", url:"https://docs.oracle.com/en/applications/peoplesoft/peopletools/index.html"},
+      },
+    ],
+  },
+  {
+    id:"glossary", module:0, num:"04",
+    title:"PeopleSoft Terminology Glossary",
+    summary:"PeopleSoft has its own vocabulary. Before you can read documentation, ask questions, or understand any tutorial, you need to know what these terms actually mean. This glossary covers the most essential PeopleSoft-specific terms you will encounter immediately.",
+    keyPoints:[
+      "EMPLID — the unique identifier for every employee across all PeopleSoft HCM records",
+      "Business Unit — the primary organizational unit for Finance (FSCM) data segregation",
+      "SetID — controls which setup/reference tables apply to each Business Unit",
+      "Effective Date (EFFDT) — PeopleSoft's mechanism for storing historical changes over time",
+      "Run Control — the record used to pass parameters to batch processes",
+    ],
+    sections:[
+      {
+        title:"People & HR Terminology",
+        body:`**EMPLID (Employee ID)**
+The unique identifier assigned to each employee in PeopleSoft HCM. Every HR table that holds employee data uses EMPLID as a primary key. It is typically a system-generated number but can be alphanumeric. One person always has one EMPLID, even if they hold multiple jobs.
+
+**EMPL_RCD (Employee Record Number)**
+Some employees have more than one concurrent employment (e.g., a professor who also works in administration). Each employment is tracked as a separate Employee Record, numbered 0, 1, 2, etc. EMPLID + EMPL_RCD together uniquely identify a single job.
+
+**Action / Action Reason**
+Every change to an employee's job record is recorded with an Action code (HIR = Hire, TER = Termination, PRO = Promotion, PAY = Pay Rate Change) and an Action Reason code (explains the why). This is how PeopleSoft tracks the complete story of every personnel change.
+
+**Position**
+A budgeted slot in the organization that can be filled by an employee. Positions belong to departments, have job codes, and carry salary grade information. Position Management links HR to Finance by connecting headcount to budget.
+
+**ChartField**
+The accounting code structure used in FSCM. Common ChartFields include Account, Department, Business Unit, Fund Code, Program Code, and Project. Every financial transaction is stamped with ChartField values that determine how it is recorded in the General Ledger.`,
+      },
+      {
+        title:"Technical Terminology",
+        body:`**Record**
+In PeopleSoft, "record" does not mean a row of data — it means the metadata definition of a table or view. A Record definition in Application Designer becomes a physical database table (prefixed with PS_) when built. So the Record named JOB becomes the database table PS_JOB.
+
+**Component Buffer**
+The in-memory data structure that holds all data for the current transaction. When a user opens a page, the Component Processor loads data from the database into the Component Buffer. PeopleCode reads and writes to this buffer. Only when the user saves does the buffer write back to the database.
+
+**Run Control**
+A record used to store and pass parameters to batch processes. When a user submits a report or AE program, they first enter their parameters (date range, department, etc.) on a Run Control page, save them, and then submit the process. The process reads those saved parameters from the Run Control table.
+
+**Meta-SQL**
+PeopleSoft-specific SQL functions that are database-independent. Instead of writing Oracle-specific date functions, developers write %CurrentDateIn and PeopleSoft translates it to the correct syntax for Oracle, SQL Server, or DB2 at runtime. This is what makes PeopleSoft code portable across databases.
+
+**Project (in App Designer)**
+A container that groups related PeopleSoft objects for migration between environments. When a developer finishes work in DEV, they add all changed objects to a Project and migrate it to QA or PROD. Projects are the unit of change management.
+
+**PUM Image**
+PeopleSoft Update Manager Image — a virtual machine snapshot containing cumulative PeopleSoft code fixes and new features. Organizations use PUM to selectively apply updates to their system without a traditional upgrade. Released quarterly by Oracle.`,
+      },
+      {
+        title:"Architecture Terminology",
+        body:`**PIA (PeopleSoft Internet Architecture)**
+The complete three-tier web architecture that powers PeopleSoft. Browser communicates with WebLogic web server, which communicates with Tuxedo App Server, which communicates with the database.
+
+**Domain**
+An instance of the Tuxedo Application Server or Process Scheduler. A single PeopleSoft environment typically has one App Server domain and one Process Scheduler domain, though high-availability setups can have multiple domains for load balancing.
+
+**JOLT**
+Java Object Linking and Transactions — the proprietary protocol used by WebLogic to communicate with the Tuxedo App Server. The JOLT port (typically 9000) is the connection point between the web tier and the application tier.
+
+**PSAPPSRV**
+The core Application Server process in Tuxedo. Handles component buffer operations, PeopleCode execution, and SQL generation. Multiple PSAPPSRV processes run simultaneously to handle concurrent user requests.
+
+**DPK (Deployment Package)**
+A PeopleSoft Deployment Package is a set of scripts and configuration files used to automate the installation and configuration of PeopleSoft environments. DPKs use Puppet for configuration management and are the standard way to set up both on-premise and cloud environments since PeopleTools 8.55.`,
+      },
+    ],
+  },
+  /* ── MODULE 2 ── */
+  {
+    id:"architecture", module:1, num:"05",
+    title:"PeopleSoft Architecture (PIA)",
+    summary:"PeopleSoft Pure Internet Architecture (PIA) is the three-tier web architecture that has powered PeopleSoft since version 8. Every user interaction flows through three tiers — browser, application server, and database — with each tier having a distinct role.",
+    keyPoints:[
+      "Browser ↔ WebLogic (HTTP/HTTPS) ↔ Tuxedo App Server (JOLT) ↔ Database (SQL)",
+      "No business logic runs in the browser — all PeopleCode executes in the App Server",
+      "Tuxedo manages multiple server processes: PSAPPSRV, PSQRYSRV, PSSAMSRV",
+      "2-tier = App Designer connects directly to DB · 3-tier = via App Server",
+      "Process Scheduler runs batch jobs asynchronously — decoupled from user sessions",
+    ],
+    sections:[
+      {
+        title:"The Three-Tier Architecture in Detail",
+        diagram:"pia",
+        body:`PeopleSoft's architecture is built on three clearly separated tiers, each with a specific responsibility:
+
+**Tier 1 — Web Tier (Oracle WebLogic)**
+The web tier is the entry point for all browser-based access. Oracle WebLogic Server hosts PeopleSoft's Java-based web application (PIA). When a user navigates to the PeopleSoft URL, their browser communicates with WebLogic over HTTP or HTTPS.
+
+WebLogic's role is purely presentational — it receives requests, routes them to the App Server, receives responses, and sends HTML back to the browser. It contains no business logic of its own. As of PeopleTools 8.59, Oracle WebLogic is the only supported web server.
+
+**Tier 2 — Application Tier (Oracle Tuxedo)**
+This is the brain of PeopleSoft. The Application Server runs on Oracle Tuxedo, a powerful middleware platform originally developed by BEA Systems and acquired by Oracle. Tuxedo manages a pool of server processes that handle user requests.
+
+Key App Server processes:
+- PSAPPSRV — handles page builds, PeopleCode execution, Component Processor operations
+- PSQRYSRV — dedicated to PS Query execution
+- PSSAMSRV — handles security validation (sign-on, permission checks)
+- PSQCKSRV — handles fast, read-only component operations
+- PSRENSRV — handles report distribution
+
+**Tier 3 — Database Tier**
+All PeopleSoft data lives in the relational database. This includes both application data (actual business data like employee records, journal entries) and PeopleTools metadata (the definitions of records, pages, components, and PeopleCode programs stored as data in system tables).
+
+PeopleSoft supports Oracle Database, Microsoft SQL Server, IBM DB2, and in recent versions, PostgreSQL.`,
+        pbLink:{title:"PeopleTools: System and Server Administration — PIA Overview", url:"https://docs.oracle.com/en/applications/peoplesoft/peopletools/index.html"},
+      },
+      {
+        title:"2-Tier vs 3-Tier Connection Mode",
+        body:`PeopleSoft supports two connection modes for Application Designer — and understanding the difference matters for developers:
+
+**2-Tier Mode (Direct DB Connection)**
+Application Designer connects directly to the database without going through the App Server. This is the most common mode for developers because it is simpler to set up. Drawbacks: some features are only available in 3-tier mode, and direct DB connections carry higher risk.
+
+In 2-tier, the connection uses standard database drivers (ODBC for SQL Server, native Oracle client for Oracle DB). The developer's workstation needs direct network access to the database server.
+
+**3-Tier Mode (Via App Server)**
+Application Designer connects to the App Server using the JOLT protocol, which then connects to the database. This adds a security layer and enables certain features (like the ability to test PeopleCode that calls PSAPPSRV-specific functions). 3-tier mode is required for environments where direct database access is restricted (common in tightly controlled production environments).
+
+To configure 3-tier, developers use PeopleSoft Configuration Manager to specify the App Server hostname, JOLT port, and domain name.`,
+      },
+      {
+        title:"Process Scheduler Architecture",
+        body:`Batch processing in PeopleSoft runs through a separate component called Process Scheduler (also known as PSPRCSRV). Process Scheduler is decoupled from the web/app server infrastructure, which is essential for running long batch jobs without affecting online user performance.
+
+**How it works:**
+1. A user submits a process request from the browser (e.g., runs a payroll calculation)
+2. A row is inserted into the PS_PRCSRQST (Process Request) table with status "Queued"
+3. The Process Scheduler daemon monitors this table and picks up queued requests
+4. The process executes on the batch server (could be the same machine or a dedicated server)
+5. Upon completion, the Distribution Agent moves output files to Report Repository
+6. The user views their report output in Report Manager
+
+**Process Monitor** — The browser-based tool where users and admins monitor process status in real-time. Shows current status (Queued, Initiated, Processing, Success, No Success, Error) and provides links to logs and output files.
+
+**Distribution Agent (PSDSTSRV)** — Transfers completed report files from the batch server to the Report Repository web server, making them accessible to users.`,
+      },
+    ],
+  },
+  {
+    id:"oci", module:1, num:"06",
+    title:"PeopleSoft Cloud & OCI Setup",
+    summary:"PeopleSoft can run on Oracle Cloud Infrastructure (OCI) as well as traditional on-premise servers. Oracle provides automated deployment tools — DPK and PUM — that simplify both initial setup and ongoing maintenance.",
+    keyPoints:[
+      "OCI = Oracle Cloud Infrastructure — Oracle's cloud platform for running PeopleSoft",
+      "DPK (Deployment Package) = automated install scripts using Puppet — standard from PT 8.55+",
+      "PUM (PeopleSoft Update Manager) = selective patching via PeopleSoft Image virtual machines",
+      "PeopleSoft Image = an Oracle VirtualBox VM with pre-built, fully configured PS environment",
+      "Cloud Manager = Oracle's PaaS tool for managing PS environments on OCI",
+    ],
+    sections:[
+      {
+        title:"Why Cloud for PeopleSoft?",
+        body:`PeopleSoft has traditionally been an on-premise application — organizations install and maintain it on their own servers. Oracle Cloud Infrastructure now provides an alternative that reduces infrastructure management overhead while preserving the full PeopleSoft feature set.
+
+Key benefits of running PeopleSoft on OCI:
+- **No hardware management** — Oracle handles the physical infrastructure
+- **Elastic scaling** — add capacity during peak periods (e.g., open enrollment, year-end payroll)
+- **Oracle support integration** — direct connection to Oracle's support infrastructure
+- **PeopleSoft Cloud Manager** — automated lifecycle management tool for OCI-hosted environments
+
+Important distinction: PeopleSoft on OCI is NOT the same as Oracle HCM Cloud (Fusion). Organizations running PeopleSoft on OCI still run their own PeopleSoft instance with all their customizations intact. They simply run it on Oracle's cloud hardware instead of their own.`,
+      },
+      {
+        title:"DPK — Deployment Package",
+        body:`Starting with PeopleTools 8.55, Oracle standardized PeopleSoft installation using Deployment Packages (DPKs). A DPK is a collection of scripts and configuration files that automate the entire installation and configuration of a PeopleSoft environment.
+
+DPKs use Puppet (an infrastructure automation tool) to define the desired state of the environment. Running the DPK setup script will install the web server, configure WebLogic, set up Tuxedo, apply PeopleTools, and configure the environment — all automatically.
+
+**Types of DPKs:**
+- **PeopleTools DPK** — installs and configures the PeopleTools technology stack (WebLogic, Tuxedo, App Server, Web Server)
+- **Application DPK** — installs the PeopleSoft application layer (HCM, FSCM, CS, etc.)
+- **Update DPK** — applies PUM patches and updates
+
+Before DPKs, PeopleSoft installation was a multi-day manual process. DPKs have reduced initial setup to hours, making it practical for organizations to build and rebuild environments quickly.`,
+      },
+      {
+        title:"PUM — PeopleSoft Update Manager",
+        body:`PeopleSoft Update Manager (PUM) replaced the old bundle patching model starting around 2014. Instead of waiting for quarterly bundles and applying everything at once, PUM allows organizations to selectively adopt individual fixes and features from a PeopleSoft Image.
+
+**PeopleSoft Image:**
+A PeopleSoft Image is an Oracle VirtualBox virtual machine (VM) that comes pre-built with all PeopleTools patches, application fixes, and new features up to a certain point. Oracle releases new Images regularly (typically every 3-4 months for each product line).
+
+Organizations use the Image as a "source" of updates. They connect their production system to the Image, browse available updates through the PUM interface, select exactly what they want, and generate a Change Package to apply to their environment.
+
+**The PUM workflow:**
+1. Download the latest PeopleSoft Image from Oracle's support site
+2. Load the Image into Oracle VirtualBox or OCI
+3. Connect your environment to the Image via PUM
+4. Browse and select updates in the PUM browser interface
+5. Generate and apply the Change Package to your environment
+6. Test and deploy
+
+This approach gives organizations much finer control over what changes they take. A team can apply only the critical security fixes without taking the new UI features they haven't tested yet.`,
+        pbLink:{title:"PeopleSoft Update Manager — Oracle Documentation", url:"https://docs.oracle.com/cd/F28299_01/pt857pbr3/eng/pt/tpum/concept_PeopleSoftUpdateManagerOverview-0750d5.html"},
+      },
+    ],
+  },
+  /* ── MODULE 3 ── */
+  {
+    id:"nav-ui", module:2, num:"07",
+    title:"PeopleSoft Navigation & User Interface",
+    summary:"Before developing in PeopleSoft, you need to understand how to use it as a user. PeopleSoft has two distinct UI paradigms — Classic (the older fixed-width interface) and Fluid (the modern responsive interface introduced in PT 8.53).",
+    keyPoints:[
+      "Classic UI = fixed-width, desktop-only, gray interface — still used in many organizations",
+      "Fluid UI = responsive HTML5, works on mobile/tablet, modern design — standard from PT 8.53+",
+      "NavBar = the slide-out navigation panel in Fluid with Recent Places, Favorites, Navigator",
+      "Homepages = Fluid landing pages with tiles — each tile links to a component",
+      "Breadcrumbs in Fluid show users where they are in the navigation hierarchy",
+    ],
+    sections:[
+      {
+        title:"Classic vs Fluid Interface",
+        body:`PeopleSoft has two visual modes that users might encounter depending on their organization's PeopleTools version and configuration:
+
+**Classic Interface**
+The original PeopleSoft web interface introduced with PIA in PeopleSoft 8 (2000). It uses fixed-width HTML tables, produces a distinctive gray-and-blue look, and works best on desktop browsers. Classic pages cannot adapt to different screen sizes — they look the same on a 27-inch monitor and a 13-inch laptop.
+
+Navigation in Classic uses a hierarchical menu bar at the top. Users click through menus and sub-menus to reach components. The "bread and butter" of PeopleSoft for over a decade.
+
+**Fluid Interface**
+Introduced in PeopleTools 8.53 (2013), Fluid completely redesigned how PeopleSoft looks and feels. Fluid pages use responsive HTML5 and CSS3 that adapts to any screen size — desktop, tablet, or smartphone. The visual design is modern and clean.
+
+Fluid uses Homepages with Tiles, a slide-out NavBar for navigation, and a more intuitive user experience. Oracle has committed to building all new functionality in Fluid and is progressively migrating Classic components to Fluid.
+
+Many organizations run both — some components have been migrated to Fluid while others remain Classic. Users may see both interfaces within the same PeopleSoft session.`,
+      },
+      {
+        title:"Fluid Navigation — Homepages, Tiles & NavBar",
+        body:`**Homepages**
+The Fluid landing page after login. A Homepage displays a collection of Tiles — large clickable buttons that link to components or show dynamic data. Users can have multiple Homepages (like tabs) for different roles. Example: an HR manager might have a "Manager Self Service" homepage with tiles for team approvals, leave requests, and job changes.
+
+Administrators configure which Tiles appear on each Homepage. Tiles can show dynamic counts (e.g., "3 pending approvals") using Tile Wizards that query live data.
+
+**NavBar (Navigation Bar)**
+The slide-out navigation panel opened by clicking the hamburger menu icon. Contains:
+- **Recent Places** — last 10 pages visited
+- **Favorites** — user-bookmarked pages
+- **Navigator** — a browsable tree of all accessible components, organized by category
+- **Classic Menu** — (when Classic navigation is enabled) the traditional menu hierarchy
+
+**Breadcrumbs**
+Fluid automatically generates breadcrumb navigation showing where the user is in the portal hierarchy. Clicking a breadcrumb navigates back up the tree.
+
+**Search Bar**
+If Elasticsearch is configured, a Global Search bar appears in the header. Users can type any name, ID, or description and get results across all PeopleSoft modules they have access to.`,
+      },
+      {
+        title:"Working with Components — A User's View",
+        body:`When a user navigates to a PeopleSoft component, they typically encounter a Search Page first:
+
+**The Search Page**
+Before seeing any data, the user must search for existing records or indicate they want to add a new one. The search page shows fields defined as Search Keys in the component's Search Record. For example, navigating to "Employee Job Data" shows a search page with fields for Employee ID, Name, or Department.
+
+**Search Results**
+After submitting search criteria, PeopleSoft displays a list of matching rows. Each row shows the List Box Item fields. The user clicks a row to open that record in the component.
+
+**The Component**
+Once a record is selected, the component opens showing one or more page tabs (folder tabs). The user can navigate between tabs — all tabs share the same data buffer and save together. Common examples: the Job Data component has tabs for Work Location, Job Information, Compensation, and Employment.
+
+**Toolbar buttons** at the bottom: Save, Return to Search, Next in List, Previous in List, Notify (sends a workflow notification).
+
+**Action Modes**
+Components can be accessed in different modes: Add (create a new record), Update/Display (view and edit existing data), Update Display All (see all historical rows), Correction (fix historical data). The available modes depend on the user's permission list.`,
+      },
+    ],
+  },
+  {
+    id:"menus", module:2, num:"08",
+    title:"Menus & Navigation",
+    summary:"Navigation in PeopleSoft defines how users find and access components. Understanding both Classic menu structure and Fluid Portal Registry is essential — both as a user and as a developer registering new components.",
+    keyPoints:[
+      "Classic nav: Root Menu → Menu → Bar Name → Item → Component",
+      "Fluid nav: Portal Registry of Content References (CREFs) organized in a hierarchy",
+      "Every component must be registered (as a CREF) to appear in navigation",
+      "Permission Lists control which CREFs (navigation items) a user can see and access",
+      "Tiles on Fluid Homepages are CREFs with an image and optional dynamic count",
+    ],
+    sections:[
+      {
+        title:"Classic Menu Structure",
+        body:`In Classic PeopleSoft, navigation is structured as a four-level hierarchy:
+
+1. **Root Menu** — the top-level navigation (e.g., "Main Menu")
+2. **Menu Bar** — second level (e.g., "Workforce Administration")
+3. **Menu Item / Bar Name** — third level (e.g., "Job Information")
+4. **Component Link** — the actual component (e.g., "Job Data")
+
+Developers register components into this hierarchy in Application Designer by creating Menu objects and associating components with menu items. The menu definition also specifies which action modes are available (Add, Update, Display).
+
+This classic menu system still works in PT 8.55+ when Classic navigation is enabled. Many organizations run in a mixed mode where the Fluid NavBar is the primary navigation but Classic menu paths still work via bookmarks and direct URLs.
+
+**Classic Navigation URL format:**
+PeopleSoft classic pages are accessed via URLs like:
+\`/psp/ps/EMPLOYEE/HRMS/c/ROLE_EMPLOYEE.JOB_DATA.GBL\`
+Where HRMS is the database name, c/ indicates a component, ROLE_EMPLOYEE is the menu, JOB_DATA is the component name, and GBL is the market.`,
+      },
+      {
+        title:"Fluid Portal Registry & Content References",
+        body:`Fluid navigation replaces the classic menu with a Portal Registry. Every navigable item in Fluid is a Content Reference (CREF) — a pointer to a component with its URL, label, and access properties.
+
+**Content Reference (CREF)**
+A CREF defines:
+- The target component (or URL for external links)
+- The display label shown in navigation
+- The folder/category it lives in
+- Security settings (which permission lists can see it)
+- Tile configuration (if it appears as a tile on a Homepage)
+
+**Portal Registry Structure**
+CREFs are organized in a folder hierarchy in the Portal Registry. This hierarchy determines how items appear in the NavBar Navigator. For example:
+- Portal Root → PeopleSoft Menu → Workforce Administration → Job Information → Job Data
+
+**Registering a New Component**
+When a developer creates a new component in Application Designer, they must:
+1. Open Portal → Structure & Content in the browser
+2. Create a new Content Reference pointing to the component
+3. Place it in the appropriate folder in the Registry
+4. Set security (which permission lists can access it)
+5. Optionally create a Tile definition if it should appear on a Homepage
+
+A component that is not registered in the Portal Registry cannot be navigated to by users — it simply won't appear anywhere. This is one of the most common mistakes new PeopleSoft developers make.`,
+      },
+    ],
+  },
+  {
+    id:"pages-components", module:2, num:"09",
+    title:"Pages & Components",
+    summary:"Pages define the user interface layout. Components group one or more pages into a transaction. Together, they form the front-end layer of PeopleSoft — what users actually see and interact with.",
+    keyPoints:[
+      "Pages are metadata layouts — not HTML — rendered into HTML by the App Server at runtime",
+      "Every field on a page must be bound to a Record.Field — no free-floating data",
+      "A Component groups pages into a single transaction — all pages save together",
+      "Grids display child rows (one-to-many data) — they replaced older Scroll Areas",
+      "Sub Pages are reusable page fragments embedded across multiple pages",
+    ],
+    sections:[
+      {
+        title:"Pages — Layout & Controls",
+        body:`A Page in PeopleSoft is the visual layout definition. You design pages in Application Designer by dragging and dropping controls onto a canvas. Pages are not HTML files — they are metadata stored in the database. The PeopleSoft App Server reads this metadata and generates the HTML that the browser displays.
+
+**Page Controls — the building blocks of every page:**
+
+- **Edit Box** — A text input field. Must be bound to a Record.Field (e.g., JOB.DEPTID). Validates against a prompt table or translate values if configured.
+- **Drop Down List** — A select box populated from Translate Values or a prompt table.
+- **Long Edit Box** — A textarea for long text entry (bound to a Long Character field).
+- **Check Box** — A boolean toggle. Bound to a Character field that stores 'Y' or 'N'.
+- **Radio Button** — For mutually exclusive options.
+- **Push Button / Hyperlink** — Triggers a PeopleCode FieldChange event or navigates elsewhere.
+- **Grid** — Displays multiple child rows of data (the modern replacement for Scroll Areas). Each row in the grid corresponds to a row in a child record. Grids support sorting, filtering, and pagination.
+- **Scroll Area** — The older control for displaying child record rows. Still seen in legacy Classic pages.
+- **Sub Page** — Embeds another page's controls inside this page. Used for common field groups shared across pages (e.g., address fields, effective date section).
+- **Group Box** — A visual border that groups related fields. No data binding — purely cosmetic organization.
+- **Static Text / Image** — Decorative text or images with no data binding.`,
+      },
+      {
+        title:"Components — The Transaction Unit",
+        body:`A Component is the unit of work in PeopleSoft. It groups one or more related pages into a single transaction. The defining characteristic of a component is that all pages share the same data buffer and save together as one atomic operation.
+
+**Component structure defined in App Designer:**
+
+1. **Component Properties**
+   - Search Record — the record used to build the search dialog
+   - Add Search Record — separate search record for Add mode
+   - Action modes — which modes are allowed (Add, Update, Display, Update All, Correction)
+
+2. **Component Pages**
+   - The ordered list of pages in the component
+   - Each page appears as a tab in the browser
+   - Tab order can be configured
+   - Pages can be hidden using PeopleCode based on business conditions
+
+3. **Component PeopleCode**
+   - PostBuild, PreBuild, SearchInit, SearchSave, SaveEdit, SavePreChange, SavePostChange
+   - These events fire at the component level, not the field level
+
+**Transaction Integrity**
+When a user saves a component, ALL data across ALL pages is validated and committed together. There is no partial save — either the entire transaction succeeds or none of it does. This is what makes the Component the logical unit of a business transaction.
+
+**Work Pages / Hidden Pages**
+Components can contain hidden pages that users never see. These are work pages backed by Derived/Work records. They store temporary values and intermediate calculations needed by PeopleCode but not relevant to the user.`,
+        pbLink:{title:"Application Designer Developer's Guide — Creating Pages and Components", url:"https://docs.oracle.com/cd/F70250_01/psft/pdf/pt860tapd-b092022.pdf"},
+      },
+    ],
+  },
+  {
+    id:"search-records", module:2, num:"10",
+    title:"Search Records & Add/Search Page",
+    summary:"Every component uses a Search Record to build the search dialog that users see before opening a transaction. Understanding how search records work — both from a user perspective and a developer perspective — is fundamental to PeopleSoft development.",
+    keyPoints:[
+      "Search Record defines the fields in the component's search dialog (which keys users can search)",
+      "Add Search Record can differ from Search Record — used when adding new entries",
+      "Search Key fields become search inputs · List Box Items become result columns",
+      "Alternate Search Keys create additional search paths without being in the primary key",
+      "Row-level security is often implemented by using a security view as the Search Record",
+    ],
+    sections:[
+      {
+        title:"What is a Search Record?",
+        body:`When a user navigates to any PeopleSoft component, they first see a Search Page — a form asking them to enter criteria to find the record they want. The fields on this Search Page are driven entirely by the component's Search Record definition.
+
+The Search Record is a regular PeopleSoft record definition — typically the same record as the component's primary (Level 0) record, or a SQL View that joins and filters data for searching purposes.
+
+**From the user's perspective:**
+The Search Page has fields corresponding to the Search Keys defined on the Search Record. The user enters values (partial Employee ID, a name, a department) and clicks Search. PeopleSoft generates a SQL SELECT against the Search Record with the entered criteria.
+
+**The Search Results list:**
+After searching, a list of matching rows appears. The columns shown in this list are the fields marked as List Box Items in the Search Record. The user clicks a row to load that record into the component.
+
+**Add Mode:**
+If the user clicks the "Add" button on the Search Page, PeopleSoft uses the Add Search Record (which may differ from the main Search Record). In Add mode, the user typically enters the key values for the new record they want to create.`,
+      },
+      {
+        title:"Search Key Types in App Designer",
+        body:`When defining fields on a record in Application Designer, you assign each field a "Use" property that determines its role:
+
+**Key (K)**
+A field that is part of the database primary key. All Key fields appear in the search dialog and are required for retrieving a specific row. PeopleSoft generates a clustered primary key index on Key fields.
+
+**Alternate Search Key (A)**
+Creates an additional search path that is not part of the primary key. For example, on the JOB record, EMPLID is the Key but you might also want to search by Name (stored in a different record). An Alternate Search Key creates a database index on that field to support efficient searching. Users see it as an optional search field.
+
+**List Box Item (L)**
+A field that appears as a column in the search results list. These help users identify which row they want to select. For example, searching for employees by department might show EMPLID, Name, Job Title, and Hire Date as List Box Items so users can distinguish between employees with similar names.
+
+**Search Key (S)**
+Appears as a searchable field in the dialog but does NOT create a database index. Used for fields that are either already indexed through another mechanism or where the search is acceptable without an index.
+
+**Performance implication:**
+Every field you mark as an Alternate Search Key or Search Key causes PeopleSoft to include that field in the WHERE clause when users enter values. If there is no supporting index, this causes a full table scan. Proper key design directly impacts the performance of the search dialog.`,
+      },
+      {
+        title:"Security Views as Search Records",
+        body:`One of the most important uses of custom Search Records is row-level security implementation. PeopleSoft's security framework allows you to restrict which data rows a user can see — not just which pages they can access.
+
+**How row-level security works through Search Records:**
+
+Instead of using the base SQL table as the Search Record, developers create a SQL View that joins the base table with a security join table. The security join table filters rows based on the user's security profile.
+
+Example: Instead of using PS_JOB as the search record for Job Data, use a view like PS_JOB_SRCH_VW that joins PS_JOB with PS_DEPT_SECURITY (a security view that only includes departments the current user is authorized to see).
+
+When a user searches for employees, the view's WHERE clause automatically filters out departments they don't have access to — without any PeopleCode needed.
+
+**This is a critical concept for developers** because forgetting to use a security view on a custom component that displays employee data means any user with access to that component can see all employee data regardless of their row-level security settings. This is a common security vulnerability in custom PeopleSoft development.`,
+        pbLink:{title:"Application Designer Developer's Guide — Defining Search Records", url:"https://docs.oracle.com/cd/F70250_01/psft/pdf/pt860tapd-b092022.pdf"},
+      },
+    ],
+  },
+  /* ── MODULE 4 ── */
+  {
+    id:"app-designer", module:3, num:"11",
+    title:"Application Designer Basics",
+    summary:"Application Designer (App Designer) is the primary development IDE for PeopleSoft. It is a Windows desktop application where developers create and manage all PeopleSoft objects — records, fields, pages, components, menus, and PeopleCode.",
+    keyPoints:[
+      "App Designer is a Windows-only client — must be installed on your development workstation",
+      "Connects to the PeopleSoft database (2-tier) or App Server (3-tier)",
+      "All PeopleSoft objects are metadata stored in DB — App Designer is just an editor for that metadata",
+      "Projects group related objects for migration between environments (DEV → QA → PROD)",
+      "Build → Current Object physically creates/alters the database table from record definition",
+    ],
+    sections:[
+      {
+        title:"The App Designer Interface",
+        body:`Application Designer opens with a workspace divided into several panels:
+
+**Project Workspace (left panel)**
+Shows a tree of all objects included in the current Project. Organized by object type — Records, Fields, Pages, Components, PeopleCode, etc. Double-clicking any object opens it in the Object Workspace.
+
+**Object Workspace (center panel)**
+The main editing area. Opens record definitions (showing field columns), page layouts (showing the drag-and-drop canvas), component definitions, and PeopleCode editors. Multiple objects can be open simultaneously as tabs.
+
+**Output Window (bottom panel)**
+Shows messages, errors, and results from operations like:
+- Compile errors when saving PeopleCode
+- Results from Find In / Find Object
+- SQL Build logs (when creating/altering tables)
+- Upgrade comparison results
+
+**Definition Properties panel**
+Context-sensitive properties for the currently selected object or field. Accessible via right-click on any object.
+
+**Sign-on**
+To open App Designer: Start → PeopleTools → Application Designer. At the sign-on dialog, enter:
+- Database Name (for 2-tier) or Application Server Name (for 3-tier)
+- User ID and Password (must have App Designer access in permission list)
+- Connection Type (Oracle, SQL Server, DB2, etc. for 2-tier)`,
+      },
+      {
+        title:"Projects — Organizing Your Work",
+        body:`A Project in Application Designer is a container that groups related objects for development and migration. Every developer should work within a named project from day one.
+
+**Creating a project:**
+File → New → Project. Give it a meaningful name following your organization's naming convention (e.g., "HCM_CUSTOM_HIRE_2025").
+
+**Adding objects to a project:**
+- Right-click on any object in the Object Workspace → Insert Into Project
+- Or drag objects from search results into the project tree
+- Or use Insert → Current Object to add the currently open object
+
+**Why projects matter — migration:**
+When you finish development in DEV, you migrate your changes to QA and eventually PROD. You do this by migrating the Project. The project contains all the objects you changed, ensuring nothing is missed or left behind.
+
+**Migration methods:**
+- **Copy To Database**: Directly copies objects from one DB to another (requires network connection to both)
+- **Export to File / Import from File**: Creates an export file (.PTP) that can be transported and imported
+- **Change Package**: The modern approach using PeopleSoft Update Manager to package and apply changes
+
+**Project naming best practices:**
+- Include a ticket or change request number
+- Include the date or release identifier
+- Use uppercase with underscores
+- Example: "CRP_CUSTOM_OB_2025Q1" for a customization related to onboarding in Q1 2025`,
+      },
+      {
+        title:"Creating Objects in App Designer — The Workflow",
+        body:`The typical development workflow in Application Designer follows a structured sequence. This is the same sequence Oracle uses to build PeopleSoft itself:
+
+**Step 1: Define Fields**
+Fields are defined globally — independent of any record. File → New → Field. Set the name, type (Character, Date, Number, etc.), and size. Because fields are global, the same field can be reused across hundreds of records. If you update the field's label, it updates everywhere.
+
+**Step 2: Define Records**
+File → New → Record. Add fields to the record by typing their names or searching. Set key properties for each field (Key, Search Key, List Box Item, etc.). Set the Record Type (SQL Table, SQL View, Derived/Work, etc.).
+
+For SQL Table records, you must physically build the table: Build → Current Object → Create Table. This runs the DDL against the database.
+
+**Step 3: Design Pages**
+File → New → Page. Drag controls from the control palette onto the canvas. Bind each control to a Record.Field by double-clicking and setting the record/field properties. Set tab order, group boxes, and page properties.
+
+**Step 4: Create Components**
+File → New → Component. Add pages to the component in order. Set the Search Record and Add Search Record. Configure action modes (Add, Update, Correction, etc.). Add component-level PeopleCode if needed.
+
+**Step 5: Register in Portal**
+Navigate in the browser to PeopleTools → Portal → Structure and Content. Create a Content Reference pointing to the new component. Assign to permission lists so authorized users can navigate to it.
+
+**Step 6: Write PeopleCode**
+Open the record or component in App Designer. Click the PeopleCode toolbar icon (or View → PeopleCode) to open the PeopleCode editor. Select the event and write code.`,
+        pbLink:{title:"Application Designer Developer's Guide — Creating Definitions", url:"https://docs.oracle.com/cd/F70250_01/psft/pdf/pt860tapd-b092022.pdf"},
+      },
+    ],
+  },
+  {
+    id:"records-fields", module:3, num:"12",
+    title:"Records & Fields",
+    summary:"Records and Fields are the foundation of PeopleSoft's data model. Every page, every component, and every line of PeopleCode ultimately reads from or writes to a Record. Understanding their types, properties, and relationships is the most critical foundation skill.",
+    keyPoints:[
+      "7 record types: SQL Table, SQL View, Dynamic View, Derived/Work, SubRecord, Query View, Temp Table",
+      "SQL Table records create physical database tables prefixed with PS_ (e.g., JOB → PS_JOB)",
+      "Derived/Work records exist only in memory — never create a DB object",
+      "Fields are defined globally — change the field definition once, it applies everywhere it's used",
+      "Key fields define the primary key; Alternate Search Keys create additional DB indexes",
+    ],
+    sections:[
+      {
+        title:"The 7 Record Types",
+        diagram:"recordtypes",
+        body:`Every Record in PeopleSoft has a type that determines how it behaves and whether it creates a database object:
+
+**1. SQL Table**
+The most common record type. Creates a physical database table named PS_<RECORDNAME> in the database. All application data lives here — PS_JOB, PS_PERSONAL_DATA, PS_DEPT_TBL. When you define a SQL Table record and run Build → Current Object → Create Table, PeopleSoft generates and executes the DDL to create the table.
+
+**2. SQL View**
+Creates a database view that joins data from one or more SQL Tables. Used for reporting, joining related data, and implementing row-level security. SQL Views are read-only — you can display data from a View but you cannot save to it directly.
+
+**3. Dynamic View**
+Similar to SQL View but the SQL is defined and resolved at runtime rather than being stored as a permanent database view. Used when the SQL needs to incorporate run-time information (like the current user's settings). Dynamic Views do not create any database object.
+
+**4. Derived/Work Record**
+Does NOT create any database object. Exists only in the component buffer during a transaction. Used for: computed/derived values shown on a page, push buttons that trigger PeopleCode, temporary values needed during processing, and Function Library programs. Fields in Derived/Work records never get saved to a table.
+
+**5. SubRecord**
+A reusable set of fields that can be embedded into other records. When you include a SubRecord in a record definition, PeopleSoft includes all of its fields in the parent record's table. SubRecords are used for common field groups — the most important example is EFFDT_SBR (containing EFFDT and EFFSEQ) which is included in hundreds of effective-dated records.
+
+**6. Query View**
+A record that is created and managed by PS Query. Primarily used when a PS Query result needs to be used as the source for another query.
+
+**7. Temporary Table**
+Used specifically by Application Engine for parallel batch processing. Multiple instances of a Temp Table can exist simultaneously in the database (e.g., MYTEMP_AET, MYTEMP_AET1, MYTEMP_AET2), allowing parallel AE processes to work on different data sets without interfering with each other.`,
+        pbLink:{title:"Application Designer Developer's Guide — Records & Fields", url:"https://docs.oracle.com/cd/F70250_01/psft/pdf/pt860tapd-b092022.pdf"},
+      },
+      {
+        title:"Field Types & Properties",
+        body:`Fields in PeopleSoft are defined at the global level before being added to records. This is fundamentally different from traditional database design where you define columns within a table. In PeopleSoft, a field like EMPLID exists as a standalone definition that is then referenced by every record that needs it.
+
+**Core Field Types:**
+
+- **Character** — Variable-length text. Most common. Can be up to 32,767 characters. Stored as VARCHAR or CHAR in the database depending on size settings.
+- **Long Character** — For large text blocks. Stored as CLOB (Character Large Object) in Oracle. Used for descriptions, notes, and text areas.
+- **Number** — Integer or decimal. Define the number of integer digits and decimal places.
+- **Signed Number** — Same as Number but allows negative values.
+- **Date** — Stores a date. Internally stored as CHAR(10) in YYYY-MM-DD format in PeopleSoft's system tables, but the database stores it natively as a DATE type.
+- **Time** — Stores a time of day (hours, minutes, seconds).
+- **DateTime** — Combined date and time value.
+- **Image** — Stores binary image data directly in the database.
+- **ImageReference** — Stores a reference (path/URL) to an image file rather than the image itself.
+
+**Why global field definitions matter:**
+If a field named DEPTID has a label "Department" and a maximum length of 10, that is true everywhere DEPTID appears across all 500 records that use it. If Oracle releases an update changing the DEPTID label to "Department ID," that change automatically flows to all pages, all search dialogs, and all reports that use DEPTID — without any developer work.`,
+      },
+    ],
+  },
+  {
+    id:"data-model", module:3, num:"13",
+    title:"PeopleSoft Data Model Basics",
+    summary:"PeopleSoft organizes data through a set of key structural concepts — Business Units, SetIDs, and TableSets — that allow a single PeopleSoft system to serve multiple organizations or business entities while sharing common setup data.",
+    keyPoints:[
+      "Business Unit = the primary organizing unit for transactions (company, division, institution)",
+      "SetID = controls which setup/reference tables apply to each Business Unit via TableSets",
+      "TableSet sharing allows multiple Business Units to share the same department or job code tables",
+      "Installation Table = the global configuration table for the entire PeopleSoft system",
+      "PS_ prefix = every application table · PSREC* / PSDBFIELD = PeopleTools metadata tables",
+    ],
+    sections:[
+      {
+        title:"Business Units — The Core Organizing Concept",
+        body:`A Business Unit is the fundamental organizational entity in PeopleSoft — particularly in FSCM (Finance). Every financial transaction is associated with a Business Unit. It represents a distinct part of an organization that maintains its own set of financial books.
+
+Examples of Business Units:
+- A holding company might have Business Units for each subsidiary
+- A university might have Business Units for different campuses
+- A government agency might have Business Units for different departments with separate budgets
+
+Business Units in HCM and FSCM serve slightly different purposes:
+
+**HCM Business Unit (HR Business Unit):**
+Groups employees for HR processing purposes. Pay groups, benefit programs, and regulatory compliance are configured at the Business Unit level.
+
+**FSCM Business Unit (GL Business Unit / AP Business Unit / etc.):**
+Each FSCM module has its own set of Business Units. The GL Business Unit is the core financial entity. AP, AR, and other modules have Business Units that must be linked to a GL Business Unit.
+
+**Why this matters for developers:**
+Many PeopleSoft tables have BUSINESS_UNIT as part of their primary key. When writing SQL or PeopleCode that queries financial tables, you must always include the Business Unit in your WHERE clause — otherwise you'll get data from all Business Units mixed together.`,
+      },
+      {
+        title:"SetIDs & TableSet Sharing",
+        body:`SetIDs are one of the most misunderstood PeopleSoft concepts for beginners. They solve a very specific problem: how do you let multiple Business Units share common reference data while still allowing each to have its own unique reference data when needed?
+
+**The problem SetIDs solve:**
+Imagine a company with 10 Business Units spread across 3 countries. They share the same Department codes and Job Codes, but each country has different Regulatory Regions and Pay Groups. Without SetIDs, you would either:
+- Duplicate all reference data for each Business Unit (wasteful, maintenance nightmare)
+- Force all Business Units to share all reference data (inflexible, can't accommodate differences)
+
+**How SetIDs work:**
+SetIDs are codes assigned to setup tables. Instead of reading "Department 10000 for Business Unit USA001," PeopleSoft reads "Department 10000 for SetID SHARE." Multiple Business Units can point to the same SetID, meaning they share that reference data.
+
+**TableSet Controls:**
+The link between Business Units and SetIDs is defined in TableSet Controls (PS_SET_CNTRL_TBL). For each Business Unit, you define which SetID to use for each record group. This allows:
+- Business Unit USA001 → Uses SetID SHARE for Department codes, SetID USA for Regulatory data
+- Business Unit GBR001 → Uses SetID SHARE for Department codes, SetID GBR for Regulatory data
+
+Both US and UK Business Units share the same Department structure but maintain separate regulatory configurations.`,
+      },
+      {
+        title:"PeopleSoft Database Structure",
+        body:`Understanding how PeopleSoft's database is organized helps you navigate it and write efficient queries.
+
+**Application Tables (PS_ prefix)**
+Every application data table in PeopleSoft starts with PS_. When you define a SQL Table record named JOB, the physical database table is PS_JOB. This prefix distinguishes PeopleSoft application tables from the database's own system tables.
+
+**PeopleTools Metadata Tables (PSREC*, PSDBFIELD, PSPNLFIELD, etc.)**
+PeopleTools stores its metadata — the definitions of all records, fields, pages, components, PeopleCode programs — in database tables that start with PS (no underscore) or PSTOOLS. Examples:
+- PSRECDEFN — record definitions
+- PSDBFIELD — field definitions
+- PSPNLDEFN — page definitions
+- PSPCMPROG — PeopleCode programs
+- PSPRCSRQST — Process Request table (all batch job requests)
+
+**System Tables (PSSTATUS, PSDBOWNER, etc.)**
+Installation-level information and database ownership tables.
+
+**The Installation Table:**
+PSOPTIONS and PS_INSTALLATION contain system-wide configuration settings: the PeopleTools version, enabled modules, base currency, default language, and many global settings. Developers and administrators frequently reference these tables.
+
+**A practical tip:**
+When you see a table name in PeopleSoft that starts with PS_ and is in ALL CAPS with underscores, it's an application data table. When you see PSREC*, PSPNL*, or PSPC*, you're looking at PeopleTools metadata. Learning to distinguish these quickly helps you understand whether you're looking at business data or system configuration.`,
+      },
+    ],
+  },
+  {
+    id:"effdt", module:3, num:"14",
+    title:"Effective Dating (EFFDT & EFFSEQ)",
+    summary:"Effective Dating is one of PeopleSoft's most distinctive and powerful concepts. Instead of overwriting data when something changes, PeopleSoft inserts a new row with a new Effective Date — preserving complete history. This pattern is used extensively throughout HCM and FSCM.",
+    keyPoints:[
+      "EFFDT (Effective Date) — the date from which a row is valid",
+      "EFFSEQ (Effective Sequence) — handles multiple changes on the same date, sequenced 0,1,2...",
+      "PeopleSoft always shows the 'current' row: max EFFDT where EFFDT <= today",
+      "Future-dated rows can be entered today and activate automatically on the specified date",
+      "Historical rows are never deleted — this enables retrospective reporting and retroactive payroll",
+    ],
+    sections:[
+      {
+        title:"The Problem Effective Dating Solves",
+        body:`Consider a simple employee salary record. In a traditional database, when an employee gets a raise, you update their salary record. The old salary is gone. You now have no record of what they earned before the raise. If auditors ask what the employee earned in Q1, you cannot answer.
+
+PeopleSoft solves this with Effective Dating. Instead of UPDATE, it does INSERT. Every change creates a new row with a new date. The old row remains permanently.
+
+**A real example with PS_JOB:**
+An employee is hired on January 1st as a Software Engineer with a salary of $80,000. On July 1st, they are promoted to Senior Software Engineer with a salary of $95,000.
+
+In the PS_JOB table, you would see:
+
+\`EMPLID   EFFDT       ACTION   JOBCODE   COMPRATE
+E12345   2025-01-01  HIR      SWENG     80000.000
+E12345   2025-07-01  PRO      SRSWENG   95000.000\`
+
+Both rows exist. The January row is not overwritten. PeopleSoft shows the July row as "current" because it has the latest EFFDT that is on or before today's date.
+
+If you run a headcount report for March 2025, PeopleSoft uses the January row — correctly reporting the employee as a Software Engineer at $80,000.`,
+      },
+      {
+        title:"How PeopleSoft Selects the Current Row",
+        body:`PeopleSoft uses a specific SQL pattern to retrieve the "current" effective-dated row. This pattern is fundamental and appears in hundreds of delivered queries and components.
+
+**Standard effective dating WHERE clause:**
+\`SELECT *
+FROM PS_JOB A
+WHERE A.EMPLID = :1
+AND A.EMPL_RCD = :2
+AND A.EFFDT = (
+    SELECT MAX(B.EFFDT)
+    FROM PS_JOB B
+    WHERE B.EMPLID = A.EMPLID
+    AND B.EMPL_RCD = A.EMPL_RCD
+    AND B.EFFDT <= %CurrentDateIn
+)
+AND A.EFFSEQ = (
+    SELECT MAX(C.EFFSEQ)
+    FROM PS_JOB C
+    WHERE C.EMPLID = A.EMPLID
+    AND C.EMPL_RCD = A.EMPL_RCD
+    AND C.EFFDT = A.EFFDT
+)\`
+
+This subquery pattern — "max EFFDT on or before today, then max EFFSEQ for that date" — is the universal PeopleSoft effective dating pattern.
+
+**EFFSEQ (Effective Sequence):**
+What happens if someone gets two changes on the same date? For example, a pay rate change AND a department transfer both effective July 1st? EFFSEQ handles this. The first change gets EFFSEQ=0, the second gets EFFSEQ=1. The most current row for a given date is the one with the highest EFFSEQ.`,
+        pbLink:{title:"PeopleSoft HCM: Understanding Effective Dates — PeopleBooks", url:"https://docs.oracle.com/cd/E17566_01/epm91pbr0/eng/psbooks/hrms/chapter.htm?File=hrms/htm/a_bs24ef.htm"},
+      },
+      {
+        title:"Future Dating & Historical Corrections",
+        body:`**Future Dating**
+PeopleSoft allows you to enter a row with a future effective date today. The row exists in the database right now but does not become "current" until its EFFDT is reached.
+
+Example: An employee's pay raise is approved today but effective on the first of next month. Enter it today with next month's date. Payroll processing will automatically use the new rate starting next month.
+
+This is extremely valuable for HR planning — you can enter an entire organizational restructuring in advance and it automatically activates on the planned date.
+
+**Viewing Historical Data**
+PeopleSoft components typically have an "Include History" toggle that shows all historical rows, not just the current one. In Job Data, enabling history shows every job action the employee ever had, in chronological order.
+
+**Correction Mode**
+PeopleSoft's Correction action mode allows authorized users to go back and change historical rows — for example, correcting a salary that was entered incorrectly for a past period. This is tightly controlled by security because retroactive changes can trigger payroll recalculations.
+
+**Why this matters for developers:**
+Any custom SQL or PeopleCode that queries effective-dated tables MUST include the effective dating WHERE clause. Forgetting it returns ALL rows for an employee — including historical ones — leading to duplicate data and incorrect results. This is one of the most common mistakes in custom PeopleSoft development.`,
+      },
+    ],
+  },
+  /* ── MODULE 5 ── */
+  {
+    id:"peoplecode", module:4, num:"15",
+    title:"PeopleCode Basics",
+    summary:"PeopleCode is PeopleSoft's proprietary event-driven programming language. It runs server-side within the Tuxedo App Server and is how all business logic, validations, defaults, and dynamic UI behavior is implemented.",
+    keyPoints:[
+      "PeopleCode is always attached to an event on a specific object — never standalone",
+      "Three variable scopes: Local (current program only), Component (entire transaction), Global (full session)",
+      "SQLExec = single-row SQL result · CreateSQL = multi-row loop iteration",
+      "RowInit fires for EVERY row loaded — avoid heavy SQL here (N+1 problem)",
+      "SaveEdit is the standard event for final business rule validation before save",
+    ],
+    sections:[
+      {
+        title:"PeopleCode Language Fundamentals",
+        body:`PeopleCode is a strongly typed, case-insensitive scripting language that resembles a hybrid of Java and Basic. All PeopleCode runs server-side within the Tuxedo Application Server — never in the browser.
+
+**Variable declaration and types:**
+\`/* All variables must be declared */
+Local String &emplId;
+Local Number &salary;
+Local Date &hireDate;
+Local Boolean &isActive;
+Local Record &recJob;
+Local Rowset &rsJob;
+Local Array of String &deptList;\`
+
+**Assignment and basic operations:**
+\`&emplId = "E12345";
+&salary = 75000;
+&hireDate = %Date;  /* %Date = today's date */
+&isActive = True;\`
+
+**Conditional logic:**
+\`If &salary > 50000 Then
+   &grade = "Senior";
+Else
+   &grade = "Junior";
+End-If;\`
+
+**Loops:**
+\`For &i = 1 To &rsJob.ActiveRowCount
+   &row = &rsJob.GetRow(&i);
+   /* process each row */
+End-For;
+
+While &condition
+   /* loop body */
+End-While;\`
+
+**Key language rules:**
+- Variables are prefixed with & (ampersand)
+- No semicolons required but best practice to include them
+- Comments: /* comment */ for inline, /* on its own line for block comments
+- NOT case-sensitive for keywords (IF = If = if)
+- String concatenation uses the | operator: "Hello" | " " | "World"`,
+        pbLink:{title:"PeopleCode Language Structure — PeopleCode Developer's Guide", url:"https://docs.oracle.com/cd/F28299_01/pt857pbr3/eng/pt/tpcd/concept_PeopleCodeOverview-074b56.html"},
+      },
+      {
+        title:"Variable Scopes — Local, Component, Global",
+        body:`The scope of a variable determines how long it lives and which PeopleCode programs can access it. Choosing the wrong scope is one of the most common beginner mistakes.
+
+**Local Scope**
+\`Local String &myVar;\`
+Exists only for the duration of the current PeopleCode program execution. Once the event ends (e.g., FieldChange completes), the variable is destroyed. This is the safest scope and should be the default choice for most variables.
+
+**Component Scope**
+\`Component String &myCompVar;\`
+Persists for the entire component transaction — from when the user opens the component to when they save or cancel. Any PeopleCode program within the same component can read and write Component variables.
+
+Use Component scope when you need to pass values between different events in the same transaction. Example: Set a flag in PostBuild (Component &isNewHire = True) and check it later in SaveEdit to apply special validation rules.
+
+**Global Scope**
+\`Global String &myGlobalVar;\`
+Persists for the entire PeopleSoft session until the user logs out. Any component in the entire session can access Global variables.
+
+Use very sparingly. Global variables can cause subtle bugs when Component B unexpectedly reads a value set by Component A. Appropriate for truly session-wide data like user preferences loaded at sign-on.
+
+**Scope comparison:**
+\`/* In PostBuild */
+Local String &localVar;      /* dies when PostBuild ends */
+Component String &compVar;   /* lives until save/cancel */
+Global String &globalVar;    /* lives until logout */\``,
+      },
+      {
+        title:"PeopleCode Events — The Complete Event Flow",
+        diagram:"eventflow",
+        body:`PeopleCode is always attached to a specific event on a specific object. The event determines when the code runs. Understanding the full event lifecycle is THE most important concept in PeopleSoft development.
+
+**Component Load Sequence (when user opens a page):**
+1. SearchInit — fires before the search dialog opens (hide/show search fields)
+2. SearchSave — fires when user submits search criteria
+3. RowInit — fires for EVERY row loaded into the buffer (all scroll levels)
+4. FieldDefault — sets default values for fields that have no value
+5. FieldFormula — computes derived field values
+6. PostBuild — fires ONCE after the entire component is fully loaded ← most common location for show/hide logic
+
+**During user interaction:**
+7. Activate — fires each time a specific page tab is activated
+8. FieldEdit — fires when a field loses focus; return False to show error and prevent navigation
+9. FieldChange — fires when a user changes a field value ← most common for dynamic field updates
+
+**Component Save Sequence (when user clicks Save):**
+10. SaveEdit — final validation before save; Error or Warning stops the save ← go-to for business rules
+11. SavePreChange — fires just before SQL writes to DB; all buffer manipulation done here
+12. Workflow — fires workflow triggers
+13. SavePostChange — fires AFTER data is committed to DB; use for downstream updates, notifications
+
+**Row operations:**
+- RowInsert — when user adds a new row to a grid
+- RowDelete — when user deletes a row from a grid
+- RowSelect — during the SELECT that loads data; can filter rows using DiscardRow()`,
+        pbLink:{title:"PeopleCode Events — PeopleCode Developer's Guide", url:"https://docs.oracle.com/cd/F28299_01/pt857pbr3/eng/pt/tpcd/task_PeopleCodeEvents-074aba.html"},
+      },
+      {
+        title:"Working with Fields and Records",
+        body:`The most fundamental PeopleCode operation is reading from and writing to fields in the Component Buffer.
+
+**Direct dot notation — most common approach:**
+\`/* Read a field value */
+Local String &dept;
+&dept = JOB.DEPTID.Value;
+
+/* Write a field value */
+JOB.DEPTID.Value = "HR001";
+
+/* Check if field is empty */
+If None(JOB.EMPLID.Value) Then
+   Error "Employee ID is required.";
+End-If;
+
+/* Gray out a field (prevent editing) */
+JOB.SALARY.Enabled = False;
+
+/* Hide a field completely */
+JOB.BONUS_AMT.Visible = False;
+
+/* Set a field to read-only display */
+JOB.HIRE_DT.DisplayOnly = True;\`
+
+**Using GetRecord to work with records as objects:**
+\`Local Record &recJob;
+&recJob = GetRecord(Record.JOB);
+
+/* Access fields on the record object */
+&recJob.DEPTID.Value = "FIN001";
+&recJob.JOBCODE.Value = "ANALYST";\`
+
+**System variables you use constantly:**
+\`%EmployeeId   /* current user's Employee ID */
+%OperatorId    /* current user's Operator ID (User ID) */
+%Date          /* today's date */
+%DateTime      /* current date and time */
+%Mode          /* component mode: A=Add, U=Update, etc. */
+%Component     /* name of current component */
+%Page          /* name of current page */\``,
+      },
+      {
+        title:"SQL in PeopleCode — SQLExec and CreateSQL",
+        body:`PeopleCode frequently needs to retrieve data from the database that is not already in the Component Buffer. Two built-in functions handle this: SQLExec (single row) and CreateSQL (multiple rows).
+
+**SQLExec — for single-row results:**
+\`/* Basic form: SQL, bind values, output variables */
+Local String &deptName;
+SQLExec("SELECT DESCR FROM PS_DEPT_TBL WHERE DEPTID = :1
+         AND EFFDT = (SELECT MAX(EFFDT) FROM PS_DEPT_TBL
+                      WHERE DEPTID = :1
+                      AND EFFDT <= %CurrentDateIn)",
+         JOB.DEPTID.Value,   /* bind :1 */
+         &deptName);          /* receives first column */
+
+/* If no row found, &deptName is empty string */
+If None(&deptName) Then
+   Warning "Department not found.";
+End-If;\`
+
+**CreateSQL — for multi-row results:**
+\`Local SQL &sql;
+Local String &empId, &name;
+
+&sql = CreateSQL("SELECT EMPLID, NAME FROM PS_NAMES_VW
+                  WHERE DEPTID = :1
+                  ORDER BY NAME",
+                  JOB.DEPTID.Value);
+
+While &sql.Fetch(&empId, &name)
+   /* process each row */
+   WinMessage(&empId | ": " | &name);
+End-While;
+&sql.Close();\`
+
+**Using %Table and %CurrentDateIn Meta-SQL:**
+\`/* %Table() = resolves to PS_<recordname> */
+SQLExec("SELECT DESCR FROM %Table(DEPT_TBL)
+         WHERE DEPTID = :1
+         AND EFFDT <= %CurrentDateIn",
+         &deptId, &descr);\`
+
+**Performance rule:** SQLExec in RowInit is dangerous. If your component loads 200 rows, RowInit fires 200 times — meaning 200 separate SQL calls. Pre-fetch data in PostBuild or use a View to join the data instead.`,
+      },
+      {
+        title:"Real Scenarios & Sample Code",
+        body:`Here are practical PeopleCode patterns you will use on real projects:
+
+**Scenario 1: Validate that salary is within the pay grade range (SaveEdit)**
+\`Local Number &minRate, &maxRate;
+
+SQLExec("SELECT MIN_RT, MAX_RT FROM PS_SAL_GRADE_TBL
+         WHERE SETID = :1 AND SAL_ADMIN_PLAN = :2
+         AND GRADE = :3 AND CURRENCY_CD = :4
+         AND EFFDT = (SELECT MAX(EFFDT) FROM PS_SAL_GRADE_TBL
+                       WHERE SETID = :1 AND SAL_ADMIN_PLAN = :2
+                       AND GRADE = :3 AND CURRENCY_CD = :4
+                       AND EFFDT <= %CurrentDateIn)",
+         JOB.SETID.Value, JOB.SAL_ADMIN_PLAN.Value,
+         JOB.GRADE.Value, JOB.CURRENCY_CD.Value,
+         &minRate, &maxRate);
+
+If JOB.COMPRATE.Value < &minRate Or
+   JOB.COMPRATE.Value > &maxRate Then
+   Error "Salary " | JOB.COMPRATE.Value |
+         " is outside the grade range (" |
+         &minRate | " - " | &maxRate | ")";
+End-If;\`
+
+**Scenario 2: Default Department from Position (FieldChange on POSITION_NBR)**
+\`/* When user enters a position number, auto-fill the department */
+Local String &deptId;
+SQLExec("SELECT DEPTID FROM PS_POSITION_DATA
+         WHERE POSITION_NBR = :1
+         AND EFFDT = (SELECT MAX(EFFDT) FROM PS_POSITION_DATA
+                       WHERE POSITION_NBR = :1
+                       AND EFFDT <= %CurrentDateIn)",
+         JOB.POSITION_NBR.Value, &deptId);
+
+If Not None(&deptId) Then
+   JOB.DEPTID.Value = &deptId;
+End-If;\`
+
+**Scenario 3: Show/hide a field based on Mode (PostBuild)**
+\`/* In Add mode — show the Hire Date field */
+/* In Update mode — gray it out */
+If %Mode = "A" Then
+   JOB.HIRE_DT.Visible = True;
+   JOB.HIRE_DT.Enabled = True;
+Else
+   JOB.HIRE_DT.DisplayOnly = True;
+End-If;\``,
+      },
+    ],
+  },
+  {
+    id:"buffer", module:4, num:"16",
+    title:"Component Buffer Basics",
+    summary:"The Component Buffer is the in-memory data structure that holds all data for the currently active component transaction. Understanding how the buffer is organized, how data flows in and out, and how Rowsets work is fundamental to PeopleCode development.",
+    keyPoints:[
+      "Component Buffer = memory area storing ALL data for the current open component",
+      "Buffer is organized hierarchically: Level 0 (primary record) → Level 1 (child rows) → Level 2+",
+      "Data loads into buffer when component opens · writes to DB only on Save",
+      "Rowset class = a collection of Rows · Row class = one row containing Record objects",
+      "GetRowset(), GetRow(), GetRecord(), ActiveRowCount are the core buffer navigation methods",
+    ],
+    sections:[
+      {
+        title:"What is the Component Buffer?",
+        body:`The Component Buffer is a memory-based data structure managed by the Component Processor within the Tuxedo App Server. When a user opens a PeopleSoft component, the Component Processor executes SQL statements to fetch all related data from the database and loads it into the Component Buffer.
+
+From that point on, everything the user sees and everything PeopleCode reads is coming from the buffer — not directly from the database. PeopleCode that sets JOB.DEPTID.Value is writing to the buffer, not the database. The buffer only writes to the database when the user clicks Save.
+
+**Why this matters:**
+This means that multiple field changes a user makes during a session are all temporary until Save. If a user changes 5 fields and then navigates away without saving, none of those changes persist. The Component Processor enforces atomicity — all changes succeed together or none of them do.
+
+**Buffer vs. Database:**
+When you write \`JOB.DEPTID.Value = "HR001"\` in a FieldChange event, you are modifying the in-memory buffer. The PS_JOB table in the database still has the old value. Only when SavePreChange fires does the Component Processor generate and execute the UPDATE (or INSERT for effective-dated records) SQL statement.`,
+      },
+      {
+        title:"Buffer Hierarchy — Scroll Levels",
+        diagram:"bufferlevels",
+        body:`The Component Buffer is organized in a hierarchical structure that mirrors the scroll levels on the page:
+
+**Level 0 — The Primary Record**
+Every component has exactly one Level 0 record. This is the "parent" record — for example, PERSONAL_DATA for the Personal Information component or JOB for Job Data. Level 0 always has exactly one row.
+
+**Level 1 — Child Rows (First Scroll)**
+Child records attached to Level 0 through a common key. A Grid or Scroll Area on the page corresponds to Level 1. There can be many rows. For example, in the Job Data component, the JOB record is actually at Level 1 (multiple effective-dated job rows) while EMPLOYMENT is Level 0.
+
+**Level 2+ — Grandchild Rows**
+Scrolls within scrolls — grids within grids. These are less common but exist in complex components like payroll or benefit enrollment.
+
+**PeopleCode to navigate the buffer:**
+\`/* Get Level 0 rowset */
+Local Rowset &rsLevel0;
+&rsLevel0 = GetRowset();  /* returns Level 0 rowset */
+
+/* Get Level 1 rowset (by scroll name) */
+Local Rowset &rsJob;
+&rsJob = GetRowset(Scroll.JOB);
+
+/* Get a specific row */
+Local Row &row;
+&row = &rsJob.GetRow(1);  /* first row */
+
+/* Get a record from the row */
+Local Record &recJob;
+&recJob = &row.GetRecord(Record.JOB);
+
+/* Access a field on the record */
+Local String &dept;
+&dept = &recJob.DEPTID.Value;\``,
+      },
+      {
+        title:"Rowset, Row, Record & Field — The Four Buffer Classes",
+        body:`PeopleSoft's buffer has four interrelated object classes. Understanding all four is necessary to work with multi-row data.
+
+**Rowset Class**
+A collection of Row objects. Think of it as a table or grid with multiple rows.
+Key properties and methods:
+- ActiveRowCount — number of data rows (excludes deleted rows)
+- RowCount — total rows including deleted
+- GetRow(n) — returns the nth Row object
+- InsertRow(n) — inserts a new row after position n
+- DeleteRow(n) — marks a row for deletion
+- Flush() — clears all rows from the rowset
+
+**Row Class**
+Represents one row within a Rowset. Contains one or more Record objects.
+Key methods:
+- GetRecord(Record.RECORDNAME) — returns the Record object
+- IsDeleted — True if row is marked for deletion
+- ChildCount — number of child rowsets
+- GetRowset(Scroll.RECORDNAME) — gets child rowset
+
+**Record Class**
+Represents all fields of a single record definition within a row.
+Key methods and properties:
+- GetField(Field.FIELDNAME) — returns the Field object
+- FIELDNAME.Value — direct field access (shortcut for GetField)
+- CopyFieldsByName(targetRecord) — copies matching field values to another record
+- ExecuteEdits() — runs field edits programmatically
+
+**Field Class**
+Represents an individual field within a record.
+Key properties:
+- Value — the actual data value (read/write)
+- Enabled — controls whether the field is editable
+- Visible — controls whether the field is displayed
+- DisplayOnly — shows value but prevents editing
+- Label — the text label shown next to the field
+- Style — CSS class applied to the field
+
+\`/* Complete example: iterate Level 1 rows */
+Local Rowset &rsJob;
+Local Row &row;
+Local Record &recJob;
+Local Integer &i;
+
+&rsJob = GetRowset(Scroll.JOB);
+
+For &i = 1 To &rsJob.ActiveRowCount
+   &row = &rsJob.GetRow(&i);
+   &recJob = &row.GetRecord(Record.JOB);
+
+   /* Now work with the record */
+   If &recJob.EMPL_STATUS.Value = "T" Then
+      &recJob.DEPTID.Enabled = False;
+   End-If;
+End-For;\``,
+        pbLink:{title:"PeopleCode API Reference — Rowset, Row, Record & Field Classes", url:"https://docs.oracle.com/cd/F28299_01/pt857pbr3/eng/pt/tpcr/concept_PeopleCodeBuiltInFunctionsAndLanguageConstructs-074b50.html"},
+      },
+    ],
+  },
+  /* ── MODULE 6 ── */
+  {
+    id:"ps-query", module:5, num:"17",
+    title:"PS Query Fundamentals",
+    summary:"PS Query is PeopleSoft's built-in ad-hoc reporting tool. It allows users to build SQL-based queries using a visual interface — no SQL knowledge required. Understanding PS Query is essential for both report builders and developers who need to create query-based data sources.",
+    keyPoints:[
+      "PS Query generates SQL — always check the SQL tab to understand what it produces",
+      "Three query types: User (private), Role (shared with a role), Public (all users)",
+      "Prompts make queries dynamic — users enter criteria values at run time",
+      "PS Query respects row-level security automatically when run online",
+      "Connected Queries link a parent and child query for master-detail reports",
+    ],
+    sections:[
+      {
+        title:"Building a PS Query — Step by Step",
+        body:`PS Query is accessed via Reporting Tools → Query → Query Manager in the PeopleSoft menu.
+
+**Step 1 — Select Records (the base tables)**
+Click "Add Record" and search for the PeopleSoft records (tables) you need. PS Query shows a list of all accessible records. Add the primary record first (e.g., PS_JOB for employee job data).
+
+**Step 2 — Join Related Records**
+Add additional records that you need to join. PS Query automatically suggests joins based on common fields (matching field names and types). You can accept the suggested join or manually define the join condition. Join types: Standard (INNER JOIN), Left Outer, Right Outer, Full Outer.
+
+**Step 3 — Select Output Fields**
+In the "Fields" tab, check the boxes next to the fields you want in your query output. Each selected field becomes a column in the results. You can rename columns, apply aggregate functions (SUM, COUNT, MAX, AVG), and format numeric output.
+
+**Step 4 — Add Criteria (WHERE clause)**
+In the "Criteria" tab, add filters to limit the data. Each criterion becomes a condition in the SQL WHERE clause. You can use operators: =, !=, <, >, BETWEEN, IN, LIKE, IS NULL, etc. Multiple criteria are combined with AND/OR.
+
+**Step 5 — Add Prompts (run-time parameters)**
+Instead of hardcoding a value in a criterion, make it a Prompt — a field where the user enters the value each time they run the query. This makes the query reusable for different parameters (different departments, different date ranges).
+
+**Step 6 — Set Output Order (ORDER BY)**
+In the "Having" tab (or field properties), specify sort order for results.
+
+**Step 7 — View SQL and Test**
+ALWAYS click the "SQL" tab to review the generated SQL. This shows exactly what query PS Query will execute. Verify it looks correct — especially that effective dating criteria are included for date-effective records.
+
+Run the query with sample data to validate results.`,
+        pbLink:{title:"PeopleTools: PS/nVision and PeopleSoft Query — Query Manager", url:"https://docs.oracle.com/cd/F28299_01/pt857pbr3/eng/pt/tqry/concept_PeopleSoftQueryOverview-0750c0.html"},
+      },
+      {
+        title:"Query Security & Access Control",
+        body:`**Query Types and Sharing:**
+
+- **User Queries** — Private. Only visible and accessible to the user who created them. Good for personal one-time queries or work-in-progress.
+
+- **Role Queries** — Shared with all users who have a specific PeopleSoft Role. The creator assigns the query to a Role. Any user with that Role can run (but not necessarily edit) the query.
+
+- **Public Queries** — Accessible to all users who have Query access in their Permission List. Typically used for organization-wide standard reports.
+
+**Row-Level Security:**
+When PS Query runs online (in the browser), it automatically respects PeopleSoft's row-level security. If a user only has access to departments 100 and 200, running a query on PS_JOB will only return employees in those departments.
+
+Important: When PS Query is scheduled as a batch process through Process Scheduler, it runs in the context of the submitting user's security. This means the same query can return different data depending on who submits it.
+
+**Query Access Trees:**
+Query access is controlled in Permission Lists via Query Trees. A Query Tree is a hierarchical structure of record groups. Users can only build queries against records in the Query Trees assigned to their permission lists. This prevents users from querying sensitive tables they should not see.
+
+**Query Viewer vs Query Manager:**
+- Query Viewer — read-only access. Users can run existing queries but cannot create or modify them.
+- Query Manager — full access. Users can create, edit, save, and run queries. Should be restricted to trained users.`,
+      },
+    ],
+  },
+  {
+    id:"translate-prompt", module:5, num:"18",
+    title:"Translate Values & Prompt Tables",
+    summary:"Two mechanisms control what values are valid for a field: Translate Values (for short, fixed lists) and Prompt Tables (for longer, database-driven lists). Understanding both is essential for any PeopleSoft developer or configurator.",
+    keyPoints:[
+      "Translate Values = a special PeopleTools table for short code lists (max 4 characters)",
+      "Translate Values are effective-dated — you can add new values or inactivate old ones",
+      "Prompt Table = a record or view used to validate field input from a database table",
+      "A Drop Down field uses Translate Values · An Edit Box with prompt uses a Prompt Table",
+      "Prompt Tables can be static (set in field definition) or dynamic (set via PeopleCode)",
+    ],
+    sections:[
+      {
+        title:"Translate Values — The XLAT Table",
+        body:`Translate Values (often called XLAT values) are stored in the PSXLATITEM table — a universal lookup table built into PeopleTools. They are used for short, relatively stable code lists.
+
+**Characteristics of Translate Values:**
+- Field values must be 4 characters or less
+- Each field can have its own set of translate values
+- Values are effective-dated — you can mark an old value as Inactive rather than deleting it
+- Values have both a short name (the code) and a long name (the display description)
+
+**Examples of fields using Translate Values:**
+- EMPL_STATUS: A=Active, I=Inactive, L=Leave, S=Suspended, T=Terminated
+- ACTION: HIR=Hire, TER=Termination, PRO=Promotion, PAY=Pay Rate Change, XFR=Transfer
+- FULL_PART_TIME: F=Full-Time, P=Part-Time
+- GENDER: M=Male, F=Female, U=Unknown
+
+**How to manage Translate Values:**
+In Application Designer, open a Field definition. Go to the Translate Values tab. Add, modify, or inactivate values here. The Effective Date controls when a value becomes available or inactive.
+
+**On pages:**
+Fields bound to XLAT values display as Drop Down lists in the browser. The user sees the long description (e.g., "Full-Time") but the database stores the short code (e.g., "F").
+
+**In PeopleCode:**
+\`/* Read a translate value description */
+Local String &statusDescr;
+SQLExec("SELECT XLATLONGNAME FROM PSXLATITEM
+         WHERE FIELDNAME = 'EMPL_STATUS'
+         AND FIELDVALUE = :1
+         AND EFFDT = (SELECT MAX(EFFDT) FROM PSXLATITEM
+                       WHERE FIELDNAME = 'EMPL_STATUS'
+                       AND FIELDVALUE = :1
+                       AND EFFDT <= %CurrentDateIn)",
+         JOB.EMPL_STATUS.Value, &statusDescr);\``,
+        pbLink:{title:"Application Designer Developer's Guide — Translate Values", url:"https://docs.oracle.com/cd/F70250_01/psft/pdf/pt860tapd-b092022.pdf"},
+      },
+      {
+        title:"Prompt Tables — Database-Driven Validation",
+        body:`Prompt Tables (also called lookup tables or edit tables) are used when the valid values come from a database table rather than the Translate Values list. Prompt Tables handle fields with larger code sets that change frequently.
+
+**Examples of Prompt Table fields:**
+- DEPTID — validated against PS_DEPT_TBL (hundreds to thousands of departments)
+- JOBCODE — validated against PS_JOBCODE_TBL
+- LOCATION — validated against PS_LOCATION_TBL
+- CURRENCY_CD — validated against CURRENCY_CD_TBL
+
+**How a Prompt Table works:**
+When a user tabs out of a field that has a Prompt Table defined, PeopleSoft checks whether the entered value exists in that table (as of the effective date). If not found, an error appears.
+
+When the user clicks the lookup button (magnifying glass icon) next to the field, PeopleSoft opens a pop-up search dialog showing available values from the Prompt Table. The user can scroll through or search the list and click a value to populate the field.
+
+**Defining a Prompt Table in App Designer:**
+In the Record Field Properties for a field:
+- Edit Type: Prompt Table Edit
+- Prompt Table: the name of the record to validate against
+
+The Prompt Table must have its Search Keys defined — these determine what columns appear in the lookup dialog.
+
+**Dynamic Prompt Tables (set via PeopleCode):**
+Sometimes the valid values depend on another field's value. For example, the valid Job Codes might depend on the selected Department. PeopleCode in FieldChange can dynamically change the Prompt Table:
+\`/* In DEPTID FieldChange — change the JOBCODE prompt table */
+JOB.JOBCODE.PromptTable = "DEPT_JOBCODE_VW";\`
+
+This is a powerful technique for implementing cascading field validation.`,
+      },
+    ],
+  },
+  /* ── MODULE 7 ── */
+  {
+    id:"process-monitor", module:6, num:"19",
+    title:"Process Monitor & Report Manager",
+    summary:"Every batch job, report, and scheduled process in PeopleSoft runs through Process Scheduler. Process Monitor and Report Manager are the tools users and administrators use to submit, track, and view process output.",
+    keyPoints:[
+      "Process Monitor: PeopleTools → Process Scheduler → Process Monitor — see all job statuses",
+      "Status flow: Queued → Initiated → Processing → Success / Error / No Success",
+      "Report Manager: PeopleTools → Process Scheduler → Report Manager — view output files",
+      "Run Control: the page where users enter parameters before submitting a process",
+      "Process Types: Application Engine, SQR Report, BI Publisher, COBOL, Crystal, nVision",
+    ],
+    sections:[
+      {
+        title:"Process Scheduler — How Batch Jobs Work",
+        body:`Process Scheduler is the PeopleSoft engine that manages execution of all batch processes. It operates independently of the web/app server to ensure batch jobs don't interfere with online user performance.
+
+**The full lifecycle of a process request:**
+
+1. **User submits a process** — the user fills in a Run Control page with parameters (date range, report scope, etc.), clicks Save, then clicks Run. A dialog asks for server, output type (PDF, Excel, etc.), and format.
+
+2. **Request recorded** — a row is inserted into PS_PSPRCSRQST (the Process Request table) with status "Queued."
+
+3. **Process Scheduler picks it up** — the PSPRCSRV daemon monitors PS_PSPRCSRQST. When it finds a Queued request and an available server slot, it updates the status to "Initiated" and spawns the process.
+
+4. **Process executes** — the Application Engine, SQR, or other process type runs on the batch server. The status updates to "Processing."
+
+5. **Completion** — when finished, the status becomes "Success" (completed normally), "No Success" (completed but with no data/errors to report), or "Error" (failed with errors). The Distribution Agent moves output files to the Report Repository.
+
+6. **User views output** — the user opens Report Manager to find and view their output files.`,
+        pbLink:{title:"PeopleTools: Process Scheduler — Using Process Monitor", url:"https://docs.oracle.com/cd/F28299_01/pt857pbr3/eng/pt/tpsc/concept_UnderstandingPeopleSoftProcessScheduler-074aa0.html"},
+      },
+      {
+        title:"Using Process Monitor",
+        body:`Process Monitor (PeopleTools → Process Scheduler → Process Monitor) is where you track the status of submitted processes.
+
+**What Process Monitor shows:**
+- Process instance number (unique identifier for each submission)
+- Process Name and Description
+- Server name it's running on
+- Run Date/Time — when it was submitted and when it ran
+- Status — Queued, Initiated, Processing, Success, No Success, Error, Hold, Cancel, Delete
+- Run Status — a more detailed status for in-progress jobs
+- Distribution Status — whether output has been distributed to Report Repository
+
+**Refreshing the view:**
+Process Monitor shows a snapshot. Click "Refresh" to update. For active processes, set Auto-Refresh to update every 30 seconds.
+
+**Viewing process details:**
+Click on any process to see its detail page. From here you can:
+- View the process log (messages, errors, execution steps)
+- View trace files (if SQL trace was enabled)
+- Cancel or hold a queued process
+- Restart a failed Application Engine process from its last checkpoint
+
+**Common statuses explained:**
+- Queued: waiting for an available server slot
+- Initiated: Process Scheduler has started it, waiting for OS to spawn the process
+- Processing: actively executing
+- Success: completed without errors
+- No Success: completed but encountered a data condition (e.g., no records to process)
+- Error: failed with an error — check the log file for details`,
+      },
+      {
+        title:"Report Manager & Run Controls",
+        body:`**Report Manager**
+Report Manager (PeopleTools → Process Scheduler → Report Manager) is where users access output files from completed processes.
+
+When a process completes, the Distribution Agent (PSDSTSRV) automatically copies output files from the batch server to the Report Repository. The output is stored and accessible through the Report Manager web interface.
+
+Report Manager shows:
+- Report name and description
+- The process that generated it
+- Run date/time
+- Output format (PDF, XLS, CSV, HTML, TXT)
+- A link to view or download the file
+
+Output files are retained in Report Repository for a configurable number of days (typically 7-30 days) before being purged.
+
+**Run Controls**
+A Run Control is a database record that stores the parameters a user enters before running a process. Run Controls solve a key problem: batch processes cannot ask the user for input while running. So the user enters their parameters on a Run Control page in advance, saves them, and the process reads them from the database.
+
+Run Controls are keyed by OPRID (user ID) and RUN_CNTL_ID (a user-defined name). A user can have multiple saved run controls for the same process with different parameters. For example, a payroll administrator might have run controls named "WEEKLY_USA", "BIWEEKLY_CAN", and "MONTHLY_GBR" for different pay group runs.
+
+**Creating a Run Control:**
+1. Navigate to the process's run control page (e.g., Payroll → Pay Period Processing → Run Control)
+2. Click "Add" and give the run control an ID
+3. Enter parameters (dates, departments, pay groups, etc.)
+4. Click Save
+5. Click Run → select server and output → click OK
+6. Track in Process Monitor`,
+      },
+    ],
+  },
+  {
+    id:"security-basics", module:6, num:"20",
+    title:"PeopleSoft Security Basics",
+    summary:"PeopleSoft security controls what users can access, what they can do, and which data they can see. The security model uses a four-level hierarchy — User Profiles, Roles, Permission Lists, and Row-Level Security — giving administrators fine-grained control over access.",
+    keyPoints:[
+      "User Profile → Roles → Permission Lists: the 3-level assignment chain",
+      "Permission Lists define page access (Add/Update/Display modes), process access, and query access",
+      "Row-level security controls which DATA rows a user can see — not just which pages",
+      "Department Security Trees implement row-level security in HCM by org hierarchy",
+      "Never assign the PeopleSoft Administrator permission list to regular business users",
+    ],
+    sections:[
+      {
+        title:"The Security Hierarchy",
+        body:`PeopleSoft's security model has four distinct levels, each serving a different purpose:
+
+**Level 1 — User Profile**
+The individual user account in PeopleSoft. Defined in Security → User Profiles. Each User Profile has:
+- User ID and password
+- Email address
+- Primary Permission List (for system-level access)
+- Row Security Permission List (for data-level access)
+- One or more Roles assigned
+
+User Profiles in HCM are typically linked to an employee's EMPLID, though service accounts and integration users are not linked to employees.
+
+**Level 2 — Roles**
+Roles are bundles of Permission Lists. Instead of assigning Permission Lists directly to users (which would be unmanageable at scale), you assign Roles. A Role like "HR Manager" collects all the Permission Lists relevant to that function.
+
+Roles make security administration practical: to change what all HR Managers can do, you update the Role once instead of updating thousands of user profiles.
+
+A user can have multiple roles, and their effective access is the union of all Permission Lists across all their Roles.
+
+**Level 3 — Permission Lists**
+Permission Lists are the actual security definitions. They specify exactly what a user with that permission can do. A Permission List contains:
+- **Page Permissions** — which Components are accessible and in which modes (Add, Update/Display, Display Only)
+- **PeopleTools Permissions** — access to developer tools (Application Designer, Data Mover, Query Manager, etc.)
+- **Process Groups** — which batch processes the user can submit
+- **Query Access Trees** — which database tables the user can query in PS Query
+- **Web Services** — which Integration Broker service operations the user can call
+- **Sign-on Times** — optional time-of-day and day-of-week access restrictions
+
+**Level 4 — Row-Level Security (Data Permissions)**
+Controls which rows of data a user can see. Implemented separately from page-level security. A user might have permission to access the Job Data component but only see employees in their own department — even though the component shows the same page to everyone.`,
+        pbLink:{title:"PeopleTools: Security Administration — Understanding PeopleSoft Security", url:"https://docs.oracle.com/cd/F28299_01/pt857pbr3/eng/pt/tsec/concept_UnderstandingPeopleSoftSecurity-074ac9.html"},
+      },
+      {
+        title:"Row-Level Security in HCM",
+        body:`Row-level security in PeopleSoft HCM is primarily implemented through Department Security Trees. This allows HR administrators to control which employees each HR user can see and update based on organizational hierarchy.
+
+**How it works:**
+PeopleSoft maintains a security table (typically named with a _SEC or _SRCH_VW suffix) for each application area. This table joins the data table with the user's security profile. When a query runs against Job Data, PeopleSoft automatically joins to the security view, filtering out any employees the user is not authorized to see.
+
+**Department Security Tree:**
+An organizational tree where each node is a department. Users are granted access to specific tree nodes (branches). If a user is granted access to "West Region" in the security tree, they automatically have access to all departments within West Region — including any new departments added to that branch in the future.
+
+**Row Security Permission List:**
+The Row Security Permission List on a user's profile defines their data permissions. Unlike regular permission lists (which control page access), this one controls data access.
+
+**For developers:**
+When building a custom component that displays employee data, you MUST use a security view as the Search Record (not the raw PS_JOB table). Forgetting to do this means any user with access to your component can see all employee data regardless of their row security permissions. This is a critical security requirement.
+
+**Checking what a user can see:**
+To test row-level security: log in as the test user and navigate to the component. The search results should only show records within that user's authorized scope. If you see all data, the security view is missing or incorrectly configured.`,
+      },
+      {
+        title:"Common Security Tasks",
+        body:`**Creating a New User:**
+Security → User Profiles → Add a New Value
+Enter User ID, set password, assign email, select primary Permission List, assign Roles. In HCM, link to an Employee ID if the user is an employee.
+
+**Creating a Permission List:**
+Security → Permission Lists → Add
+Configure page permissions (add components with appropriate access modes), process groups, and query trees. Give it a descriptive name following your organization's naming convention.
+
+**Creating a Role:**
+Security → Roles → Add
+Add Permission Lists to the Role. Name it descriptively (e.g., "HCM_HR_MANAGER" not just "ROLE1").
+
+**Troubleshooting "you are not authorized" errors:**
+1. Check the user's Roles — do they have the correct Role?
+2. Check the Role's Permission Lists — is the component listed?
+3. Check the component's access mode — is Update/Display granted (not just Display)?
+4. Check if the component is registered in the Portal and accessible via a CREF
+5. Check row-level security — the user might have page access but not data access
+
+**The PeopleSoft Administrator Permission List:**
+PTPT1000 (or similar names like ALLPAGES) is the super-user permission list that grants access to everything including developer tools. NEVER assign this to business users. It should only be assigned to technical administrators and developers in non-production environments.`,
+      },
+    ],
+  },
+];
+
+/* ═══════════════════════════════════════════════
+   HOMEPAGE DATA
+═══════════════════════════════════════════════ */
+const CURRICULUM_LIST = {
+  b: TOPICS.map(t => t.title),
+  i: ["Application Designer Deep Dive","Application Engine","Component Interface","SQR Programming","BI Publisher Reports","Integration Broker","Security & Roles","Process Scheduler","Data Mover & Migration","PeopleSoft Update Manager (PUM)"],
+  a: ["Fluid UI Development","Fluid Tiles & Homepages","Application Packages (OOP)","REST & SOAP Web Services","Performance Tuning","PeopleTools Upgrades","Activity Guides","Event Mapping","Elasticsearch & Search Framework","PeopleCode Debugging Techniques"],
+};
+
+/* ═══════════════════════════════════════════════
+   VISITED TOPICS TRACKER
+═══════════════════════════════════════════════ */
+const visited = new Set();
+let currentTopicIndex = 0;
+
+/* ═══════════════════════════════════════════════
+   VIEW MANAGEMENT
+═══════════════════════════════════════════════ */
+function showHome() {
+  document.getElementById('homepageView').style.display = 'block';
+  document.getElementById('appView').style.display = 'none';
+  window.scrollTo(0,0);
+}
+
+function showApp() {
+  document.getElementById('homepageView').style.display = 'none';
+  document.getElementById('appView').style.display = 'block';
+}
+
+function openTopic(index) {
+  currentTopicIndex = index;
+  visited.add(index);
+  showApp();
+  buildSidebar();
+  renderTopic(index);
+  updateProgress();
+}
+
+/* ═══════════════════════════════════════════════
+   SIDEBAR
+═══════════════════════════════════════════════ */
+function buildSidebar(filter = '') {
+  const body = document.getElementById('sidebarBody');
+  body.innerHTML = '';
+
+  let lastModule = -1;
+
+  TOPICS.forEach((topic, idx) => {
+    if (filter && !topic.title.toLowerCase().includes(filter.toLowerCase())) return;
+
+    if (topic.module !== lastModule) {
+      const mod = MODULES[topic.module];
+      const header = document.createElement('div');
+      header.className = 'sidebar__module-header';
+      header.innerHTML = `<span>${mod.icon}</span><span style="color:${mod.color}">${mod.name}</span>`;
+      body.appendChild(header);
+      lastModule = topic.module;
+    }
+
+    const btn = document.createElement('button');
+    btn.className = 'sidebar__topic' + (idx === currentTopicIndex ? ' active' : '');
+    btn.innerHTML = `
+      <span class="sidebar__topic-num">${topic.num}</span>
+      <span style="flex:1;text-align:left">${topic.title}</span>
+      ${visited.has(idx) && idx !== currentTopicIndex ? '<span style="color:var(--green);font-size:11px">✓</span>' : ''}
+    `;
+    btn.onclick = () => openTopic(idx);
+    body.appendChild(btn);
+  });
+}
+
+function filterTopics(val) {
+  buildSidebar(val);
+}
+
+/* ═══════════════════════════════════════════════
+   PROGRESS
+═══════════════════════════════════════════════ */
+function updateProgress() {
+  const count = visited.size;
+  const total = TOPICS.length;
+  document.getElementById('progressText').textContent = `${count} / ${total}`;
+  document.getElementById('progressFill').style.width = `${(count/total)*100}%`;
+}
+
+/* ═══════════════════════════════════════════════
+   TOPIC RENDERER
+═══════════════════════════════════════════════ */
+function renderTopic(index) {
+  const topic = TOPICS[index];
+  const mod = MODULES[topic.module];
+  const container = document.getElementById('topicContent');
+
+  let html = `
+    <div class="topic-header">
+      <div class="topic-module-badge">${mod.icon} ${mod.name}</div>
+      <h1 class="topic-title">${topic.title}</h1>
+      <p class="topic-summary">${topic.summary}</p>
+    </div>
+
+    <div class="key-points-box">
+      <h3>⚡ Key Takeaways</h3>
+      ${topic.keyPoints.map(pt => `
+        <div class="key-point">
+          <span class="key-point-arrow">→</span>
+          <span class="key-point-text">${pt}</span>
+        </div>
+      `).join('')}
+    </div>
+
+    ${topic.sections.map((sec, si) => `
+      <div class="section-block">
+        <button class="section-block__header" onclick="toggleSection(this, ${si})">
+          <span>${sec.title}</span>
+          <span class="section-block__chevron">›</span>
+        </button>
+        <div class="section-block__body" id="sec-${index}-${si}" style="display:none">
+          ${sec.diagram ? renderDiagram(sec.diagram) : ''}
+          ${renderSectionBody(sec.body)}
+          ${sec.pbLink ? `<a href="${sec.pbLink.url}" target="_blank" rel="noopener" class="pb-link">
+            <span class="pb-link__icon">📖</span>
+            <span class="pb-link__text">
+              <span class="pb-link__title">${sec.pbLink.title}</span>
+              <span class="pb-link__sub">Oracle PeopleBooks — docs.oracle.com ↗</span>
+            </span>
+          </a>` : ''}
+        </div>
+        <div class="section-block__preview" id="prev-${index}-${si}">
+          ${sec.body.replace(/\*\*/g,'').replace(/`[^`]+`/g,'').substring(0,110).trim()}...
+        </div>
+      </div>
+    `).join('')}
+  `;
+
+  /* PREV / NEXT NAVIGATION */
+  const prev = index > 0 ? TOPICS[index - 1] : null;
+  const next = index < TOPICS.length - 1 ? TOPICS[index + 1] : null;
+
+  html += `<div class="topic-nav">`;
+  if (prev) {
+    html += `
+      <button class="topic-nav-btn" onclick="openTopic(${index-1})">
+        <div>
+          <span class="topic-nav-label">← Previous</span>
+          <span class="topic-nav-title">${prev.title}</span>
+        </div>
+      </button>`;
+  } else {
+    html += `<div></div>`;
+  }
+  if (next) {
+    html += `
+      <button class="topic-nav-btn topic-nav-btn--next" onclick="openTopic(${index+1})">
+        <div style="text-align:right">
+          <span class="topic-nav-label">Next →</span>
+          <span class="topic-nav-title">${next.title}</span>
+        </div>
+      </button>`;
+  } else {
+    html += `<div></div>`;
+  }
+  html += `</div>`;
+
+  container.innerHTML = html;
+  container.scrollTop = 0;
+}
+
+function renderSectionBody(body) {
+  const paragraphs = body.split('\n\n');
+  return paragraphs.map(para => {
+    para = para.trim();
+    if (!para) return '';
+
+    /* Code block */
+    if (para.startsWith('```') || (para.startsWith('`') && para.includes('\n'))) {
+      const code = para.replace(/^```[a-z]*\n?/, '').replace(/\n?```$/, '').replace(/^`\n?/, '').replace(/\n?`$/, '');
+      return `<pre class="section-code">${escHtml(code)}</pre>`;
+    }
+
+    /* Format inline */
+    let formatted = para
+      .replace(/\*\*(.+?)\*\*/g, '<strong style="color:#a5b4fc">$1</strong>')
+      .replace(/`([^`]+)`/g, '<code style="background:#1e2340;color:#a5f3fc;padding:2px 6px;border-radius:4px;font-size:0.9em;font-family:var(--fm)">$1</code>');
+
+    /* List detection (lines starting with - or numbered) */
+    if (para.includes('\n- ') || para.startsWith('- ')) {
+      const items = para.split('\n').filter(l => l.trim());
+      return `<ul class="section-list">${items.map(item => {
+        const text = item.replace(/^[-*]\s*/, '').replace(/^\d+\.\s*/, '')
+          .replace(/\*\*(.+?)\*\*/g, '<strong style="color:#a5b4fc">$1</strong>')
+          .replace(/`([^`]+)`/g, '<code style="background:#1e2340;color:#a5f3fc;padding:2px 6px;border-radius:4px;font-size:0.9em;font-family:var(--fm)">$1</code>');
+        return `<li>${text}</li>`;
+      }).join('')}</ul>`;
+    }
+
+    return `<p class="section-para">${formatted}</p>`;
+  }).join('');
+}
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ═══════════════════════════════════════════════
+   DIAGRAM RENDERER
+═══════════════════════════════════════════════ */
+function renderDiagram(type) {
+  if (type === 'eventflow') return renderEventFlowDiagram();
+  if (type === 'pia') return renderPIADiagram();
+  if (type === 'recordtypes') return renderRecordTypesDiagram();
+  if (type === 'bufferlevels') return renderBufferLevelsDiagram();
+  return '';
+}
+
+function renderEventFlowDiagram() {
+  return `<div class="flow-diagram">
+    <div class="diagram-card__title">🔄 Component Processor — Full Event Execution Flow</div>
+    <svg viewBox="0 0 760 900" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:760px;font-family:'IBM Plex Sans',sans-serif">
+      <defs>
+        <marker id="arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+          <polygon points="0 0,8 3,0 6" fill="#6366f1"/>
+        </marker>
+        <marker id="arr-g" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+          <polygon points="0 0,8 3,0 6" fill="#22c55e"/>
+        </marker>
+        <marker id="arr-a" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+          <polygon points="0 0,8 3,0 6" fill="#f59e0b"/>
+        </marker>
+        <marker id="arr-r" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+          <polygon points="0 0,8 3,0 6" fill="#ef4444"/>
+        </marker>
+      </defs>
+
+      <!-- PHASE LABELS -->
+      <rect x="10" y="10" width="120" height="22" rx="4" fill="rgba(34,197,94,0.15)" stroke="#22c55e" stroke-width="1"/>
+      <text x="70" y="25" text-anchor="middle" font-size="10" fill="#22c55e" font-weight="600">COMPONENT LOAD</text>
+
+      <rect x="10" y="370" width="120" height="22" rx="4" fill="rgba(245,158,11,0.15)" stroke="#f59e0b" stroke-width="1"/>
+      <text x="70" y="385" text-anchor="middle" font-size="10" fill="#f59e0b" font-weight="600">USER INTERACTION</text>
+
+      <rect x="10" y="580" width="120" height="22" rx="4" fill="rgba(239,68,68,0.15)" stroke="#ef4444" stroke-width="1"/>
+      <text x="70" y="595" text-anchor="middle" font-size="10" fill="#ef4444" font-weight="600">SAVE SEQUENCE</text>
+
+      <!-- ── LOAD PHASE NODES ── -->
+      <!-- SearchInit -->
+      <rect x="260" y="10" width="240" height="48" rx="10" fill="rgba(34,197,94,0.12)" stroke="#22c55e" stroke-width="1.5"/>
+      <text x="380" y="30" text-anchor="middle" font-size="13" fill="#22c55e" font-weight="700">SearchInit</text>
+      <text x="380" y="48" text-anchor="middle" font-size="10" fill="#9ba8c4">Fires before search dialog opens</text>
+
+      <!-- SearchSave -->
+      <rect x="260" y="90" width="240" height="48" rx="10" fill="rgba(34,197,94,0.12)" stroke="#22c55e" stroke-width="1.5"/>
+      <text x="380" y="110" text-anchor="middle" font-size="13" fill="#22c55e" font-weight="700">SearchSave</text>
+      <text x="380" y="128" text-anchor="middle" font-size="10" fill="#9ba8c4">User submits search criteria</text>
+
+      <!-- RowSelect -->
+      <rect x="260" y="170" width="240" height="48" rx="10" fill="rgba(34,197,94,0.12)" stroke="#22c55e" stroke-width="1.5"/>
+      <text x="380" y="190" text-anchor="middle" font-size="13" fill="#22c55e" font-weight="700">RowSelect</text>
+      <text x="380" y="208" text-anchor="middle" font-size="10" fill="#9ba8c4">SQL SELECT — filter rows with DiscardRow()</text>
+
+      <!-- RowInit -->
+      <rect x="260" y="250" width="240" height="48" rx="10" fill="rgba(34,197,94,0.12)" stroke="#22c55e" stroke-width="1.5"/>
+      <text x="380" y="270" text-anchor="middle" font-size="13" fill="#22c55e" font-weight="700">RowInit</text>
+      <text x="380" y="288" text-anchor="middle" font-size="10" fill="#ef4444">⚠ Fires for EVERY row — avoid SQL here</text>
+
+      <!-- FieldDefault + FieldFormula -->
+      <rect x="150" y="330" width="200" height="44" rx="10" fill="rgba(34,197,94,0.08)" stroke="#22c55e" stroke-width="1" stroke-dasharray="4,3"/>
+      <text x="250" y="348" text-anchor="middle" font-size="12" fill="#22c55e" font-weight="600">FieldDefault</text>
+      <text x="250" y="365" text-anchor="middle" font-size="10" fill="#9ba8c4">Set default field values</text>
+
+      <rect x="410" y="330" width="200" height="44" rx="10" fill="rgba(34,197,94,0.08)" stroke="#22c55e" stroke-width="1" stroke-dasharray="4,3"/>
+      <text x="510" y="348" text-anchor="middle" font-size="12" fill="#22c55e" font-weight="600">FieldFormula</text>
+      <text x="510" y="365" text-anchor="middle" font-size="10" fill="#9ba8c4">Compute derived values</text>
+
+      <!-- PostBuild -->
+      <rect x="240" y="406" width="280" height="52" rx="10" fill="rgba(99,102,241,0.2)" stroke="#818cf8" stroke-width="2"/>
+      <text x="380" y="428" text-anchor="middle" font-size="14" fill="#818cf8" font-weight="700">PostBuild ⭐</text>
+      <text x="380" y="448" text-anchor="middle" font-size="10" fill="#9ba8c4">Component fully built — show/hide logic here</text>
+
+      <!-- ── USER INTERACTION ── -->
+      <line x1="380" y1="458" x2="380" y2="478" stroke="#6366f1" stroke-width="1.5" marker-end="url(#arr)"/>
+
+      <!-- Activate -->
+      <rect x="500" y="478" width="180" height="44" rx="10" fill="rgba(245,158,11,0.12)" stroke="#f59e0b" stroke-width="1.5"/>
+      <text x="590" y="497" text-anchor="middle" font-size="12" fill="#f59e0b" font-weight="600">Activate</text>
+      <text x="590" y="513" text-anchor="middle" font-size="10" fill="#9ba8c4">Page tab activated</text>
+
+      <!-- FieldEdit -->
+      <rect x="150" y="478" width="180" height="44" rx="10" fill="rgba(245,158,11,0.12)" stroke="#f59e0b" stroke-width="1.5"/>
+      <text x="240" y="497" text-anchor="middle" font-size="12" fill="#f59e0b" font-weight="600">FieldEdit</text>
+      <text x="240" y="513" text-anchor="middle" font-size="10" fill="#9ba8c4">Validate — return False to reject</text>
+
+      <!-- FieldChange -->
+      <rect x="260" y="548" width="240" height="44" rx="10" fill="rgba(245,158,11,0.2)" stroke="#f59e0b" stroke-width="2"/>
+      <text x="380" y="567" text-anchor="middle" font-size="13" fill="#f59e0b" font-weight="700">FieldChange</text>
+      <text x="380" y="583" text-anchor="middle" font-size="10" fill="#9ba8c4">User changes a field value</text>
+
+      <!-- ── SAVE SEQUENCE ── -->
+      <line x1="380" y1="592" x2="380" y2="616" stroke="#ef4444" stroke-width="1.5" marker-end="url(#arr-r)"/>
+
+      <!-- SaveEdit -->
+      <rect x="230" y="616" width="300" height="52" rx="10" fill="rgba(239,68,68,0.2)" stroke="#ef4444" stroke-width="2"/>
+      <text x="380" y="638" text-anchor="middle" font-size="14" fill="#ef4444" font-weight="700">SaveEdit ⭐</text>
+      <text x="380" y="656" text-anchor="middle" font-size="10" fill="#9ba8c4">Business rule validation — Error stops save</text>
+
+      <!-- SavePreChange -->
+      <rect x="260" y="700" width="240" height="44" rx="10" fill="rgba(239,68,68,0.15)" stroke="#ef4444" stroke-width="1.5"/>
+      <text x="380" y="719" text-anchor="middle" font-size="12" fill="#ef4444" font-weight="600">SavePreChange</text>
+      <text x="380" y="735" text-anchor="middle" font-size="10" fill="#9ba8c4">Last chance before DB write</text>
+
+      <!-- DB Write -->
+      <rect x="280" y="776" width="200" height="36" rx="8" fill="rgba(34,211,238,0.1)" stroke="#22d3ee" stroke-width="1.5"/>
+      <text x="380" y="799" text-anchor="middle" font-size="12" fill="#22d3ee" font-weight="600">🗃️ Database Commit</text>
+
+      <!-- SavePostChange -->
+      <rect x="260" y="844" width="240" height="44" rx="10" fill="rgba(239,68,68,0.12)" stroke="#ef4444" stroke-width="1.5"/>
+      <text x="380" y="863" text-anchor="middle" font-size="12" fill="#ef4444" font-weight="600">SavePostChange</text>
+      <text x="380" y="879" text-anchor="middle" font-size="10" fill="#9ba8c4">After DB commit — downstream updates</text>
+
+      <!-- CONNECTOR LINES -->
+      <line x1="380" y1="58" x2="380" y2="90" stroke="#22c55e" stroke-width="1.5" marker-end="url(#arr-g)"/>
+      <line x1="380" y1="138" x2="380" y2="170" stroke="#22c55e" stroke-width="1.5" marker-end="url(#arr-g)"/>
+      <line x1="380" y1="218" x2="380" y2="250" stroke="#22c55e" stroke-width="1.5" marker-end="url(#arr-g)"/>
+      <line x1="380" y1="298" x2="250" y2="330" stroke="#22c55e" stroke-width="1" marker-end="url(#arr-g)"/>
+      <line x1="380" y1="298" x2="510" y2="330" stroke="#22c55e" stroke-width="1" marker-end="url(#arr-g)"/>
+      <line x1="250" y1="374" x2="340" y2="406" stroke="#22c55e" stroke-width="1" marker-end="url(#arr-g)"/>
+      <line x1="510" y1="374" x2="420" y2="406" stroke="#22c55e" stroke-width="1" marker-end="url(#arr-g)"/>
+      <line x1="280" y1="500" x2="310" y2="548" stroke="#f59e0b" stroke-width="1" marker-end="url(#arr-a)"/>
+      <line x1="590" y1="522" x2="450" y2="548" stroke="#f59e0b" stroke-width="1" marker-end="url(#arr-a)"/>
+      <line x1="380" y1="668" x2="380" y2="700" stroke="#ef4444" stroke-width="1.5" marker-end="url(#arr-r)"/>
+      <line x1="380" y1="744" x2="380" y2="776" stroke="#ef4444" stroke-width="1.5" marker-end="url(#arr-r)"/>
+      <line x1="380" y1="812" x2="380" y2="844" stroke="#ef4444" stroke-width="1.5" marker-end="url(#arr-r)"/>
+
+      <!-- ⭐ LEGEND -->
+      <rect x="590" y="840" width="160" height="50" rx="8" fill="var(--s2,#161b32)" stroke="var(--border,#232a48)" stroke-width="1"/>
+      <text x="600" y="858" font-size="11" fill="#818cf8">⭐ = Most commonly used</text>
+      <text x="600" y="874" font-size="11" fill="#ef4444">⚠ = Performance risk</text>
+    </svg>
+  </div>`;
+}
+
+function renderPIADiagram() {
+  return `<div class="flow-diagram">
+    <div class="diagram-card__title">🏗️ PeopleSoft Internet Architecture — Request Flow</div>
+    <svg viewBox="0 0 700 140" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;font-family:'IBM Plex Sans',sans-serif">
+      <defs>
+        <marker id="a2" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
+          <polygon points="0 0,7 2.5,0 5" fill="#f0a500"/>
+        </marker>
+      </defs>
+      <!-- Browser -->
+      <rect x="10" y="40" width="130" height="60" rx="10" fill="rgba(34,197,94,0.1)" stroke="#22c55e" stroke-width="1.5"/>
+      <text x="75" y="62" text-anchor="middle" font-size="18">🌐</text>
+      <text x="75" y="82" text-anchor="middle" font-size="12" fill="#22c55e" font-weight="700">Browser</text>
+      <text x="75" y="96" text-anchor="middle" font-size="9" fill="#9ba8c4">Chrome/Firefox/Edge</text>
+      <!-- Arrow 1 -->
+      <line x1="140" y1="70" x2="175" y2="70" stroke="#f0a500" stroke-width="2" marker-end="url(#a2)"/>
+      <line x1="175" y1="70" x2="140" y2="70" stroke="#f0a500" stroke-width="1" stroke-dasharray="3,3"/>
+      <text x="157" y="62" text-anchor="middle" font-size="8" fill="#f0a500">HTTP/S</text>
+      <!-- WebLogic -->
+      <rect x="175" y="40" width="130" height="60" rx="10" fill="rgba(99,102,241,0.1)" stroke="#818cf8" stroke-width="1.5"/>
+      <text x="240" y="62" text-anchor="middle" font-size="18">⚙️</text>
+      <text x="240" y="82" text-anchor="middle" font-size="12" fill="#818cf8" font-weight="700">WebLogic</text>
+      <text x="240" y="96" text-anchor="middle" font-size="9" fill="#9ba8c4">Web Tier — Presentation</text>
+      <!-- Arrow 2 -->
+      <line x1="305" y1="70" x2="340" y2="70" stroke="#f0a500" stroke-width="2" marker-end="url(#a2)"/>
+      <line x1="340" y1="70" x2="305" y2="70" stroke="#f0a500" stroke-width="1" stroke-dasharray="3,3"/>
+      <text x="322" y="62" text-anchor="middle" font-size="8" fill="#f0a500">JOLT</text>
+      <!-- Tuxedo -->
+      <rect x="340" y="40" width="130" height="60" rx="10" fill="rgba(240,165,0,0.1)" stroke="#f0a500" stroke-width="2"/>
+      <text x="405" y="62" text-anchor="middle" font-size="18">🧠</text>
+      <text x="405" y="82" text-anchor="middle" font-size="12" fill="#f0a500" font-weight="700">Tuxedo App Server</text>
+      <text x="405" y="96" text-anchor="middle" font-size="9" fill="#9ba8c4">PeopleCode · Business Logic</text>
+      <!-- Arrow 3 -->
+      <line x1="470" y1="70" x2="505" y2="70" stroke="#f0a500" stroke-width="2" marker-end="url(#a2)"/>
+      <line x1="505" y1="70" x2="470" y2="70" stroke="#f0a500" stroke-width="1" stroke-dasharray="3,3"/>
+      <text x="487" y="62" text-anchor="middle" font-size="8" fill="#f0a500">SQL</text>
+      <!-- Database -->
+      <rect x="505" y="40" width="130" height="60" rx="10" fill="rgba(239,68,68,0.1)" stroke="#ef4444" stroke-width="1.5"/>
+      <text x="570" y="62" text-anchor="middle" font-size="18">🗃️</text>
+      <text x="570" y="82" text-anchor="middle" font-size="12" fill="#ef4444" font-weight="700">Database</text>
+      <text x="570" y="96" text-anchor="middle" font-size="9" fill="#9ba8c4">Oracle / SQL Server / DB2</text>
+      <!-- Note -->
+      <text x="350" y="125" text-anchor="middle" font-size="10" fill="#4e5a7a">All business logic executes in the App Server tier — never in the browser</text>
+    </svg>
+  </div>`;
+}
+
+function renderRecordTypesDiagram() {
+  const types = [
+    {name:'SQL Table',icon:'🗄️',color:'#22c55e',desc:'Creates PS_ table in DB'},
+    {name:'SQL View',icon:'👁️',color:'#818cf8',desc:'Database view — read only'},
+    {name:'Dynamic View',icon:'⚡',color:'#f59e0b',desc:'Runtime SQL — no DB object'},
+    {name:'Derived/Work',icon:'💾',color:'#22d3ee',desc:'Memory only — no DB'},
+    {name:'SubRecord',icon:'📎',color:'#f0a500',desc:'Reusable field groups'},
+    {name:'Query View',icon:'🔍',color:'#9ba8c4',desc:'Created by PS Query'},
+    {name:'Temp Table',icon:'⏱️',color:'#ef4444',desc:'AE parallel processing'},
+  ];
+  const cards = types.map((t,i) => {
+    const x = (i % 4) * 170 + 10;
+    const y = Math.floor(i/4) * 90 + 10;
+    return `<g>
+      <rect x="${x}" y="${y}" width="155" height="72" rx="10" fill="rgba(0,0,0,0.2)" stroke="${t.color}" stroke-width="1.5"/>
+      <text x="${x+78}" y="${y+22}" text-anchor="middle" font-size="16">${t.icon}</text>
+      <text x="${x+78}" y="${y+42}" text-anchor="middle" font-size="12" fill="${t.color}" font-weight="700">${t.name}</text>
+      <text x="${x+78}" y="${y+60}" text-anchor="middle" font-size="10" fill="#9ba8c4">${t.desc}</text>
+    </g>`;
+  }).join('');
+  return `<div class="flow-diagram">
+    <div class="diagram-card__title">🗂️ The 7 PeopleSoft Record Types</div>
+    <svg viewBox="0 0 700 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;font-family:'IBM Plex Sans',sans-serif">
+      ${cards}
+    </svg>
+  </div>`;
+}
+
+function renderBufferLevelsDiagram() {
+  return `<div class="flow-diagram">
+    <div class="diagram-card__title">📦 Component Buffer Hierarchy — Scroll Levels</div>
+    <svg viewBox="0 0 660 280" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:660px;font-family:'IBM Plex Sans',sans-serif">
+      <!-- Level 0 -->
+      <rect x="200" y="10" width="260" height="54" rx="10" fill="rgba(240,165,0,0.15)" stroke="#f0a500" stroke-width="2"/>
+      <text x="330" y="33" text-anchor="middle" font-size="13" fill="#f0a500" font-weight="700">Level 0 — Primary Record</text>
+      <text x="330" y="52" text-anchor="middle" font-size="10" fill="#9ba8c4">Always 1 row · e.g., EMPLOYMENT record</text>
+      <text x="90" y="40" text-anchor="middle" font-size="11" fill="#f0a500" font-weight="600">GetRowset()</text>
+
+      <!-- Arrow down -->
+      <line x1="280" y1="64" x2="260" y2="90" stroke="#6366f1" stroke-width="1.5"/>
+      <line x1="380" y1="64" x2="400" y2="90" stroke="#6366f1" stroke-width="1.5"/>
+
+      <!-- Level 1 rows -->
+      <rect x="60" y="90" width="250" height="52" rx="10" fill="rgba(99,102,241,0.15)" stroke="#818cf8" stroke-width="1.5"/>
+      <text x="185" y="112" text-anchor="middle" font-size="12" fill="#818cf8" font-weight="700">Level 1 — Child Rows (Scroll/Grid)</text>
+      <text x="185" y="130" text-anchor="middle" font-size="10" fill="#9ba8c4">Many rows · e.g., JOB rows (effective dated)</text>
+
+      <rect x="350" y="90" width="250" height="52" rx="10" fill="rgba(99,102,241,0.15)" stroke="#818cf8" stroke-width="1.5"/>
+      <text x="475" y="112" text-anchor="middle" font-size="12" fill="#818cf8" font-weight="700">Level 1 — Another Child Scroll</text>
+      <text x="475" y="130" text-anchor="middle" font-size="10" fill="#9ba8c4">Multiple grids can exist at Level 1</text>
+
+      <!-- Rowset label -->
+      <text x="30" y="120" text-anchor="middle" font-size="11" fill="#818cf8" font-weight="600">GetRowset</text>
+      <text x="30" y="134" text-anchor="middle" font-size="11" fill="#818cf8" font-weight="600">(Scroll.JOB)</text>
+
+      <!-- Arrow down from level 1 left -->
+      <line x1="185" y1="142" x2="185" y2="168" stroke="#22d3ee" stroke-width="1.5"/>
+
+      <!-- Level 2 -->
+      <rect x="60" y="168" width="250" height="52" rx="10" fill="rgba(34,211,238,0.12)" stroke="#22d3ee" stroke-width="1.5"/>
+      <text x="185" y="190" text-anchor="middle" font-size="12" fill="#22d3ee" font-weight="700">Level 2 — Grandchild Rows</text>
+      <text x="185" y="208" text-anchor="middle" font-size="10" fill="#9ba8c4">Scroll within a scroll — less common</text>
+
+      <!-- Code snippet -->
+      <rect x="60" y="240" width="540" height="32" rx="6" fill="rgba(7,9,17,0.8)" stroke="#232a48" stroke-width="1"/>
+      <text x="330" y="260" text-anchor="middle" font-size="11" fill="#a5f3fc" font-family="IBM Plex Mono,monospace">GetRowset() → GetRow(n) → GetRecord(Record.JOB) → DEPTID.Value</text>
+    </svg>
+  </div>`;
+}
+
+/* ═══════════════════════════════════════════════
+   THEME TOGGLE
+═══════════════════════════════════════════════ */
+function toggleTheme() {
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  const newTheme = isLight ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', newTheme);
+  document.getElementById('themeKnob').textContent = newTheme === 'light' ? '☀️' : '🌙';
+  document.getElementById('themeLabel').textContent = newTheme === 'light' ? 'Day' : 'Night';
+  localStorage.setItem('pslearn-theme', newTheme);
+}
+// Restore saved theme
+(function(){
+  const saved = localStorage.getItem('pslearn-theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+  const knob = document.getElementById('themeKnob');
+  const label = document.getElementById('themeLabel');
+  if (knob) knob.textContent = saved === 'light' ? '☀️' : '🌙';
+  if (label) label.textContent = saved === 'light' ? 'Day' : 'Night';
+})();
+
+function toggleSection(btn, si) {
+  const chevron = btn.querySelector('.section-block__chevron');
+  const bodyId = btn.closest('.section-block').querySelector('[id^="sec-"]').id;
+  const prevId = btn.closest('.section-block').querySelector('[id^="prev-"]').id;
+  const body = document.getElementById(bodyId);
+  const prev = document.getElementById(prevId);
+  const isOpen = body.style.display !== 'none';
+
+  body.style.display = isOpen ? 'none' : 'block';
+  prev.style.display = isOpen ? 'block' : 'none';
+  chevron.classList.toggle('open', !isOpen);
+}
+
+/* ═══════════════════════════════════════════════
+   HOMEPAGE JAVASCRIPT
+═══════════════════════════════════════════════ */
+/* Build curriculum topic grids */
+['b','i','a'].forEach(level => {
+  const grid = document.getElementById(`topics-${level}`);
+  if (!grid) return;
+  CURRICULUM_LIST[level].forEach((topic, i) => {
+    const div = document.createElement('div');
+    div.className = 'topic-item';
+    const isClickable = level === 'b';
+    div.innerHTML = `
+      <span class="topic-item__num">${String(i+1).padStart(2,'0')}</span>
+      <span class="topic-item__dot dot--${level}"></span>
+      <span>${topic}</span>
+      <span class="topic-item__arrow">›</span>
+    `;
+    if (isClickable) div.onclick = () => openTopic(i);
+    grid.appendChild(div);
+  });
+});
+
+/* Curriculum tab switcher */
+function switchTab(btn, level) {
+  document.querySelectorAll('.curriculum-tab').forEach(t => t.classList.remove('ab','ai','aa'));
+  document.querySelectorAll('.curriculum-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('a' + level);
+  document.getElementById(`panel-${level}`).classList.add('active');
+}
+
+/* Marquee */
+const allTopics = [...CURRICULUM_LIST.b, ...CURRICULUM_LIST.i, ...CURRICULUM_LIST.a];
+const track = document.getElementById('marqueeTrack');
+[...allTopics, ...allTopics].forEach(t => {
+  const span = document.createElement('span');
+  span.className = 'marquee-item';
+  span.innerHTML = `<span>✦</span>${t}`;
+  track.appendChild(span);
+});
+
+/* Scroll reveal */
+const revealObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); revealObs.unobserve(e.target); }
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+
+/* Nav scroll border */
+const mainNav = document.getElementById('mainNav');
+window.addEventListener('scroll', () => {
+  mainNav.style.borderBottomColor = window.scrollY > 60 ? 'rgba(45,55,96,.9)' : 'var(--border)';
+}, { passive: true });
+
+/* Counter animation */
+function animateCounters() {
+  document.querySelectorAll('.stat-item__number').forEach(el => {
+    const target = parseInt(el.textContent);
+    if (isNaN(target)) return;
+    const suffix = el.textContent.replace(/[0-9]/g, '');
+    let start = 0;
+    const step = ts => {
+      if (!start) start = ts;
+      const p = Math.min((ts - start) / 1600, 1);
+      el.textContent = Math.floor((1 - Math.pow(1-p,3)) * target) + suffix;
+      if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  });
+}
+const statsObs = new IntersectionObserver(entries => {
+  if (entries[0].isIntersecting) { animateCounters(); statsObs.disconnect(); }
+}, { threshold: 0.5 });
+const statsBar = document.querySelector('.stats-bar');
+if (statsBar) statsObs.observe(statsBar);
+</script>
+</body>
+</html>
