@@ -4,6 +4,32 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>PSLearn — Master PeopleSoft from Zero to Expert</title>
+
+<!-- ── SEO META TAGS ── -->
+<meta name="description" content="PSLearn is a free, structured PeopleSoft learning platform covering PeopleCode, Application Engine, Fluid UI, Integration Broker, and more. Built for beginners to enterprise experts."/>
+<meta name="keywords" content="PeopleSoft, PeopleCode, PeopleTools, HCM, FSCM, Application Engine, Fluid UI, Integration Broker, PS Query, PeopleSoft Tutorial, PeopleSoft Learning"/>
+<meta name="author" content="Koushik Ram M"/>
+<meta name="robots" content="index, follow"/>
+<link rel="canonical" href="https://pslearn.vercel.app/"/>
+
+<!-- ── OPEN GRAPH (LinkedIn, WhatsApp, Facebook) ── -->
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://pslearn.vercel.app/"/>
+<meta property="og:title" content="PSLearn — Master PeopleSoft from Zero to Expert"/>
+<meta property="og:description" content="Free structured learning platform for PeopleSoft. 20+ beginner topics, mini quizzes, real-world scenarios, and interview prep — all in one place."/>
+<meta property="og:image" content="https://pslearn.vercel.app/og-preview.png"/>
+<meta property="og:site_name" content="PSLearn"/>
+
+<!-- ── TWITTER CARD ── -->
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="PSLearn — Master PeopleSoft from Zero to Expert"/>
+<meta name="twitter:description" content="Free structured PeopleSoft learning. PeopleCode, Architecture, Fluid UI, PS Query, Security and more."/>
+
+<!-- ── FAVICON (SVG inline as data URI) ── -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23080c18'/%3E%3Crect width='32' height='32' rx='8' fill='url(%23g)'/%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23f0a500'/%3E%3Cstop offset='1' stop-color='%23e06c00'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='8' fill='%23080c18'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Arial,sans-serif' font-weight='800' font-size='14' fill='%23f0a500'%3EPS%3C/text%3E%3C/svg%3E"/>
+<link rel="icon" type="image/png" sizes="32x32" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23080c18'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Arial,sans-serif' font-weight='800' font-size='14' fill='%23f0a500'%3EPS%3C/text%3E%3C/svg%3E"/>
+<meta name="theme-color" content="#080c18"/>
+
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
@@ -551,9 +577,121 @@ button{font-family:inherit;cursor:pointer}
 .glossary-term__def.open{display:block}
 .glossary-empty{text-align:center;padding:60px 20px;color:var(--faint);font-size:15px}
 
-/* ── FEATURE 9: APP DESIGNER UI ILLUSTRATION ── */
+/* ── UI ILLUSTRATION ── */
 .ui-illustration{margin:18px 0;border-radius:12px;overflow:hidden;border:1px solid var(--border)}
 .ui-illustration svg{display:block;width:100%}
+
+/* ── COPY BUTTON ON CODE BLOCKS ── */
+.code-wrap{position:relative;margin-top:14px}
+.copy-btn{
+  position:absolute;top:8px;right:8px;
+  background:var(--s3);border:1px solid var(--border-hi);border-radius:6px;
+  color:var(--soft);font-family:var(--fm);font-size:11px;font-weight:500;
+  padding:4px 10px;cursor:pointer;transition:all .2s;
+  display:flex;align-items:center;gap:5px;
+}
+.copy-btn:hover{background:var(--indigo-lo);color:#fff;border-color:var(--indigo)}
+.copy-btn.copied{background:rgba(34,197,94,0.15);color:var(--green);border-color:var(--green)}
+
+/* ── KEYBOARD NAV HINT ── */
+.keyboard-hint{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  padding:10px 0 0;font-family:var(--fm);font-size:11px;color:var(--faint);
+}
+.key-badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:22px;height:20px;border-radius:4px;
+  background:var(--s2);border:1px solid var(--border-hi);
+  font-size:11px;color:var(--soft);
+}
+
+/* ── HOMEPAGE SEARCH ── */
+.homepage-search{
+  position:relative;z-index:1;
+  background:var(--s0);border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  padding:32px 0;
+}
+.homepage-search__inner{max-width:640px;margin:0 auto;padding:0 24px}
+.homepage-search__label{
+  font-family:var(--fm);font-size:11px;text-transform:uppercase;
+  letter-spacing:.12em;color:var(--gold);margin-bottom:12px;
+  display:flex;align-items:center;gap:6px;
+}
+.homepage-search__bar{
+  width:100%;background:var(--s1);border:1.5px solid var(--border-hi);
+  border-radius:12px;padding:14px 20px 14px 48px;color:var(--text);
+  font-size:15px;font-family:var(--fb);outline:none;
+  transition:border-color .2s,box-shadow .2s;
+}
+.homepage-search__bar:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-glow)}
+.homepage-search__bar::placeholder{color:var(--faint)}
+.homepage-search__icon{
+  position:absolute;left:36px;top:50%;transform:translateY(-50%);
+  font-size:18px;pointer-events:none;
+}
+.homepage-search__results{
+  margin-top:10px;background:var(--s1);border:1px solid var(--border);
+  border-radius:10px;overflow:hidden;display:none;
+}
+.homepage-search__results.open{display:block}
+.hp-result{
+  display:flex;align-items:center;gap:12px;
+  padding:11px 16px;cursor:pointer;border-bottom:1px solid var(--border);
+  transition:background .15s;font-size:14px;color:var(--soft);
+}
+.hp-result:last-child{border-bottom:none}
+.hp-result:hover{background:var(--s2);color:var(--text)}
+.hp-result__num{font-family:var(--fm);font-size:11px;color:var(--faint);width:20px;flex-shrink:0}
+.hp-result__dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.hp-result__title{flex:1}
+.hp-result__module{font-family:var(--fm);font-size:10px;color:var(--faint);margin-left:auto}
+.hp-result__arrow{color:var(--faint);font-size:14px}
+.hp-no-result{padding:16px;text-align:center;color:var(--faint);font-size:13px}
+
+/* ── ABOUT SECTION ── */
+.about-section{position:relative;z-index:1;background:var(--s0);border-top:1px solid var(--border)}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start}
+.about-platform__label{font-family:var(--fm);font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--gold);margin-bottom:14px}
+.about-platform__title{font-family:var(--fd);font-size:26px;font-weight:800;letter-spacing:-1px;color:var(--text);margin-bottom:14px}
+.about-platform__body{font-size:14px;color:var(--soft);line-height:1.8;margin-bottom:16px}
+.about-sources{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.about-source-chip{
+  font-family:var(--fm);font-size:11px;padding:4px 12px;border-radius:999px;
+  background:var(--s2);border:1px solid var(--border-hi);color:var(--soft);
+}
+.builder-card{
+  background:var(--s1);border:1px solid var(--border-hi);border-radius:16px;
+  padding:28px;position:relative;overflow:hidden;
+}
+.builder-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--gold),var(--indigo));
+}
+.builder-card__label{font-family:var(--fm);font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--faint);margin-bottom:16px}
+.builder-card__avatar{
+  width:56px;height:56px;border-radius:50%;
+  background:linear-gradient(135deg,var(--gold),#e06c00);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--fd);font-weight:800;font-size:20px;color:var(--void);
+  margin-bottom:14px;
+}
+.builder-card__name{font-family:var(--fd);font-size:20px;font-weight:800;color:var(--text);margin-bottom:4px}
+.builder-card__role{font-size:13px;color:var(--gold);font-weight:500;margin-bottom:16px;font-family:var(--fm)}
+.builder-card__bio{font-size:13px;color:var(--soft);line-height:1.7;margin-bottom:18px}
+.builder-card__linkedin{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(10,102,194,0.12);border:1px solid rgba(10,102,194,0.3);
+  color:#0a66c2;border-radius:8px;padding:9px 16px;
+  font-size:13px;font-weight:600;font-family:var(--fb);
+  text-decoration:none;transition:all .2s;
+}
+.builder-card__linkedin:hover{background:rgba(10,102,194,0.2);transform:translateY(-1px)}
+[data-theme="light"] .builder-card__linkedin{color:#004182}
+
+@media(max-width:768px){.about-grid{grid-template-columns:1fr;gap:28px}}
+
+/* ── FEATURE 9 & DIAGRAM ── */
 
 /* RESPONSIVE */
 @media(max-width:1024px){.concepts-grid{grid-template-columns:repeat(2,1fr)}}
@@ -567,42 +705,34 @@ button{font-family:inherit;cursor:pointer}
   .features-grid{grid-template-columns:1fr}.concepts-grid{grid-template-columns:1fr}
   .nav__links{display:none}.stat-item{border-right:none;border-bottom:1px solid var(--border)}
   .topic-content{padding:16px 14px}
-  /* Sidebar becomes a fixed full-height drawer on mobile */
+
+  /* ── SIDEBAR = FIXED DRAWER ON MOBILE ── */
   .sidebar{
     position:fixed !important;
     top:60px !important;
-    left:-100% !important;
-    width:88% !important;
-    max-width:340px !important;
-    height:calc(100vh - 60px) !important;
-    z-index:600 !important;
-    transition:left .28s var(--ease) !important;
-    box-shadow:6px 0 40px rgba(0,0,0,0.8) !important;
-    background:#0c1020 !important;
+    left:-110% !important;
+    width:88vw !important;
+    max-width:320px !important;
+    height:calc(100dvh - 60px) !important;
+    z-index:9000 !important;
+    transition:left .3s cubic-bezier(0.16,1,0.3,1) !important;
+    box-shadow:none !important;
+    background:var(--s0) !important;
+    border-right:1px solid var(--border) !important;
     opacity:1 !important;
     backdrop-filter:none !important;
+    -webkit-backdrop-filter:none !important;
+    overflow-y:auto !important;
   }
   [data-theme="light"] .sidebar{background:#f0f4fb !important}
-  .sidebar.drawer-open{left:0 !important}
-}
-
-
-/* ── MOBILE DRAWER OVERLAY ── */
-.drawer-overlay{
-  display:none;
-  position:fixed;
-  top:60px;left:0;right:0;bottom:0;
-  background:rgba(0,0,0,0.75);
-  z-index:598;
-  backdrop-filter:none;
-  -webkit-backdrop-filter:none;
-}
-.drawer-overlay.visible{display:block}
-
-@media(max-width:600px){
-  /* Collapse sidebar from normal layout flow — it's a drawer now */
+  .sidebar.drawer-open{
+    left:0 !important;
+    box-shadow:8px 0 48px rgba(0,0,0,0.85) !important;
+  }
+  /* Collapse sidebar from flex layout — drawer is outside flow */
   .app-layout > aside.sidebar{
     width:0 !important;
+    min-width:0 !important;
     border:none !important;
     flex-shrink:0 !important;
   }
@@ -645,6 +775,21 @@ button{font-family:inherit;cursor:pointer}
   .mobile-topbar{display:flex}
   .fab-topics{display:flex}
 }
+
+/* ── MOBILE DRAWER OVERLAY ── */
+.drawer-overlay{
+  display:none;
+  position:fixed;
+  top:0;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,0.82);
+  z-index:8999;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+.drawer-overlay.visible{display:block}
+
+/* ── FEATURE 9 ── */
+.ui-illustration{margin:18px 0;border-radius:12px;overflow:hidden;border:1px solid var(--border)}
 </style>
 </head>
 <body>
@@ -671,6 +816,7 @@ button{font-family:inherit;cursor:pointer}
         <button class="nav__link" onclick="showGlossary()">Glossary</button>
         <button class="nav__link">Quiz</button>
         <button class="nav__link">Interview Prep</button>
+        <button class="nav__link" onclick="showHome();setTimeout(()=>document.querySelector('.about-section').scrollIntoView({behavior:'smooth'}),100)">About</button>
       </div>
       <div class="nav__actions">
         <span class="nav__badge">✦ Free Platform</span>
@@ -728,6 +874,22 @@ button{font-family:inherit;cursor:pointer}
 
 <!-- MARQUEE -->
 <div class="marquee-wrap" aria-hidden="true"><div class="marquee-track" id="marqueeTrack"></div></div>
+
+<!-- HOMEPAGE SEARCH -->
+<div class="homepage-search">
+  <div class="homepage-search__inner">
+    <div class="homepage-search__label">🔍 Find a Topic</div>
+    <div style="position:relative">
+      <span class="homepage-search__icon">🔍</span>
+      <input class="homepage-search__bar" id="homepageSearchBar" type="text"
+        placeholder="Search any topic — e.g. PeopleCode, Effective Dating, Security..."
+        oninput="homepageSearch(this.value)"
+        onkeydown="homepageSearchKey(event)"
+        autocomplete="off"/>
+      <div class="homepage-search__results" id="homepageSearchResults"></div>
+    </div>
+  </div>
+</div>
 
 <!-- WHAT IS PEOPLESOFT -->
 <section class="section intro-strip">
@@ -905,6 +1067,53 @@ button{font-family:inherit;cursor:pointer}
       <button class="btn btn--ghost btn--lg">Test Your Knowledge 🧠</button>
     </div>
     <p class="cta-note reveal">No login required · 100% free · Learn at your own pace</p>
+  </div>
+</section>
+
+<!-- ABOUT SECTION -->
+<section class="section about-section">
+  <div class="container">
+    <div class="about-grid">
+      <!-- LEFT: Platform info -->
+      <div class="reveal">
+        <div class="about-platform__label">// About This Platform</div>
+        <h2 class="about-platform__title">Built to Make PeopleSoft <span style="color:var(--gold)">Accessible</span></h2>
+        <p class="about-platform__body">
+          PSLearn is a free, structured learning platform built to make PeopleSoft accessible to everyone — from complete beginners to experienced developers looking to upskill. Every topic is written in plain English with real-world context, not just syntax dumps.
+        </p>
+        <p class="about-platform__body">
+          Content is sourced, reframed, and explained based on Oracle PeopleBooks documentation, PeopleSoft community resources, and real enterprise implementation experience across HCM, FSCM, and Campus Solutions.
+        </p>
+        <div class="about-platform__label" style="margin-top:20px">📚 Sources & References</div>
+        <div class="about-sources">
+          <span class="about-source-chip">Oracle PeopleBooks</span>
+          <span class="about-source-chip">PeopleSoft Tutorial</span>
+          <span class="about-source-chip">PeopleSoft Community</span>
+          <span class="about-source-chip">Real Project Experience</span>
+          <span class="about-source-chip">PeopleTools Documentation</span>
+        </div>
+      </div>
+      <!-- RIGHT: Builder card -->
+      <div class="reveal" style="transition-delay:.12s">
+        <div class="builder-card">
+          <div class="builder-card__label">👤 Built By</div>
+          <div class="builder-card__avatar">KR</div>
+          <div class="builder-card__name">Koushik Ram M</div>
+          <div class="builder-card__role">PeopleSoft Technical Consultant</div>
+          <div class="builder-card__bio">
+            Passionate about making PeopleSoft knowledge accessible to everyone — from fresh graduates entering the ERP world to experienced professionals looking to sharpen their technical edge.
+          </div>
+          <a href="https://www.linkedin.com/in/koushik-ram-m-3b6599210"
+             target="_blank" rel="noopener"
+             class="builder-card__linkedin">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+            </svg>
+            Connect on LinkedIn ↗
+          </a>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -2920,15 +3129,91 @@ let currentTopicIndex = 0;
    MOBILE DRAWER
 ═══════════════════════════════════════════════ */
 function openDrawer() {
-  document.getElementById('mobileSidebar').classList.add('drawer-open');
-  document.getElementById('drawerOverlay').classList.add('visible');
+  const sb = document.getElementById('mobileSidebar');
+  const ov = document.getElementById('drawerOverlay');
+  if(sb) sb.classList.add('drawer-open');
+  if(ov) ov.classList.add('visible');
   document.body.style.overflow = 'hidden';
 }
 function closeDrawer() {
-  document.getElementById('mobileSidebar').classList.remove('drawer-open');
-  document.getElementById('drawerOverlay').classList.remove('visible');
+  const sb = document.getElementById('mobileSidebar');
+  const ov = document.getElementById('drawerOverlay');
+  if(sb) sb.classList.remove('drawer-open');
+  if(ov) ov.classList.remove('visible');
   document.body.style.overflow = '';
 }
+
+/* ═══════════════════════════════════════════════
+   HOMEPAGE SEARCH (Feature 2)
+═══════════════════════════════════════════════ */
+function homepageSearch(val) {
+  const res = document.getElementById('homepageSearchResults');
+  if (!res) return;
+  const q = val.trim().toLowerCase();
+  if (!q) { res.classList.remove('open'); res.innerHTML=''; return; }
+
+  const matches = TOPICS.filter(t =>
+    t.title.toLowerCase().includes(q) ||
+    t.summary.toLowerCase().includes(q) ||
+    (t.keyPoints||[]).some(kp => kp.toLowerCase().includes(q))
+  ).slice(0, 6);
+
+  if (!matches.length) {
+    res.innerHTML = `<div class="hp-no-result">No topics found for "<strong>${val}</strong>"</div>`;
+    res.classList.add('open');
+    return;
+  }
+  const dotColors = ['#22c55e','#22c55e','#22c55e','#22c55e','#f59e0b','#f59e0b','#f59e0b','#f59e0b','#ef4444'];
+  res.innerHTML = matches.map(t => {
+    const idx = TOPICS.indexOf(t);
+    const mod = MODULES[t.module];
+    const color = dotColors[t.module] || '#818cf8';
+    return `<div class="hp-result" onclick="openTopic(${idx});document.getElementById('homepageSearchBar').value='';document.getElementById('homepageSearchResults').classList.remove('open')">
+      <span class="hp-result__num">${t.num}</span>
+      <span class="hp-result__dot" style="background:${color}"></span>
+      <span class="hp-result__title">${t.title}</span>
+      <span class="hp-result__module">${mod.icon} ${mod.name.split(':')[0]}</span>
+      <span class="hp-result__arrow">›</span>
+    </div>`;
+  }).join('');
+  res.classList.add('open');
+}
+
+function homepageSearchKey(e) {
+  if (e.key === 'Escape') {
+    document.getElementById('homepageSearchResults').classList.remove('open');
+    e.target.blur();
+  }
+}
+
+// Close search on outside click
+document.addEventListener('click', e => {
+  const bar = document.getElementById('homepageSearchBar');
+  const results = document.getElementById('homepageSearchResults');
+  if (bar && results && !bar.contains(e.target) && !results.contains(e.target)) {
+    results.classList.remove('open');
+  }
+});
+
+/* ═══════════════════════════════════════════════
+   KEYBOARD NAVIGATION (Feature 4)
+═══════════════════════════════════════════════ */
+document.addEventListener('keydown', e => {
+  // Only active when app view is visible and no input is focused
+  const appView = document.getElementById('appView');
+  if (!appView || appView.style.display === 'none') return;
+  const focused = document.activeElement;
+  if (focused && (focused.tagName === 'INPUT' || focused.tagName === 'TEXTAREA')) return;
+
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+    e.preventDefault();
+    if (currentTopicIndex < TOPICS.length - 1) openTopic(currentTopicIndex + 1);
+  } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    if (currentTopicIndex > 0) openTopic(currentTopicIndex - 1);
+  }
+});
+
 
 /* ═══════════════════════════════════════════════
    VIEW MANAGEMENT
@@ -3166,7 +3451,13 @@ function renderTopic(index) {
   } else {
     html += `<div></div>`;
   }
-  html += `</div>`;
+  html += `</div>
+  <div class="keyboard-hint">
+    <span class="key-badge">←</span> Prev
+    <span style="margin:0 6px;color:var(--border-hi)">·</span>
+    <span class="key-badge">→</span> Next
+    <span style="margin-left:8px;font-size:11px;color:var(--faint)">Use arrow keys to navigate topics</span>
+  </div>`;
 
   container.innerHTML = html;
   container.scrollTop = 0;
@@ -3178,10 +3469,16 @@ function renderSectionBody(body) {
     para = para.trim();
     if (!para) return '';
 
-    /* Code block */
+    /* Code block — wrap with copy button */
     if (para.startsWith('```') || (para.startsWith('`') && para.includes('\n'))) {
       const code = para.replace(/^```[a-z]*\n?/, '').replace(/\n?```$/, '').replace(/^`\n?/, '').replace(/\n?`$/, '');
-      return `<pre class="section-code">${escHtml(code)}</pre>`;
+      const escaped = escHtml(code);
+      return `<div class="code-wrap">
+        <pre class="section-code">${escaped}</pre>
+        <button class="copy-btn" onclick="copyCode(this,'${btoa(unescape(encodeURIComponent(code)))}')">
+          <span>📋</span> Copy
+        </button>
+      </div>`;
     }
 
     /* Format inline */
@@ -3189,7 +3486,7 @@ function renderSectionBody(body) {
       .replace(/\*\*(.+?)\*\*/g, '<strong style="color:#a5b4fc">$1</strong>')
       .replace(/`([^`]+)`/g, '<code style="background:#1e2340;color:#a5f3fc;padding:2px 6px;border-radius:4px;font-size:0.9em;font-family:var(--fm)">$1</code>');
 
-    /* List detection (lines starting with - or numbered) */
+    /* List detection */
     if (para.includes('\n- ') || para.startsWith('- ')) {
       const items = para.split('\n').filter(l => l.trim());
       return `<ul class="section-list">${items.map(item => {
@@ -3856,8 +4153,34 @@ function toggleGlossaryTerm(el) {
 
 
 /* ═══════════════════════════════════════════════
-   HOMEPAGE JAVASCRIPT
+   COPY CODE (Feature 3)
 ═══════════════════════════════════════════════ */
+function copyCode(btn, b64) {
+  try {
+    const text = decodeURIComponent(escape(atob(b64)));
+    navigator.clipboard.writeText(text).then(() => {
+      btn.classList.add('copied');
+      btn.innerHTML = '<span>✅</span> Copied!';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = '<span>📋</span> Copy';
+      }, 2000);
+    });
+  } catch(e) {
+    // Fallback for older browsers
+    const ta = document.createElement('textarea');
+    ta.value = decodeURIComponent(escape(atob(b64)));
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.classList.add('copied');
+    btn.innerHTML = '<span>✅</span> Copied!';
+    setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = '<span>📋</span> Copy'; }, 2000);
+  }
+}
+
+
 /* Build curriculum topic grids */
 ['b','i','a'].forEach(level => {
   const grid = document.getElementById(`topics-${level}`);
