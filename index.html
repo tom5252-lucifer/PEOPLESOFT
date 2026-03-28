@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>PSLearn — Master PeopleSoft from Zero to Expert</title>
-   
+
 <!-- ── SEO META TAGS ── -->
 <meta name="description" content="PSLearn is a free, structured PeopleSoft learning platform covering PeopleCode, Application Engine, Fluid UI, Integration Broker, and more. Built for beginners to enterprise experts."/>
 <meta name="keywords" content="PeopleSoft, PeopleCode, PeopleTools, HCM, FSCM, Application Engine, Fluid UI, Integration Broker, PS Query, PeopleSoft Tutorial, PeopleSoft Learning"/>
@@ -792,8 +792,222 @@ button{font-family:inherit;cursor:pointer}
 }
 .drawer-overlay.visible{display:block}
 
-/* ── FEATURE 9 ── */
-.ui-illustration{margin:18px 0;border-radius:12px;overflow:hidden;border:1px solid var(--border)}
+/* ── OUTCOME CARDS ── */
+.outcome-card{
+  background:var(--s1);border:1px solid var(--border);border-radius:12px;
+  padding:20px;transition:border-color .2s,transform .2s var(--ease);
+}
+.outcome-card:hover{border-color:var(--gold);transform:translateY(-3px)}
+.outcome-card__icon{font-size:26px;margin-bottom:12px}
+.outcome-card__title{font-family:var(--fd);font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px}
+.outcome-card__desc{font-size:13px;color:var(--soft);line-height:1.65}
+@media(max-width:768px){
+  .outcome-card{padding:16px}
+  div:has(>.outcome-card){grid-template-columns:1fr 1fr !important}
+}
+@media(max-width:480px){
+  div:has(>.outcome-card){grid-template-columns:1fr !important}
+}
+
+/* ── SAMPLE LESSON ── */
+.sample-lesson{
+  background:var(--s1);border:1px solid var(--border-hi);border-radius:16px;
+  overflow:hidden;
+}
+.sample-lesson__header{
+  padding:24px 28px;border-bottom:1px solid var(--border);
+  background:linear-gradient(135deg,rgba(99,102,241,0.06),rgba(240,165,0,0.04));
+}
+.sample-lesson__badge{
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:var(--fm);font-size:11px;color:var(--soft);
+  background:var(--s2);border:1px solid var(--border);border-radius:999px;
+  padding:3px 12px;margin-bottom:12px;
+}
+.sample-lesson__title{font-family:var(--fd);font-size:22px;font-weight:800;color:var(--text);margin-bottom:8px;letter-spacing:-0.5px}
+.sample-lesson__summary{font-size:14px;color:var(--soft);line-height:1.7}
+.sample-lesson__body{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.sample-lesson__col{padding:22px 28px;border-right:1px solid var(--border)}
+.sample-lesson__col:last-child{border-right:none}
+.sample-lesson__section-label{
+  font-family:var(--fm);font-size:10px;text-transform:uppercase;
+  letter-spacing:.1em;color:var(--gold);margin-bottom:10px;font-weight:600;
+}
+.sample-lesson__list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px}
+.sample-lesson__list li{
+  display:flex;gap:8px;align-items:flex-start;
+  font-size:13px;color:var(--soft);line-height:1.5;
+}
+.sample-lesson__list li::before{content:'→';color:var(--indigo-hi);flex-shrink:0}
+.sample-lesson__mistake{
+  background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.15);
+  border-radius:8px;padding:12px 14px;
+}
+@media(max-width:600px){
+  .sample-lesson__body{grid-template-columns:1fr}
+  .sample-lesson__col{border-right:none;border-bottom:1px solid var(--border)}
+  .sample-lesson__col:last-child{border-bottom:none}
+  .sample-lesson__header,.sample-lesson__col{padding:16px}
+}
+
+/* ── DESKTOP BACK BAR ── */
+.desktop-back-bar{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 20px;background:var(--s0);
+  border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.back-home-btn{
+  background:none;border:none;color:var(--indigo-hi);font-size:13px;
+  font-family:var(--fb);font-weight:600;cursor:pointer;padding:0;
+  transition:color .2s;display:flex;align-items:center;gap:5px;
+}
+.back-home-btn:hover{color:var(--gold)}
+.back-divider{color:var(--faint);font-size:12px}
+
+/* ══════════════════════════════════════════
+   QUIZ ENGINE
+══════════════════════════════════════════ */
+#quizView{
+  display:none;position:relative;z-index:1;
+  min-height:100vh;padding-top:60px;
+  background:var(--base);
+}
+
+/* Quiz Home */
+.quiz-home{max-width:880px;margin:0 auto;padding:40px 24px}
+.quiz-home__back{background:none;border:none;color:var(--soft);font-size:13px;cursor:pointer;padding:0 0 20px;font-family:var(--fb);display:flex;align-items:center;gap:6px}
+.quiz-home__back:hover{color:var(--gold)}
+.quiz-home__header{text-align:center;margin-bottom:40px}
+.quiz-home__tag{font-family:var(--fm);font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--gold);margin-bottom:12px}
+.quiz-home__title{font-family:var(--fd);font-size:clamp(28px,4vw,42px);font-weight:800;letter-spacing:-1.5px;color:var(--text);margin-bottom:10px}
+.quiz-home__sub{font-size:15px;color:var(--soft);line-height:1.6}
+
+.quiz-modes{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:32px}
+@media(max-width:600px){.quiz-modes{grid-template-columns:1fr}}
+.quiz-mode-card{
+  background:var(--s1);border:1.5px solid var(--border);border-radius:16px;
+  padding:28px 24px;cursor:pointer;transition:all .22s var(--ease);text-align:left;
+}
+.quiz-mode-card:hover{transform:translateY(-4px);border-color:var(--indigo);box-shadow:0 8px 32px rgba(99,102,241,.15)}
+.quiz-mode-card.selected{border-color:var(--gold);background:rgba(240,165,0,.06);box-shadow:0 0 0 2px var(--gold)}
+.quiz-mode-card__top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+.quiz-mode-card__icon{font-size:32px}
+.quiz-mode-card__badge{font-family:var(--fm);font-size:11px;border-radius:999px;padding:3px 11px;font-weight:600}
+.badge-green{background:rgba(34,197,94,.12);color:var(--green);border:1px solid rgba(34,197,94,.25)}
+.badge-indigo{background:rgba(99,102,241,.12);color:var(--indigo-hi);border:1px solid rgba(99,102,241,.25)}
+.quiz-mode-card__title{font-family:var(--fd);font-size:18px;font-weight:800;color:var(--text);margin-bottom:8px;letter-spacing:-.5px}
+.quiz-mode-card__desc{font-size:13px;color:var(--soft);line-height:1.7;margin-bottom:16px}
+.quiz-mode-card__meta{display:flex;flex-wrap:wrap;gap:8px}
+.q-meta-chip{font-family:var(--fm);font-size:11px;background:var(--s3);border:1px solid var(--border-hi);border-radius:6px;padding:3px 10px;color:var(--soft)}
+
+/* Module selector */
+.quiz-module-section{background:var(--s0);border:1px solid var(--border);border-radius:12px;padding:20px 22px;margin-bottom:20px;display:none}
+.quiz-module-section.visible{display:block}
+.quiz-module-label{font-family:var(--fm);font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--soft);margin-bottom:12px}
+.quiz-module-grid{display:flex;flex-wrap:wrap;gap:8px}
+.qmod-btn{font-family:var(--fm);font-size:12px;padding:7px 14px;border-radius:8px;border:1px solid var(--border-hi);background:var(--s2);color:var(--soft);cursor:pointer;transition:all .18s}
+.qmod-btn:hover{color:var(--text);background:var(--s3)}
+.qmod-btn.active{background:rgba(99,102,241,.15);border-color:var(--indigo);color:var(--indigo-hi)}
+
+.quiz-start-bar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
+.quiz-start-info{font-size:14px;color:var(--soft)}
+.quiz-start-info strong{color:var(--text)}
+.quiz-start-btn{
+  padding:13px 32px;border-radius:10px;font-family:var(--fd);font-size:15px;font-weight:700;
+  cursor:pointer;border:none;background:linear-gradient(135deg,var(--gold),#d08a00);
+  color:var(--void);transition:all .22s var(--ease);
+}
+.quiz-start-btn:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(240,165,0,.35)}
+.quiz-start-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+
+/* Active Quiz */
+.quiz-active{max-width:680px;margin:0 auto;padding:32px 24px}
+.quiz-top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.quiz-top-left{display:flex;align-items:center;gap:12px}
+.quiz-q-counter{font-family:var(--fm);font-size:13px;color:var(--soft)}
+.quiz-category-chip{font-family:var(--fm);font-size:11px;background:var(--s2);border:1px solid var(--border);border-radius:999px;padding:3px 11px;color:var(--faint)}
+.quiz-timer{display:flex;align-items:center;gap:6px;font-family:var(--fd);font-size:18px;font-weight:800;color:var(--text);min-width:48px;justify-content:flex-end}
+.quiz-timer.warning{color:var(--red)}
+.quiz-timer.danger{color:var(--red);animation:pulse-dot .5s ease infinite}
+.quiz-progress-track{height:5px;background:var(--s3);border-radius:99px;overflow:hidden;margin-bottom:28px}
+.quiz-progress-fill{height:100%;background:linear-gradient(90deg,var(--indigo),var(--gold));border-radius:99px;transition:width .3s var(--ease)}
+.quiz-timer-track{height:3px;background:var(--s3);border-radius:99px;overflow:hidden;margin-bottom:28px}
+.quiz-timer-fill{height:100%;border-radius:99px;transition:width 1s linear}
+.timer-green{background:var(--green)}.timer-amber{background:var(--amber)}.timer-red{background:var(--red)}
+
+.quiz-question-card{background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:20px}
+.quiz-q-num{font-family:var(--fm);font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--faint);margin-bottom:10px}
+.quiz-q-text{font-family:var(--fd);font-size:18px;font-weight:700;color:var(--text);line-height:1.45;letter-spacing:-.3px}
+.quiz-scenario-badge{display:inline-flex;align-items:center;gap:5px;font-family:var(--fm);font-size:10px;background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.2);color:var(--gold);border-radius:999px;padding:2px 10px;margin-bottom:10px}
+
+.quiz-options{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.quiz-opt{
+  display:flex;align-items:center;gap:14px;
+  background:var(--s2);border:1.5px solid var(--border);border-radius:10px;
+  padding:13px 18px;cursor:pointer;font-size:14px;color:var(--soft);
+  transition:all .18s;text-align:left;width:100%;
+}
+.quiz-opt:hover:not(:disabled){background:var(--s3);color:var(--text);border-color:var(--border-hi)}
+.quiz-opt.correct{background:rgba(34,197,94,.12);border-color:var(--green);color:var(--green)}
+.quiz-opt.wrong{background:rgba(239,68,68,.1);border-color:var(--red);color:var(--red)}
+.quiz-opt.reveal{background:rgba(34,197,94,.06);border-color:rgba(34,197,94,.3);color:rgba(34,197,94,.7)}
+.quiz-opt__letter{
+  width:28px;height:28px;border-radius:50%;border:1.5px solid currentColor;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;flex-shrink:0;font-family:var(--fm);
+}
+.quiz-opt__text{flex:1}
+
+.quiz-explanation{
+  background:var(--s0);border:1px solid var(--border);border-radius:10px;
+  padding:14px 18px;font-size:13px;color:var(--soft);line-height:1.7;
+  margin-bottom:20px;display:none;
+}
+.quiz-explanation.show{display:block}
+.quiz-explanation strong{color:var(--indigo-hi)}
+
+.quiz-nav-bar{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.quiz-skip-btn{background:none;border:1px solid var(--border);border-radius:8px;color:var(--faint);font-size:13px;padding:8px 16px;cursor:pointer;font-family:var(--fb);transition:all .2s}
+.quiz-skip-btn:hover{color:var(--soft);border-color:var(--border-hi)}
+.quiz-next-btn{background:linear-gradient(135deg,var(--indigo),var(--indigo-lo));color:#fff;border:none;border-radius:8px;font-family:var(--fd);font-size:14px;font-weight:700;padding:10px 24px;cursor:pointer;transition:all .2s;display:none}
+.quiz-next-btn.show{display:block}
+.quiz-next-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(99,102,241,.4)}
+
+/* Results Screen */
+.quiz-results{max-width:680px;margin:0 auto;padding:32px 24px}
+.quiz-score-card{
+  background:var(--s1);border:1px solid var(--border-hi);border-radius:20px;
+  padding:36px 28px;text-align:center;margin-bottom:24px;
+  position:relative;overflow:hidden;
+}
+.quiz-score-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--gold),var(--indigo))}
+.quiz-score-circle{
+  width:110px;height:110px;border-radius:50%;margin:0 auto 20px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-family:var(--fd);position:relative;
+}
+.quiz-score-pct{font-size:32px;font-weight:800;line-height:1;color:var(--text)}
+.quiz-score-label{font-size:11px;color:var(--faint);font-family:var(--fm);margin-top:2px}
+.quiz-grade{font-family:var(--fd);font-size:22px;font-weight:800;margin-bottom:6px}
+.grade-excellent{color:var(--green)}.grade-good{color:var(--gold)}.grade-ok{color:var(--amber)}.grade-retry{color:var(--red)}
+.quiz-grade-sub{font-size:14px;color:var(--soft);margin-bottom:24px}
+.quiz-stats-row{display:flex;justify-content:center;gap:32px;flex-wrap:wrap}
+.quiz-stat{text-align:center}
+.quiz-stat__num{font-family:var(--fd);font-size:22px;font-weight:800;color:var(--text)}
+.quiz-stat__lbl{font-size:11px;color:var(--faint);font-family:var(--fm);text-transform:uppercase;letter-spacing:.08em}
+
+.quiz-results-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:28px}
+.quiz-review-section{background:var(--s0);border:1px solid var(--border);border-radius:14px;padding:20px;display:none}
+.quiz-review-section.open{display:block}
+.quiz-review-title{font-family:var(--fm);font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--soft);margin-bottom:16px}
+.review-item{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:10px}
+.review-item__q{font-size:14px;font-weight:600;color:var(--text);margin-bottom:10px;line-height:1.45}
+.review-item__answers{display:flex;flex-direction:column;gap:6px}
+.review-answer{display:flex;align-items:flex-start;gap:8px;font-size:13px;padding:8px 12px;border-radius:7px}
+.review-answer.your-correct{background:rgba(34,197,94,.1);color:var(--green);border:1px solid rgba(34,197,94,.2)}
+.review-answer.your-wrong{background:rgba(239,68,68,.08);color:var(--red);border:1px solid rgba(239,68,68,.15)}
+.review-answer.correct-ans{background:rgba(34,197,94,.06);color:rgba(34,197,94,.8);border:1px solid rgba(34,197,94,.12)}
+.review-item__exp{font-size:12px;color:var(--faint);line-height:1.6;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
 </style>
 </head>
 <body>
@@ -818,7 +1032,7 @@ button{font-family:inherit;cursor:pointer}
         <button class="nav__link nav__link--active" onclick="showHome()">Home</button>
         <button class="nav__link" onclick="openTopic(0)">Learn</button>
         <button class="nav__link" onclick="showGlossary()">Glossary</button>
-        <button class="nav__link">Quiz</button>
+        <button class="nav__link" onclick="showQuiz()">Quiz</button>
         <button class="nav__link">Interview Prep</button>
         <button class="nav__link" onclick="showHome();setTimeout(()=>document.querySelector('.about-section').scrollIntoView({behavior:'smooth'}),100)">About</button>
       </div>
@@ -842,23 +1056,22 @@ button{font-family:inherit;cursor:pointer}
 <!-- HERO -->
 <section class="hero">
   <div class="container">
-    <div class="hero__eyebrow">The Complete PeopleSoft Learning Platform</div>
+    <div class="hero__eyebrow">A Growing PeopleSoft Learning Platform</div>
     <h1 class="hero__headline">
-      Master <em>PeopleSoft</em>
-      <span class="line-2">from Zero to Enterprise Expert</span>
+      Learn PeopleSoft the Way
+      <em>Projects Actually Use It</em>
     </h1>
-    <p class="hero__sub">Structured learning paths built from Oracle PeopleBooks and real-world enterprise implementation experience. Learn PeopleCode, Fluid UI, Application Engine, Integration Broker and more.</p>
+    <p class="hero__sub">From App Designer basics to real enterprise development — structured, practical, and built for freshers, support engineers, and developers moving into PeopleSoft.</p>
     <div class="hero__actions">
-      <button class="btn btn--gold btn--lg" onclick="openTopic(0)">🚀 Start Learning Free</button>
+      <button class="btn btn--gold btn--lg" onclick="openTopic(0)">🚀 Start Beginner Path</button>
       <button class="btn btn--ghost btn--lg" onclick="document.getElementById('curriculum').scrollIntoView({behavior:'smooth'})">Browse Curriculum →</button>
     </div>
     <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:40px;animation:fade-up .7s ease .4s both">
-      <span class="pill pill--green">🌱 Beginner</span>
-      <span class="code-chip">PeopleCode</span><span class="code-chip">App Engine</span><span class="code-chip">Fluid UI</span>
-      <span class="code-chip">Integration Broker</span><span class="code-chip">PS Query</span>
-      <span class="pill pill--amber">⚡ Intermediate</span>
-      <span class="code-chip">REST APIs</span><span class="code-chip">Event Mapping</span><span class="code-chip">BI Publisher</span>
-      <span class="pill pill--red">🔥 Advanced</span>
+      <span class="pill pill--green">🌱 Beginner — Live Now</span>
+      <span class="code-chip">PeopleCode</span><span class="code-chip">App Designer</span><span class="code-chip">PS Query</span>
+      <span class="code-chip">Effective Dating</span><span class="code-chip">Security</span>
+      <span class="pill pill--amber">⚡ Intermediate — Building</span>
+      <span class="pill pill--red">🔥 Advanced — Planned</span>
     </div>
     <div class="hero__scroll-hint">scroll to explore <span class="scroll-arrow">↓</span></div>
   </div>
@@ -868,10 +1081,10 @@ button{font-family:inherit;cursor:pointer}
 <div class="stats-bar">
   <div class="container">
     <div class="stats-bar__grid">
-      <div class="stat-item"><span class="stat-item__number">20+</span><span class="stat-item__label">Beginner Topics</span></div>
-      <div class="stat-item"><span class="stat-item__number">60+</span><span class="stat-item__label">Quiz Questions</span></div>
-      <div class="stat-item"><span class="stat-item__number">40+</span><span class="stat-item__label">Interview Q&As</span></div>
-      <div class="stat-item"><span class="stat-item__number">100%</span><span class="stat-item__label">Free Access</span></div>
+      <div class="stat-item"><span class="stat-item__number">20</span><span class="stat-item__label">Beginner Topics Live</span></div>
+      <div class="stat-item"><span class="stat-item__number">7</span><span class="stat-item__label">Learning Modules</span></div>
+      <div class="stat-item"><span class="stat-item__number">43</span><span class="stat-item__label">Glossary Terms</span></div>
+      <div class="stat-item"><span class="stat-item__number">100%</span><span class="stat-item__label">Free — No Login</span></div>
     </div>
   </div>
 </div>
@@ -895,51 +1108,53 @@ button{font-family:inherit;cursor:pointer}
   </div>
 </div>
 
-<!-- WHAT IS PEOPLESOFT -->
+<!-- WHAT IS PEOPLESOFT — slimmed down -->
 <section class="section intro-strip">
   <div class="container">
     <div class="intro-strip__grid">
       <div class="reveal">
-        <div class="intro-strip__label">// What is PeopleSoft?</div>
-        <h2 class="intro-strip__title">An <em>Enterprise Platform</em><br>Built on Metadata</h2>
-        <p class="intro-strip__body">PeopleSoft is Oracle's enterprise application suite powering HR, Finance, Supply Chain, and Campus Solutions for thousands of organizations worldwide. Founded in 1987 and acquired by Oracle in 2005, it is one of the most widely deployed ERP platforms in the world.</p>
-        <p class="intro-strip__body">What makes PeopleSoft unique is its <strong style="color:var(--gold)">metadata-driven architecture</strong> — every form, field, workflow, and report is stored as metadata in system tables. Developers work in Application Designer to define objects that the runtime engine renders into working pages and reports. No raw HTML. No hardcoded SQL.</p>
+        <div class="intro-strip__label">What is PeopleSoft?</div>
+        <h2 class="intro-strip__title">Oracle's Enterprise Platform<br><em>Built on Metadata</em></h2>
+        <p class="intro-strip__body">PeopleSoft is Oracle's ERP suite used by thousands of enterprises worldwide for HR, Finance, Supply Chain, and Education. What makes it unique is its <strong style="color:var(--gold)">metadata-driven architecture</strong> — every page, field, and workflow is defined as metadata in Application Designer, not hardcoded files.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin:16px 0">
+          <span class="about-source-chip">HCM — HR & Payroll</span>
+          <span class="about-source-chip">FSCM — Finance</span>
+          <span class="about-source-chip">Campus Solutions</span>
+          <span class="about-source-chip">PeopleTools IDE</span>
+        </div>
         <button class="btn btn--gold btn--md" onclick="openTopic(0)" style="margin-top:8px">Start with the Basics →</button>
       </div>
       <div class="reveal" style="transition-delay:.1s">
         <div class="intro-strip__facts">
-          <div class="intro-fact"><div class="intro-fact__icon">🏢</div><div class="intro-fact__text"><strong>8 Major Product Lines · 201 Modules</strong><span>HCM, FSCM, Campus Solutions, ELM, CRM, EPM, SRM, Supply Chain Management</span></div></div>
-          <div class="intro-fact"><div class="intro-fact__icon">🗄️</div><div class="intro-fact__text"><strong>Multi-Database, Multi-Platform</strong><span>Runs on Oracle DB, Microsoft SQL Server, IBM DB2 — PeopleTools Meta-SQL abstracts all platform differences</span></div></div>
-          <div class="intro-fact"><div class="intro-fact__icon">🌐</div><div class="intro-fact__text"><strong>Pure Internet Architecture (PIA)</strong><span>Three-tier architecture — browser, Tuxedo application server, database. Any supported browser can access PeopleSoft</span></div></div>
-          <div class="intro-fact"><div class="intro-fact__icon">🔧</div><div class="intro-fact__text"><strong>PeopleTools — The Development Layer</strong><span>Application Designer, PeopleCode, App Engine, Integration Broker, PS Query, BI Publisher — all built into PeopleTools</span></div></div>
-          <div class="intro-fact"><div class="intro-fact__icon">☁️</div><div class="intro-fact__text"><strong>On-Premise or Oracle Cloud (OCI)</strong><span>Deploy on your own servers or Oracle Cloud Infrastructure — DPK bundles and PUM make setup and patching streamlined</span></div></div>
+          <div class="intro-fact"><div class="intro-fact__icon">🌐</div><div class="intro-fact__text"><strong>Browser-Based via PIA</strong><span>Three-tier: Browser → WebLogic → Tuxedo App Server → Database. All business logic runs server-side.</span></div></div>
+          <div class="intro-fact"><div class="intro-fact__icon">🔧</div><div class="intro-fact__text"><strong>PeopleTools — The Dev Layer</strong><span>App Designer, PeopleCode, App Engine, Integration Broker, PS Query, BI Publisher — all built-in.</span></div></div>
+          <div class="intro-fact"><div class="intro-fact__icon">🗄️</div><div class="intro-fact__text"><strong>Multi-Database Support</strong><span>Oracle DB, SQL Server, IBM DB2 — Meta-SQL makes your code database-independent.</span></div></div>
+          <div class="intro-fact"><div class="intro-fact__icon">☁️</div><div class="intro-fact__text"><strong>On-Premise or Oracle Cloud</strong><span>Deploy on your servers or OCI — DPK and PUM make setup and patching straightforward.</span></div></div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ARCHITECTURE -->
-<section class="section" style="position:relative;z-index:1">
+<!-- ARCHITECTURE — mini only, link to full lesson -->
+<section class="section" style="position:relative;z-index:1;padding:48px 0">
   <div class="container">
-    <div class="section-header reveal">
-      <div class="section-header__tag">// PeopleSoft Internet Architecture</div>
-      <h2 class="section-header__title">How PeopleSoft <em>Actually Works</em></h2>
-      <p class="section-header__sub">Every request travels Browser → WebLogic → Tuxedo App Server → Database. No business logic runs in the browser — it all executes server-side.</p>
+    <div class="section-header reveal" style="margin-bottom:28px">
+      <div class="section-header__tag">PeopleSoft Internet Architecture</div>
+      <h2 class="section-header__title">How a Page Request <em>Actually Works</em></h2>
+      <p class="section-header__sub">Every user action flows through three tiers. Understanding this is the foundation of all PeopleSoft development and debugging.</p>
     </div>
     <div class="arch-diagram reveal" style="transition-delay:.1s">
-      <div class="arch-node"><div class="arch-node__tag tag--browser">Client</div><div class="arch-node__icon">🌐</div><div class="arch-node__title">Browser</div><div class="arch-node__sub">Chrome/Firefox/Edge<br>HTTP/HTTPS</div></div>
+      <div class="arch-node"><div class="arch-node__tag tag--browser">Client</div><div class="arch-node__icon">🌐</div><div class="arch-node__title">Browser</div><div class="arch-node__sub">HTTP/HTTPS</div></div>
       <div class="arch-arrow"><div class="arch-arrow__line"></div><div class="arch-arrow__label">HTTP/S</div></div>
-      <div class="arch-node"><div class="arch-node__tag tag--web">Tier 1</div><div class="arch-node__icon">⚙️</div><div class="arch-node__title">Web Server</div><div class="arch-node__sub">Oracle WebLogic<br>Presentation only</div></div>
+      <div class="arch-node"><div class="arch-node__tag tag--web">Tier 1</div><div class="arch-node__icon">⚙️</div><div class="arch-node__title">WebLogic</div><div class="arch-node__sub">Presentation only</div></div>
       <div class="arch-arrow"><div class="arch-arrow__line"></div><div class="arch-arrow__label">JOLT</div></div>
-      <div class="arch-node"><div class="arch-node__tag tag--app">Tier 2</div><div class="arch-node__icon">🧠</div><div class="arch-node__title">App Server</div><div class="arch-node__sub">Oracle Tuxedo<br>PeopleCode · Logic</div></div>
+      <div class="arch-node"><div class="arch-node__tag tag--app">Tier 2</div><div class="arch-node__icon">🧠</div><div class="arch-node__title">Tuxedo</div><div class="arch-node__sub">PeopleCode · Logic</div></div>
       <div class="arch-arrow"><div class="arch-arrow__line"></div><div class="arch-arrow__label">SQL</div></div>
-      <div class="arch-node"><div class="arch-node__tag tag--db">Tier 3</div><div class="arch-node__icon">🗃️</div><div class="arch-node__title">Database</div><div class="arch-node__sub">Oracle/SQL Server/DB2<br>Data + Metadata</div></div>
+      <div class="arch-node"><div class="arch-node__tag tag--db">Tier 3</div><div class="arch-node__icon">🗃️</div><div class="arch-node__title">Database</div><div class="arch-node__sub">Oracle/SQL Server/DB2</div></div>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:40px">
-      <div class="concept-card reveal"><div class="concept-card__num">01</div><div class="concept-card__icon">⚙️</div><div class="concept-card__title">Web Server — WebLogic</div><div class="concept-card__desc">Handles HTTP/HTTPS. Zero business logic — purely presentation layer. Forwards all requests to the App Server via the JOLT port.</div></div>
-      <div class="concept-card reveal" style="transition-delay:.1s"><div class="concept-card__num">02</div><div class="concept-card__icon">🧠</div><div class="concept-card__title">App Server — Tuxedo</div><div class="concept-card__desc">The brain of PeopleSoft. Runs PSAPPSRV, PSQRYSRV, PSSAMSRV. All PeopleCode, Component Processor, and business rules execute here.</div></div>
-      <div class="concept-card reveal" style="transition-delay:.2s"><div class="concept-card__num">03</div><div class="concept-card__icon">🗃️</div><div class="concept-card__title">Database — Three Layers</div><div class="concept-card__desc">RDBMS system tables, PeopleTools metadata (record/field/page definitions), and application data (PS_JOB, PS_PERSONAL_DATA, etc.).</div></div>
+    <div style="text-align:center;margin-top:20px">
+      <button class="btn btn--ghost btn--sm" onclick="openTopic(4)">Explore Full Architecture Lesson →</button>
     </div>
   </div>
 </section>
@@ -948,48 +1163,51 @@ button{font-family:inherit;cursor:pointer}
 <section class="section" style="position:relative;z-index:1;background:var(--s0);border-top:1px solid var(--border)">
   <div class="container">
     <div class="section-header reveal">
-      <div class="section-header__tag">// Curriculum Structure</div>
+      <div class="section-header__tag">Learning Paths</div>
       <h2 class="section-header__title">Three Paths. <em>One Goal.</em></h2>
-      <p class="section-header__sub">Whether you are starting from scratch or sharpening advanced skills, the curriculum is designed to take you exactly where you need to go.</p>
+      <p class="section-header__sub">Start with Foundations — Intermediate and Advanced paths are actively being built.</p>
     </div>
     <div class="path-grid">
       <div class="path-card path-card--b reveal" onclick="openTopic(0)" style="cursor:pointer">
         <div class="path-card__top-bar"></div><div class="path-card__glow"></div>
         <span class="path-card__icon">🌱</span>
-        <div class="path-card__level">Beginner — 7 Modules · 20 Topics</div>
+        <div class="path-card__level">Beginner — 7 Modules · 20 Topics · Live Now</div>
         <h3 class="path-card__title">PeopleSoft Foundations</h3>
-        <p class="path-card__desc">No prior experience needed. Understand the platform from the ground up — history, architecture, PeopleTools, records, pages, PeopleCode, and PS Query.</p>
+        <p class="path-card__desc">No prior experience needed. Learn architecture, PeopleTools, records, pages, PeopleCode basics, PS Query, security, and process scheduling.</p>
         <div class="path-card__topics">
-          <span class="path-card__topic">Module 1 — Foundations (History, Intro, Tools, Glossary)</span>
-          <span class="path-card__topic">Module 2 — Architecture & Cloud (PIA, OCI)</span>
-          <span class="path-card__topic">Module 3 — UI & Navigation (Pages, Components, Search)</span>
-          <span class="path-card__topic">Module 4 — App Designer & Data Model (Records, Eff Dating)</span>
-          <span class="path-card__topic">Module 5 — Development Basics (PeopleCode, Buffer)</span>
-          <span class="path-card__topic">Module 6 — Data & Query · Module 7 — Process & Security</span>
+          <span class="path-card__topic">Module 1 — History, Intro, PeopleTools, Glossary</span>
+          <span class="path-card__topic">Module 2 — Architecture & Cloud (PIA, OCI, PUM)</span>
+          <span class="path-card__topic">Module 3 — UI, Navigation, Pages, Components</span>
+          <span class="path-card__topic">Module 4 — App Designer, Records, Effective Dating</span>
+          <span class="path-card__topic">Module 5 — PeopleCode Basics & Component Buffer</span>
+          <span class="path-card__topic">Module 6 & 7 — PS Query, Security, Process Monitor</span>
         </div>
         <button class="btn btn--gold btn--sm" style="margin-top:8px">Start Beginner Path →</button>
       </div>
       <div class="path-card path-card--i reveal" style="transition-delay:.1s">
         <div class="path-card__top-bar"></div><div class="path-card__glow"></div>
         <span class="path-card__icon">⚡</span>
-        <div class="path-card__level">Intermediate — Coming Next</div>
+        <div class="path-card__level">Intermediate — In Progress (~30% built)</div>
         <h3 class="path-card__title">Core Development Skills</h3>
-        <p class="path-card__desc">Application Engine, Component Interface, Integration Broker, BI Publisher, Security, Process Scheduler, Data Mover, and PUM.</p>
+        <p class="path-card__desc">Application Engine, Component Interface, Integration Broker, BI Publisher, advanced security, Process Scheduler, and Data Mover.</p>
         <div class="path-card__topics">
           <span class="path-card__topic">Application Engine — batch framework & Meta-SQL</span>
           <span class="path-card__topic">Component Interface — programmatic APIs</span>
-          <span class="path-card__topic">Integration Broker — messaging & web services</span>
+          <span class="path-card__topic">Integration Broker — messaging & REST/SOAP</span>
           <span class="path-card__topic">BI Publisher — formatted PDF/Excel reports</span>
-          <span class="path-card__topic">Security — Roles, Permission Lists, Row-level</span>
+          <span class="path-card__topic">Advanced Security — row-level, trees, auditing</span>
         </div>
-        <span class="path-card__count">10 Topics · ~8 hrs · Coming Soon</span>
+        <span class="path-card__count" style="display:flex;align-items:center;gap:8px;margin-top:12px">
+          <span style="flex:1;height:4px;background:var(--s3);border-radius:99px;overflow:hidden"><span style="display:block;width:30%;height:100%;background:var(--amber);border-radius:99px"></span></span>
+          <span>30% — Coming Soon</span>
+        </span>
       </div>
       <div class="path-card path-card--a reveal" style="transition-delay:.2s">
         <div class="path-card__top-bar"></div><div class="path-card__glow"></div>
         <span class="path-card__icon">🔥</span>
-        <div class="path-card__level">Advanced — Coming Next</div>
+        <div class="path-card__level">Advanced — Planned</div>
         <h3 class="path-card__title">Expert-Level Mastery</h3>
-        <p class="path-card__desc">Fluid UI, Application Packages (OOP), REST/SOAP services, Performance Tuning, Event Mapping, Activity Guides, and Elasticsearch.</p>
+        <p class="path-card__desc">Fluid UI development, Application Packages (OOP), REST/SOAP services, performance tuning, Event Mapping, and Elasticsearch.</p>
         <div class="path-card__topics">
           <span class="path-card__topic">Fluid UI — responsive HTML5, tiles & homepages</span>
           <span class="path-card__topic">Application Packages — OOP in PeopleCode</span>
@@ -997,7 +1215,100 @@ button{font-family:inherit;cursor:pointer}
           <span class="path-card__topic">Event Mapping — upgrade-safe customization</span>
           <span class="path-card__topic">Performance Tuning — trace, SQL, caching</span>
         </div>
-        <span class="path-card__count">10 Topics · ~10 hrs · Coming Soon</span>
+        <span class="path-card__count" style="display:flex;align-items:center;gap:8px;margin-top:12px">
+          <span style="flex:1;height:4px;background:var(--s3);border-radius:99px;overflow:hidden"><span style="display:block;width:5%;height:100%;background:var(--red);border-radius:99px"></span></span>
+          <span>Planned — Coming Later</span>
+        </span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OUTCOMES SECTION -->
+<section class="section" style="position:relative;z-index:1">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-header__tag">Learning Outcomes</div>
+      <h2 class="section-header__title">After the Beginner Path,<br><em>You'll Be Able To...</em></h2>
+      <p class="section-header__sub">Concrete skills you'll have after completing all 20 beginner topics — not vague promises.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px" class="reveal" style="transition-delay:.1s">
+      <div class="outcome-card">
+        <div class="outcome-card__icon">🏗️</div>
+        <div class="outcome-card__title">Explain PeopleSoft Architecture</div>
+        <div class="outcome-card__desc">Describe the three-tier PIA architecture, what each tier does, and why business logic runs in Tuxedo — not the browser.</div>
+      </div>
+      <div class="outcome-card">
+        <div class="outcome-card__icon">🛠️</div>
+        <div class="outcome-card__title">Navigate Application Designer</div>
+        <div class="outcome-card__desc">Create records, define fields, design pages, build components, and register them in the Portal — the core developer workflow.</div>
+      </div>
+      <div class="outcome-card">
+        <div class="outcome-card__icon">⚡</div>
+        <div class="outcome-card__title">Write Basic PeopleCode</div>
+        <div class="outcome-card__desc">Use SQLExec, CreateSQL, field defaulting, SaveEdit validation, and PostBuild logic with confidence in real components.</div>
+      </div>
+      <div class="outcome-card">
+        <div class="outcome-card__icon">📅</div>
+        <div class="outcome-card__title">Understand Effective Dating</div>
+        <div class="outcome-card__desc">Query effective-dated tables correctly, understand why PS_JOB can have 30+ rows per employee, and avoid the most common SQL mistake.</div>
+      </div>
+      <div class="outcome-card">
+        <div class="outcome-card__icon">🔒</div>
+        <div class="outcome-card__title">Configure Basic Security</div>
+        <div class="outcome-card__desc">Set up User Profiles, assign Roles and Permission Lists, understand row-level security, and troubleshoot access issues.</div>
+      </div>
+      <div class="outcome-card">
+        <div class="outcome-card__icon">💼</div>
+        <div class="outcome-card__title">Answer Beginner Interview Questions</div>
+        <div class="outcome-card__desc">Confidently answer the 20 most common PeopleSoft beginner interview questions on architecture, records, PeopleCode, and security.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SAMPLE LESSON PREVIEW -->
+<section class="section" style="position:relative;z-index:1;background:var(--s0);border-top:1px solid var(--border);padding:56px 0">
+  <div class="container">
+    <div class="section-header reveal" style="margin-bottom:32px">
+      <div class="section-header__tag">Sample Lesson</div>
+      <h2 class="section-header__title">See What a Lesson <em>Actually Looks Like</em></h2>
+      <p class="section-header__sub">Every topic is structured the same way — pre-checklist, key takeaways, deep sections, real-world context, common mistakes, and a mini quiz.</p>
+    </div>
+    <div class="sample-lesson reveal" style="transition-delay:.1s">
+      <div class="sample-lesson__header">
+        <span class="sample-lesson__badge">🧱 Module 4: Application Designer & Data Model</span>
+        <h3 class="sample-lesson__title">Effective Dating (EFFDT & EFFSEQ)</h3>
+        <p class="sample-lesson__summary">Instead of overwriting data when something changes, PeopleSoft inserts a new row with a new Effective Date — preserving the complete history of every change forever.</p>
+      </div>
+      <div class="sample-lesson__body">
+        <div class="sample-lesson__col">
+          <div class="sample-lesson__section-label">⚡ Key Takeaways</div>
+          <ul class="sample-lesson__list">
+            <li>EFFDT = the date a row becomes valid</li>
+            <li>EFFSEQ handles multiple changes on the same date</li>
+            <li>PeopleSoft always shows MAX(EFFDT) ≤ today</li>
+            <li>Future-dated rows enter today but activate later</li>
+            <li>Historical rows are never deleted — ever</li>
+          </ul>
+          <div class="sample-lesson__section-label" style="margin-top:16px">🏢 Real-World Context</div>
+          <p style="font-size:13px;color:var(--soft);line-height:1.7">In a 100,000-employee system, PS_JOB alone can have 3M+ rows. Every salary change, promotion, and transfer is a new row — not an update. This is what makes retroactive payroll possible.</p>
+        </div>
+        <div class="sample-lesson__col">
+          <div class="sample-lesson__section-label">⚠️ Common Mistakes</div>
+          <div class="sample-lesson__mistake">
+            <span style="color:var(--red);font-weight:700;font-size:12px">MISTAKE</span>
+            <p style="font-size:13px;color:var(--soft);margin-top:4px">Querying PS_JOB without effective dating WHERE clause — returns ALL rows for an employee (30+ rows), causing duplicate records in reports.</p>
+          </div>
+          <div class="sample-lesson__section-label" style="margin-top:16px">🧠 Mini Quiz Preview</div>
+          <div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px 14px">
+            <p style="font-size:13px;color:var(--text);font-weight:600;margin-bottom:8px">What does PeopleSoft do when an employee gets promoted?</p>
+            <p style="font-size:12px;color:var(--green)">✅ Inserts a new row with the new Effective Date — the old row remains</p>
+          </div>
+        </div>
+      </div>
+      <div style="text-align:center;padding-top:20px;border-top:1px solid var(--border)">
+        <button class="btn btn--gold btn--md" onclick="openTopic(13)">Read Full Lesson on Effective Dating →</button>
       </div>
     </div>
   </div>
@@ -1007,13 +1318,13 @@ button{font-family:inherit;cursor:pointer}
 <section id="curriculum" class="section--tight curriculum-section">
   <div class="container">
     <div class="section-header reveal" style="margin-bottom:28px">
-      <div class="section-header__tag">// Full Topic List</div>
-      <h2 class="section-header__title">Browse the <em>Curriculum</em></h2>
+      <div class="section-header__tag">Full Curriculum</div>
+      <h2 class="section-header__title">Browse All <em>Topics</em></h2>
     </div>
     <div class="curriculum-tabs reveal">
-      <button class="curriculum-tab ab" onclick="switchTab(this,'b')">🌱 Beginner</button>
-      <button class="curriculum-tab" onclick="switchTab(this,'i')">⚡ Intermediate</button>
-      <button class="curriculum-tab" onclick="switchTab(this,'a')">🔥 Advanced</button>
+      <button class="curriculum-tab ab" onclick="switchTab(this,'b')">🌱 Beginner — Live</button>
+      <button class="curriculum-tab" onclick="switchTab(this,'i')">⚡ Intermediate — Building</button>
+      <button class="curriculum-tab" onclick="switchTab(this,'a')">🔥 Advanced — Planned</button>
     </div>
     <div class="curriculum-panel active" id="panel-b"><div class="topic-grid" id="topics-b"></div></div>
     <div class="curriculum-panel" id="panel-i"><div class="topic-grid" id="topics-i"></div></div>
@@ -1021,98 +1332,75 @@ button{font-family:inherit;cursor:pointer}
   </div>
 </section>
 
-<!-- CONCEPTS -->
-<section class="section" style="position:relative;z-index:1">
-  <div class="container">
-    <div class="section-header reveal">
-      <div class="section-header__tag">// Core Concepts You Will Master</div>
-      <h2 class="section-header__title">The Building Blocks of <em>PeopleSoft</em></h2>
-    </div>
-    <div class="concepts-grid">
-      <div class="concept-card reveal"><div class="concept-card__num">01</div><div class="concept-card__icon">🗂️</div><div class="concept-card__title">Component Processor</div><div class="concept-card__desc">The runtime engine managing data flow — loading the buffer, firing PeopleCode events in sequence (RowInit → PostBuild → SaveEdit), writing back to DB.</div></div>
-      <div class="concept-card reveal" style="transition-delay:.06s"><div class="concept-card__num">02</div><div class="concept-card__icon">📅</div><div class="concept-card__title">Effective Dating</div><div class="concept-card__desc">Instead of overwriting records, new rows are inserted with EFFDT and EFFSEQ — enabling full historical reporting and retroactive payroll processing.</div></div>
-      <div class="concept-card reveal" style="transition-delay:.12s"><div class="concept-card__num">03</div><div class="concept-card__icon">⚡</div><div class="concept-card__title">PeopleCode Events</div><div class="concept-card__desc">PeopleCode attaches to a specific event — FieldDefault, RowInit, PostBuild, SaveEdit, SavePostChange. The event determines when your code fires.</div></div>
-      <div class="concept-card reveal" style="transition-delay:.18s"><div class="concept-card__num">04</div><div class="concept-card__icon">🏗️</div><div class="concept-card__title">Metadata Architecture</div><div class="concept-card__desc">Every record, page, component, and PeopleCode program is metadata stored in PeopleTools system tables — not files on disk.</div></div>
-      <div class="concept-card reveal" style="transition-delay:.24s"><div class="concept-card__num">05</div><div class="concept-card__icon">🔒</div><div class="concept-card__title">Role-Based Security</div><div class="concept-card__desc">User → Roles → Permission Lists → Row-Level Security. Permission Lists define which pages, processes, and data rows each user can access.</div></div>
-      <div class="concept-card reveal" style="transition-delay:.30s"><div class="concept-card__num">06</div><div class="concept-card__icon">🔄</div><div class="concept-card__title">Integration Broker</div><div class="concept-card__desc">Enterprise messaging platform for REST, SOAP, and async integrations. Service Operations, Nodes, Handlers, and Routing Rules form the full framework.</div></div>
-      <div class="concept-card reveal" style="transition-delay:.36s"><div class="concept-card__num">07</div><div class="concept-card__icon">📱</div><div class="concept-card__title">Fluid UI</div><div class="concept-card__desc">Responsive HTML5/CSS3 introduced in PT 8.53. Built on Oracle JET, works on mobile, tablet, and desktop with a modern grid-based layout system.</div></div>
-      <div class="concept-card reveal" style="transition-delay:.42s"><div class="concept-card__num">08</div><div class="concept-card__icon">🛡️</div><div class="concept-card__title">Event Mapping</div><div class="concept-card__desc">PT 8.55+ upgrade-safe customization. Attach custom App Class PeopleCode to delivered component events without touching Oracle's delivered objects.</div></div>
-    </div>
-  </div>
-</section>
-
-<!-- FEATURES -->
+<!-- FEATURES — updated copy, no over-promising -->
 <section class="section features-section" style="background:var(--s0);border-top:1px solid var(--border)">
   <div class="container">
     <div class="section-header reveal">
-      <div class="section-header__tag">// Platform Features</div>
-      <h2 class="section-header__title">Everything You Need to <em>Level Up</em></h2>
+      <div class="section-header__tag">Platform Features</div>
+      <h2 class="section-header__title">Practical Learning — <em>No Fluff</em></h2>
     </div>
     <div class="features-grid">
-      <div class="feature-card reveal"><div class="feature-card__icon-wrap fw-gold">📚</div><h3 class="feature-card__title">Deep Topic Explanations</h3><p class="feature-card__desc">Every topic goes beyond surface syntax — why it exists, when to use it, how it connects to everything else. Based on PeopleBooks and real project experience.</p></div>
-      <div class="feature-card reveal" style="transition-delay:.08s"><div class="feature-card__icon-wrap fw-indigo">🧠</div><h3 class="feature-card__title">Interactive Quiz Engine</h3><p class="feature-card__desc">Randomized 10-question quizzes with questions from real PeopleSoft certification and interview material. Instant feedback with detailed explanations.</p></div>
-      <div class="feature-card reveal" style="transition-delay:.16s"><div class="feature-card__icon-wrap fw-cyan">💼</div><h3 class="feature-card__title">Interview Preparation</h3><p class="feature-card__desc">40+ expert Q&As covering PeopleCode, architecture, HCM, FSCM, integration, and security. Answers written at senior technical interview level.</p></div>
-      <div class="feature-card reveal" style="transition-delay:.08s"><div class="feature-card__icon-wrap fw-green">⚡</div><h3 class="feature-card__title">Real PeopleCode Examples</h3><p class="feature-card__desc">Runnable code — not pseudocode. SQLExec, CreateSQL, Rowsets, App Packages, Component Interface calls with context explaining each approach.</p></div>
-      <div class="feature-card reveal" style="transition-delay:.16s"><div class="feature-card__icon-wrap fw-amber">🗺️</div><h3 class="feature-card__title">Structured Learning Path</h3><p class="feature-card__desc">Topics are sequenced with intention. Architecture before development. Records before Pages. Component Processor before PeopleCode events.</p></div>
-      <div class="feature-card reveal" style="transition-delay:.24s"><div class="feature-card__icon-wrap fw-red">🎯</div><h3 class="feature-card__title">Real-World Scenarios</h3><p class="feature-card__desc">Every concept grounded in enterprise use cases — payroll batch runs, HR data migrations, REST integrations, PUM patching, upgrade-safe customizations.</p></div>
+      <div class="feature-card reveal"><div class="feature-card__icon-wrap fw-gold">📚</div><h3 class="feature-card__title">Deep Topic Explanations</h3><p class="feature-card__desc">Every topic covers the why, not just the what. Based on Oracle PeopleBooks and real enterprise project patterns — not documentation copy-paste.</p></div>
+      <div class="feature-card reveal" style="transition-delay:.08s"><div class="feature-card__icon-wrap fw-green">⚡</div><h3 class="feature-card__title">Real PeopleCode Examples</h3><p class="feature-card__desc">Actual runnable code — SQLExec, CreateSQL, Rowsets, field defaults, SaveEdit validation. Every example is production-pattern, not toy code.</p></div>
+      <div class="feature-card reveal" style="transition-delay:.16s"><div class="feature-card__icon-wrap fw-indigo">🧠</div><h3 class="feature-card__title">Mini Quiz Per Topic</h3><p class="feature-card__desc">2–3 questions at the end of every topic with instant feedback and full explanations. Reinforces what you just read while it's fresh.</p></div>
+      <div class="feature-card reveal" style="transition-delay:.08s"><div class="feature-card__icon-wrap fw-red">⚠️</div><h3 class="feature-card__title">Common Mistakes Section</h3><p class="feature-card__desc">Every topic lists the 2–3 mistakes beginners make most often — SQLExec in RowInit, missing effective dating WHERE clauses, forgetting Portal registration.</p></div>
+      <div class="feature-card reveal" style="transition-delay:.16s"><div class="feature-card__icon-wrap fw-amber">🗺️</div><h3 class="feature-card__title">Structured Sequence</h3><p class="feature-card__desc">Topics are ordered intentionally. Architecture before development. Records before Pages. Component Processor before PeopleCode events. No guesswork.</p></div>
+      <div class="feature-card reveal" style="transition-delay:.24s"><div class="feature-card__icon-wrap fw-cyan">🔗</div><h3 class="feature-card__title">Direct PeopleBooks Links</h3><p class="feature-card__desc">Every topic section links to the relevant Oracle PeopleBooks page. You can verify, go deeper, or bookmark the official source at any time.</p></div>
     </div>
   </div>
 </section>
 
-<!-- CTA -->
+<!-- CTA — honest, strong -->
 <section class="section cta-section">
   <div class="cta-bg" aria-hidden="true"></div>
   <div class="container cta-inner">
-    <div class="cta-tag reveal">// Start Today — No Account Needed</div>
-    <h2 class="cta-title reveal">Your PeopleSoft<br><em>Career Starts Here</em></h2>
-    <p class="cta-sub reveal">Free, structured, and built for real-world outcomes. Start with the foundations and work your way to senior consultant-level knowledge.</p>
+    <div class="cta-tag reveal">Start Today — No Account Needed</div>
+    <h2 class="cta-title reveal">Learn PeopleSoft the Way<br><em>Projects Actually Use It</em></h2>
+    <p class="cta-sub reveal">Structured, practical, enterprise-focused. Start the Beginner Path and build real foundational knowledge — for free.</p>
     <div class="cta-actions reveal">
-      <button class="btn btn--gold btn--lg" onclick="openTopic(0)">🚀 Begin Learning Now</button>
-      <button class="btn btn--ghost btn--lg">Test Your Knowledge 🧠</button>
+      <button class="btn btn--gold btn--lg" onclick="openTopic(0)">🚀 Start Beginner Path</button>
+      <button class="btn btn--ghost btn--lg" onclick="showGlossary()">Browse Glossary 📖</button>
     </div>
-    <p class="cta-note reveal">No login required · 100% free · Learn at your own pace</p>
+    <p class="cta-note reveal">No login · No payment · Learn at your own pace</p>
   </div>
 </section>
 
-<!-- ABOUT SECTION -->
+<!-- ABOUT SECTION — stronger credibility -->
 <section class="section about-section">
   <div class="container">
     <div class="about-grid">
-      <!-- LEFT: Platform info -->
       <div class="reveal">
-        <div class="about-platform__label">// About This Platform</div>
-        <h2 class="about-platform__title">Built to Make PeopleSoft <span style="color:var(--gold)">Accessible</span></h2>
-        <p class="about-platform__body">
-          PSLearn is a free, structured learning platform built to make PeopleSoft accessible to everyone — from complete beginners to experienced developers looking to upskill. Every topic is written in plain English with real-world context, not just syntax dumps.
-        </p>
-        <p class="about-platform__body">
-          Content is sourced, reframed, and explained based on Oracle PeopleBooks documentation, PeopleSoft community resources, and real enterprise implementation experience across HCM, FSCM, and Campus Solutions.
-        </p>
+        <div class="about-platform__label">About This Platform</div>
+        <h2 class="about-platform__title">Why PSLearn <span style="color:var(--gold)">Exists</span></h2>
+        <p class="about-platform__body">Good PeopleSoft learning content online is genuinely scarce. Most resources are fragmented forum posts, outdated PDFs, or expensive training courses. PSLearn was built to fix that — a structured, free, practical learning path from zero to job-ready.</p>
+        <p class="about-platform__body">Every topic is written from real enterprise experience — not documentation rewrites. The examples, mistakes, and real-world scenarios come from actual production implementations.</p>
         <div class="about-platform__label" style="margin-top:20px">📚 Sources & References</div>
         <div class="about-sources">
           <span class="about-source-chip">Oracle PeopleBooks</span>
-          <span class="about-source-chip">PeopleSoft Tutorial</span>
           <span class="about-source-chip">PeopleSoft Community</span>
-          <span class="about-source-chip">Real Project Experience</span>
+          <span class="about-source-chip">Enterprise Project Experience</span>
           <span class="about-source-chip">PeopleTools Documentation</span>
         </div>
       </div>
-      <!-- RIGHT: Builder card -->
       <div class="reveal" style="transition-delay:.12s">
         <div class="builder-card">
           <div class="builder-card__label">👤 Built By</div>
           <div class="builder-card__avatar">KR</div>
           <div class="builder-card__name">Koushik Ram M</div>
           <div class="builder-card__role">PeopleSoft Technical Consultant</div>
-          <div class="builder-card__bio">
-            Passionate about making PeopleSoft knowledge accessible to everyone — from fresh graduates entering the ERP world to experienced professionals looking to sharpen their technical edge.
+          <div class="builder-card__bio">Hands-on experience in HCM, FSCM, and HRMS implementations — production support, enhancements, and full project cycles. Worked with PeopleCode, Application Engine, SQR, SQL, PS Query, Integration Broker, security configurations, and validations across enterprise environments.</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px">
+            <span class="about-source-chip" style="font-size:10px">PeopleCode</span>
+            <span class="about-source-chip" style="font-size:10px">App Engine</span>
+            <span class="about-source-chip" style="font-size:10px">SQR</span>
+            <span class="about-source-chip" style="font-size:10px">Integration Broker</span>
+            <span class="about-source-chip" style="font-size:10px">HCM</span>
+            <span class="about-source-chip" style="font-size:10px">FSCM</span>
+            <span class="about-source-chip" style="font-size:10px">PS Query</span>
+            <span class="about-source-chip" style="font-size:10px">Security</span>
           </div>
-          <a href="https://www.linkedin.com/in/koushik-ram-m-3b6599210"
-             target="_blank" rel="noopener"
-             class="builder-card__linkedin">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-            </svg>
+          <a href="https://www.linkedin.com/in/koushik-ram-m-3b6599210" target="_blank" rel="noopener" class="builder-card__linkedin">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
             Connect on LinkedIn ↗
           </a>
         </div>
@@ -1129,12 +1417,11 @@ button{font-family:inherit;cursor:pointer}
         <div class="nav__logo-mark" style="width:28px;height:28px;font-size:12px">PS</div>
         <span style="font-family:var(--fd);font-weight:700;font-size:14px">PSLearn</span>
       </div>
-      <p class="footer__copy">© 2025 PSLearn · All rights reserved</p>
+      <p class="footer__copy">© 2025 PSLearn · Built by Koushik Ram M</p>
       <div class="footer__links">
-        <a href="#" class="footer__link">Learn</a>
-        <a href="#" class="footer__link">Quiz</a>
-        <a href="#" class="footer__link">Interview</a>
-        <a href="#" class="footer__link">Resources</a>
+        <button onclick="openTopic(0)" class="footer__link" style="background:none;border:none;cursor:pointer">Learn</button>
+        <button onclick="showGlossary()" class="footer__link" style="background:none;border:none;cursor:pointer">Glossary</button>
+        <a href="https://www.linkedin.com/in/koushik-ram-m-3b6599210" target="_blank" class="footer__link">LinkedIn</a>
       </div>
     </div>
   </div>
@@ -1181,6 +1468,12 @@ button{font-family:inherit;cursor:pointer}
         </div>
         <span class="mobile-topbar__count" id="mobileTopicCount">01/20</span>
       </div>
+      <!-- DESKTOP BACK BAR -->
+      <div class="desktop-back-bar">
+        <button onclick="showHome()" class="back-home-btn">← Home</button>
+        <span class="back-divider">·</span>
+        <span id="desktopTopicBreadcrumb" style="font-size:13px;color:var(--soft)">Topic 01 / 20</span>
+      </div>
       <div class="topic-content" id="topicContent"></div>
     </div>
   </div>
@@ -1207,6 +1500,127 @@ button{font-family:inherit;cursor:pointer}
     </div>
     <div id="glossaryContent"></div>
   </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     QUIZ VIEW
+═══════════════════════════════════════════════ -->
+<div id="quizView">
+
+  <!-- QUIZ HOME -->
+  <div id="quizHome">
+    <div class="quiz-home">
+      <button class="quiz-home__back" onclick="showHome()">← Back to Home</button>
+      <div class="quiz-home__header">
+        <div class="quiz-home__tag">🧠 Test Your Knowledge</div>
+        <h1 class="quiz-home__title">PeopleSoft <span style="color:var(--gold)">Quiz Engine</span></h1>
+        <p class="quiz-home__sub">100 questions covering foundations, architecture, development, and real project scenarios. Choose your mode and start testing.</p>
+      </div>
+
+      <!-- MODE SELECTOR -->
+      <div class="quiz-modes">
+        <div class="quiz-mode-card" id="modeCardModule" onclick="selectQuizMode('module')">
+          <div class="quiz-mode-card__top">
+            <span class="quiz-mode-card__icon">📦</span>
+            <span class="quiz-mode-card__badge badge-green">30 Questions</span>
+          </div>
+          <div class="quiz-mode-card__title">Topic-by-Topic</div>
+          <div class="quiz-mode-card__desc">Pick a module and get 30 questions focused on that topic area. Great for targeted revision after studying a module.</div>
+          <div class="quiz-mode-card__meta">
+            <span class="q-meta-chip">⏱ 30 sec / Q</span>
+            <span class="q-meta-chip">7 modules</span>
+            <span class="q-meta-chip">Focused</span>
+          </div>
+        </div>
+        <div class="quiz-mode-card" id="modeCardFull" onclick="selectQuizMode('full')">
+          <div class="quiz-mode-card__top">
+            <span class="quiz-mode-card__icon">📋</span>
+            <span class="quiz-mode-card__badge badge-indigo">40 Questions</span>
+          </div>
+          <div class="quiz-mode-card__title">Full Exam Mode</div>
+          <div class="quiz-mode-card__desc">40 questions randomly drawn from all 100 — covering everything from history to real project scenarios. Full timed exam.</div>
+          <div class="quiz-mode-card__meta">
+            <span class="q-meta-chip">⏱ 30 sec / Q</span>
+            <span class="q-meta-chip">All topics</span>
+            <span class="q-meta-chip">Random mix</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODULE SELECTOR (shown for Topic mode) -->
+      <div class="quiz-module-section" id="quizModuleSection">
+        <div class="quiz-module-label">Select a Module</div>
+        <div class="quiz-module-grid" id="quizModuleGrid"></div>
+      </div>
+
+      <!-- START BAR -->
+      <div class="quiz-start-bar">
+        <div class="quiz-start-info" id="quizStartInfo">Select a quiz mode above to begin</div>
+        <button class="quiz-start-btn" id="quizStartBtn" disabled onclick="startQuiz()">Start Quiz →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTIVE QUIZ -->
+  <div id="quizActive" style="display:none">
+    <div class="quiz-active">
+      <div class="quiz-top-bar">
+        <div class="quiz-top-left">
+          <span class="quiz-q-counter" id="quizQCounter">Question 1 of 30</span>
+          <span class="quiz-category-chip" id="quizCategoryChip">Architecture</span>
+        </div>
+        <div class="quiz-timer" id="quizTimerDisplay">30</div>
+      </div>
+      <div class="quiz-progress-track">
+        <div class="quiz-progress-fill" id="quizProgressFill" style="width:0%"></div>
+      </div>
+      <div class="quiz-timer-track">
+        <div class="quiz-timer-fill timer-green" id="quizTimerFill" style="width:100%"></div>
+      </div>
+      <div class="quiz-question-card">
+        <div class="quiz-q-num" id="quizQNum">Q1</div>
+        <div class="quiz-scenario-badge" id="quizScenarioBadge" style="display:none">🏢 Real Project Scenario</div>
+        <div class="quiz-q-text" id="quizQText">Question text here</div>
+      </div>
+      <div class="quiz-options" id="quizOptions"></div>
+      <div class="quiz-explanation" id="quizExplanation"></div>
+      <div class="quiz-nav-bar">
+        <button class="quiz-skip-btn" id="quizSkipBtn" onclick="skipQuestion()">Skip →</button>
+        <button class="quiz-next-btn" id="quizNextBtn" onclick="nextQuestion()">Next Question →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="quizResults" style="display:none">
+    <div class="quiz-results">
+      <div class="quiz-score-card">
+        <div class="quiz-score-circle">
+          <canvas id="scoreCanvas" width="110" height="110" style="position:absolute;top:0;left:0"></canvas>
+          <span class="quiz-score-pct" id="resultPct">0%</span>
+          <span class="quiz-score-label">Score</span>
+        </div>
+        <div class="quiz-grade" id="resultGrade">Excellent!</div>
+        <div class="quiz-grade-sub" id="resultGradeSub">You've mastered the basics.</div>
+        <div class="quiz-stats-row">
+          <div class="quiz-stat"><div class="quiz-stat__num" id="resultCorrect" style="color:var(--green)">0</div><div class="quiz-stat__lbl">Correct</div></div>
+          <div class="quiz-stat"><div class="quiz-stat__num" id="resultWrong" style="color:var(--red)">0</div><div class="quiz-stat__lbl">Wrong</div></div>
+          <div class="quiz-stat"><div class="quiz-stat__num" id="resultSkipped" style="color:var(--faint)">0</div><div class="quiz-stat__lbl">Skipped</div></div>
+          <div class="quiz-stat"><div class="quiz-stat__num" id="resultTime" style="color:var(--cyan)">0s</div><div class="quiz-stat__lbl">Time</div></div>
+        </div>
+      </div>
+      <div class="quiz-results-actions">
+        <button class="btn btn--gold btn--md" onclick="startQuiz()">🔄 Retake Quiz</button>
+        <button class="btn btn--ghost btn--md" id="reviewToggleBtn" onclick="toggleReview()">📋 Review Answers</button>
+        <button class="btn btn--ghost btn--md" onclick="showQuiz()">← Back to Modes</button>
+      </div>
+      <div class="quiz-review-section" id="quizReviewSection">
+        <div class="quiz-review-title">Your Answers — Detailed Review</div>
+        <div id="quizReviewContent"></div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -3115,6 +3529,403 @@ PTPT1000 (or similar names like ALLPAGES) is the super-user permission list that
 ];
 
 /* ═══════════════════════════════════════════════
+   QUIZ ENGINE — 100 QUESTION BANK
+═══════════════════════════════════════════════ */
+const QUIZ_BANK = [
+  /* ── HISTORY & INTRODUCTION (10) ── */
+  {cat:"History & Introduction",q:"In what year was PeopleSoft founded?",opts:["1982","1987","1992","1995"],ans:1,exp:"PeopleSoft was founded in 1987 by Dave Duffield and Ken Morris in Pleasanton, California. Their first product was a client-server HR payroll application."},
+  {cat:"History & Introduction",q:"Who founded PeopleSoft?",opts:["Larry Ellison","Dave Duffield and Ken Morris","Craig Conway and Mark Hurd","Safra Catz and Jeff Henley"],ans:1,exp:"Dave Duffield and Ken Morris co-founded PeopleSoft in 1987. Duffield later founded Workday after Oracle's acquisition."},
+  {cat:"History & Introduction",q:"Oracle acquired PeopleSoft for approximately how much?",opts:["$2.1 billion","$5.8 billion","$10.3 billion","$15 billion"],ans:2,exp:"Oracle acquired PeopleSoft in January 2005 for $10.3 billion after an 18-month hostile takeover battle that started in June 2003."},
+  {cat:"History & Introduction",q:"Which PeopleSoft version first introduced browser-based access (PIA)?",opts:["PeopleSoft 6","PeopleSoft 7","PeopleSoft 8","PeopleSoft 9"],ans:2,exp:"PeopleSoft 8 (2000) introduced Pure Internet Architecture (PIA). Users no longer needed to install the desktop client — any browser could access PeopleSoft."},
+  {cat:"History & Introduction",q:"What does PeopleSoft metadata-driven architecture mean?",opts:["All code is stored in text files on the server","Every page, field and workflow is defined as metadata in database tables, not hardcoded files","PeopleSoft uses JSON files to drive the UI","Developers write SQL directly to create forms"],ans:1,exp:"PeopleSoft is metadata-driven — every Record, Page, Component, and PeopleCode program is stored as metadata in PeopleTools system tables. The runtime engine reads this metadata to generate pages and execute logic."},
+  {cat:"History & Introduction",q:"What is PeopleSoft Update Manager (PUM)?",opts:["A tool to monitor server performance","Oracle's selective patching system allowing organizations to pick specific fixes from a PeopleSoft Image","A backup utility for PeopleSoft databases","A deployment tool for moving code to production"],ans:1,exp:"PUM (introduced ~2014) replaced old bundle patching. Organizations download a PeopleSoft Image VM, browse available updates, and selectively apply only the fixes and features they need."},
+  {cat:"History & Introduction",q:"Which product did Dave Duffield found AFTER leaving Oracle?",opts:["SAP SuccessFactors","ServiceNow","Workday","Ceridian"],ans:2,exp:"After the Oracle acquisition of PeopleSoft, Dave Duffield founded Workday — now one of PeopleSoft HCM's primary cloud competitors."},
+  {cat:"History & Introduction",q:"PeopleSoft HCM is primarily used for:",opts:["Financial reporting and budgeting","Managing the complete employee lifecycle — hire to retire","Supply chain and inventory management","Customer relationship management"],ans:1,exp:"PeopleSoft HCM (Human Capital Management) manages the complete employee lifecycle — recruiting, onboarding, job data, compensation, benefits, payroll, time & labor, absence, and talent management."},
+  {cat:"History & Introduction",q:"Which PeopleTools version introduced Fluid UI?",opts:["PT 8.49","PT 8.51","PT 8.53","PT 8.57"],ans:2,exp:"Fluid UI was introduced in PeopleTools 8.53. It replaced the Classic fixed-width HTML interface with a responsive HTML5/CSS3 design that works on mobile, tablet, and desktop."},
+  {cat:"History & Introduction",q:"PeopleSoft can be deployed on:",opts:["On-premise only","Oracle Cloud (OCI) only","Both on-premise and Oracle Cloud Infrastructure (OCI)","Only on Amazon AWS"],ans:2,exp:"PeopleSoft supports both on-premise deployment and Oracle Cloud Infrastructure (OCI). Organizations running on OCI still maintain full control of their customizations."},
+
+  /* ── ARCHITECTURE & PIA (12) ── */
+  {cat:"Architecture & PIA",q:"In PeopleSoft three-tier architecture, where does all PeopleCode execute?",opts:["In the browser","In the WebLogic web server","In the Tuxedo Application Server","In the Oracle database"],ans:2,exp:"All PeopleCode executes in the Tuxedo Application Server (Tier 2). The browser is a pure display layer with no business logic."},
+  {cat:"Architecture & PIA",q:"What protocol does WebLogic use to communicate with the Tuxedo App Server?",opts:["HTTP","SOAP","JOLT","JDBC"],ans:2,exp:"WebLogic communicates with Tuxedo using JOLT (Java Object Linking and Transactions). The JOLT port is typically 9000."},
+  {cat:"Architecture & PIA",q:"What is PSAPPSRV responsible for?",opts:["Handling file uploads","Executing PeopleCode, Component Processor operations, and SQL generation","Managing DB connections only","Serving static HTML files"],ans:1,exp:"PSAPPSRV is the core Application Server process in Tuxedo. It handles component buffer operations, PeopleCode execution, and SQL generation."},
+  {cat:"Architecture & PIA",q:"What does PSQRYSRV handle?",opts:["Queue management for batch jobs","PS Query execution","Security validation","Report distribution"],ans:1,exp:"PSQRYSRV is dedicated to PS Query execution, separating query processing from component processing handled by PSAPPSRV."},
+  {cat:"Architecture & PIA",q:"In 2-tier App Designer mode, the connection goes:",opts:["Through the App Server","Directly to the database","Through WebLogic","Through the Process Scheduler"],ans:1,exp:"In 2-tier mode, Application Designer connects directly to the database, bypassing the App Server. In 3-tier, it connects via the App Server using JOLT."},
+  {cat:"Architecture & PIA",q:"Which web server is the ONLY supported option in PeopleTools 8.59+?",opts:["Apache Tomcat","IBM WebSphere","Oracle WebLogic","Microsoft IIS"],ans:2,exp:"As of PeopleTools 8.59, Oracle WebLogic is the only supported web server for PeopleSoft."},
+  {cat:"Architecture & PIA",q:"What does Process Scheduler (PSPRCSRV) do?",opts:["Manages user sessions","Runs batch jobs like App Engine, SQR, BI Publisher outside the online session","Handles DB connection pooling","Manages file uploads"],ans:1,exp:"Process Scheduler manages all batch process execution independently from the online web/app server to prevent batch jobs from affecting online user performance."},
+  {cat:"Architecture & PIA",q:"What is the Distribution Agent (PSDSTSRV)?",opts:["A tool for distributing updates","Moves completed batch output files to the Report Repository","A load balancer","A security component"],ans:1,exp:"PSDSTSRV transfers completed report output files from the batch server to the Report Repository, making them accessible in Report Manager."},
+  {cat:"Architecture & PIA",q:"Where is PeopleSoft application metadata stored?",opts:["XML files on the web server","In the database in PeopleTools system tables","In App Server memory cache","In flat files on the batch server"],ans:1,exp:"All PeopleSoft metadata — Records, Fields, Pages, Components, PeopleCode — is stored in the database in PeopleTools system tables like PSRECDEFN, PSDBFIELD, PSPNLDEFN."},
+  {cat:"Architecture & PIA",q:"What is a PeopleSoft DPK?",opts:["Dynamic Page Kit","Deployment Package — Puppet-based scripts automating environment installation","Database Patching Kit","Developer Process Kit"],ans:1,exp:"DPK (Deployment Package) uses Puppet scripts to automate PeopleSoft environment setup. Standard from PT 8.55+, reducing multi-day manual installs to hours."},
+  {cat:"Architecture & PIA",q:"What is a PeopleSoft Domain?",opts:["A business unit grouping","An instance of the Tuxedo App Server or Process Scheduler","The database schema","A set of navigation menus"],ans:1,exp:"A Domain is an instance of either the Tuxedo Application Server or Process Scheduler. A standard environment has one App Server domain and one Process Scheduler domain."},
+  {cat:"Architecture & PIA",q:"What happens atomically when a user saves in PeopleSoft?",opts:["Fields write one by one","All pages validate, SavePreChange fires, ALL data commits as one transaction, SavePostChange fires","Only the visible page saves","Browser writes data directly to DB"],ans:1,exp:"On Save: SaveEdit validates, SavePreChange fires before commit, ALL component data commits atomically to DB, then SavePostChange fires. Either all succeeds or none does."},
+
+  /* ── PEOPLECODE BASICS & EVENTS (16) ── */
+  {cat:"PeopleCode Basics",q:"Which PeopleCode event fires ONCE after the entire component is fully loaded?",opts:["RowInit","FieldDefault","PostBuild","SearchInit"],ans:2,exp:"PostBuild fires once after all RowInit and FieldDefault events have run. Best place for show/hide logic and component-level initialization."},
+  {cat:"PeopleCode Basics",q:"Which event is correct for final business rule validation before saving?",opts:["FieldChange","RowInit","PostBuild","SaveEdit"],ans:3,exp:"SaveEdit fires during the save sequence. Error() in SaveEdit stops the save and highlights the problem. Standard location for cross-field business rules."},
+  {cat:"PeopleCode Basics",q:"What is the main performance risk of SQLExec in RowInit?",opts:["SQLExec not supported in RowInit","RowInit fires for every row — SQLExec causes N+1 queries","SQLExec commits data early","It causes a deadlock"],ans:1,exp:"RowInit fires for EVERY row in EVERY grid. SQLExec in RowInit = one SQL per row. 200 rows = 200 SQLs. Most common performance anti-pattern in PeopleSoft."},
+  {cat:"PeopleCode Basics",q:"Which function handles queries returning MULTIPLE rows?",opts:["SQLExec","FetchSQL","CreateSQL with .Fetch() in a While loop","MultiRowSQL"],ans:2,exp:"CreateSQL returns a SQL object. Use While &sql.Fetch() to iterate rows. Always call .Close() when done. SQLExec only returns the first matching row."},
+  {cat:"PeopleCode Basics",q:"What does Component scope mean for a variable?",opts:["Exists only for one function call","Persists for the entire component transaction","Available across all components in the session","Stored in the database"],ans:1,exp:"Component scope variables persist from component open to save/cancel. Any event in that component can read and write them. Use when you need to pass values between different events."},
+  {cat:"PeopleCode Basics",q:"What fires FieldChange?",opts:["A user pressing Save","A user navigating between page tabs","A user changing a field value and tabbing out","The component first loading"],ans:2,exp:"FieldChange fires when a user changes a field value. Used for dynamic field updates — auto-populating related fields, showing/hiding controls based on the new value."},
+  {cat:"PeopleCode Basics",q:"What does %OperatorId return?",opts:["The current employee EMPLID","The current user login ID","The current component name","The current database name"],ans:1,exp:"%OperatorId returns the current user's login ID. %EmployeeId returns the linked EMPLID. %Date returns today's date."},
+  {cat:"PeopleCode Basics",q:"If SQLExec finds no rows, what happens to output variables?",opts:["Runtime error is thrown","Set to empty string or zero — no error","Last query values remain","PeopleCode skips the statement"],ans:1,exp:"If SQLExec finds no rows, output variables are set to empty string or 0. No error. Always use None() to check before using the value."},
+  {cat:"PeopleCode Basics",q:"Which event fires during the SQL SELECT that loads data into the buffer?",opts:["PostBuild","RowInit","RowSelect","SearchInit"],ans:2,exp:"RowSelect fires for each row being fetched. Use DiscardRow() to filter rows. Using SQL Views to filter is more efficient than RowSelect PeopleCode."},
+  {cat:"PeopleCode Basics",q:"What does Error() in FieldEdit do?",opts:["Logs to server console","Prevents tabbing out and highlights the field in red","Cancels the component","Sends an email"],ans:1,exp:"Error() in FieldEdit prevents accepting the new value. The field is highlighted and the user must correct it or revert. Use Warning() to allow the value but show a caution."},
+  {cat:"PeopleCode Basics",q:"Where does PeopleCode execute in PIA architecture?",opts:["In the browser","In Oracle PL/SQL","In the Tuxedo App Server","In WebLogic"],ans:2,exp:"All PeopleCode runs server-side in the Tuxedo Application Server. Zero business logic in the browser."},
+  {cat:"PeopleCode Basics",q:"What is Meta-SQL?",opts:["Syntax for creating DB tables","PeopleSoft SQL functions like %CurrentDateIn and %Table() that resolve correctly for any supported database","Pre-built SQL reports","Encrypted SQL"],ans:1,exp:"Meta-SQL makes PeopleCode database-independent. %CurrentDateIn resolves to the correct date syntax for Oracle/SQL Server/DB2. %Table(NAME) resolves to PS_NAME."},
+  {cat:"PeopleCode Basics",q:"What does SavePostChange fire after?",opts:["Before DB commit","After DB commit — for downstream updates","When user clicks Cancel","During search dialog"],ans:1,exp:"SavePostChange fires AFTER database commit. Cannot cancel the save. Use for downstream updates, notifications, integrations that depend on the committed data."},
+  {cat:"PeopleCode Basics",q:"How do you make a field visible but not editable in PeopleCode?",opts:["JOB.DEPTID.Enabled = False","JOB.DEPTID.DisplayOnly = True","JOB.DEPTID.Visible = False","JOB.DEPTID.ReadOnly = True"],ans:1,exp:"DisplayOnly = True shows the value but prevents editing. Enabled = False grays the field out. Visible = False hides it completely."},
+  {cat:"PeopleCode Basics",q:"When should you use Global scope?",opts:["For all variables","For values that persist across components for the entire user session","For loop counters","For DB query results"],ans:1,exp:"Global scope persists for the entire user session. Use very sparingly — only for truly session-wide data. Can cause subtle bugs between components."},
+  {cat:"PeopleCode Basics",q:"What does RowInsert fire in response to?",opts:["A row being loaded from DB","A user adding a new row to a grid","The component opening","A row being deleted"],ans:1,exp:"RowInsert fires when a user adds a new row. Note: RowInit always fires after RowInsert — don't duplicate initialization code or it runs twice."},
+
+  /* ── RECORDS, FIELDS & DATA MODEL (14) ── */
+  {cat:"Records & Fields",q:"What database table does record 'JOB' create?",opts:["PSJOB","JOB_TABLE","PS_JOB","PS.JOB"],ans:2,exp:"PeopleSoft prefixes all SQL Table database tables with PS_. Record JOB becomes PS_JOB."},
+  {cat:"Records & Fields",q:"Which record type should you use for values that should NEVER be stored in the database?",opts:["SQL Table","SQL View","Dynamic View","Derived/Work"],ans:3,exp:"Derived/Work records never create a database object. They exist only in the component buffer. Used for computed values, push buttons, and temporary variables."},
+  {cat:"Records & Fields",q:"What is a SubRecord?",opts:["A record within a grid","A reusable set of fields embedded into other records","A view joining two records","A temp record for batch"],ans:1,exp:"A SubRecord is a reusable field group. Including it in a record adds all its fields to the parent table. EFFDT_SBR (EFFDT + EFFSEQ) is the most important example."},
+  {cat:"Records & Fields",q:"PeopleSoft fields are defined:",opts:["Inside record definitions","Globally — one definition reused across hundreds of records","Per page","Inside PeopleCode"],ans:1,exp:"Fields are defined globally and independently. The same field EMPLID can be in 400+ records. Change the label once and it updates everywhere automatically."},
+  {cat:"Records & Fields",q:"What does an Alternate Search Key (A) field property do?",opts:["Makes the field the primary key","Creates a database index enabling efficient searching without making it the primary key","Prevents field from appearing in search results","Makes the field required"],ans:1,exp:"Alternate Search Key creates a DB index for efficient searching. For example, LAST_NAME as A on PS_NAMES allows fast employee name searches."},
+  {cat:"Records & Fields",q:"What does a SQL View record create?",opts:["A permanent read-write table","A database view — read-only","A temporary table","A stored procedure"],ans:1,exp:"SQL View records create a permanent read-only database view. Used for security views, reporting, and joining related tables."},
+  {cat:"Records & Fields",q:"What is the Temp Table record type used for?",opts:["Storing user session data","Parallel batch processing by Application Engine — multiple instances prevent collision","Storing debug logs","Caching reference data"],ans:1,exp:"Temp Tables allow multiple parallel AE instances (MYTEMP_AET, MYTEMP_AET1, MYTEMP_AET2) to work simultaneously without data collision."},
+  {cat:"Records & Fields",q:"What does a List Box Item (L) field property mean?",opts:["Field appears as search filter","Field appears as a column in the search results list","Field is required for Add mode","Field triggers a lookup"],ans:1,exp:"List Box Items appear as columns in the search results list — helping users identify which row to select."},
+  {cat:"Records & Fields",q:"After defining a SQL Table record, what creates the physical database table?",opts:["Saving the record definition","Build → Current Object → Create Table","Restarting the App Server","Running a DMS script"],ans:1,exp:"Saving only stores the metadata. Build → Create Table generates and executes the CREATE TABLE DDL to physically create PS_RECORDNAME in the database."},
+  {cat:"Records & Fields",q:"Why does the PS_ prefix exist on all PeopleSoft tables?",opts:["Performance improvement","Distinguishes application tables from PeopleTools metadata tables","Required by Oracle","Required for indexing"],ans:1,exp:"The PS_ prefix distinguishes PeopleSoft application data tables from PeopleTools system tables (PSRECDEFN, PSDBFIELD) and database system tables."},
+  {cat:"Records & Fields",q:"How many record types does PeopleSoft support?",opts:["3","5","7","10"],ans:2,exp:"7 record types: SQL Table, SQL View, Dynamic View, Derived/Work, SubRecord, Query View, and Temp Table."},
+  {cat:"Records & Fields",q:"How does a Dynamic View differ from a SQL View?",opts:["Dynamic Views are faster","Dynamic View resolves SQL at runtime with no DB object; SQL View creates a permanent DB view","Dynamic Views support inserts","No difference"],ans:1,exp:"SQL View creates a permanent database view object. Dynamic View stores SQL that resolves at runtime creating no database object — allowing runtime-specific filtering."},
+  {cat:"Records & Fields",q:"What happens when you change a global field label?",opts:["Only the first record updates","Must update each record separately","Updates everywhere the field is used automatically","Only takes effect after upgrade"],ans:2,exp:"Global field label changes propagate automatically to every record, page, grid, and search dialog that uses the field — no additional developer work."},
+  {cat:"Records & Fields",q:"What is a Query View record?",opts:["Created by App Designer for reporting","Created and managed by PS Query — used when a query result becomes source for another query","Displays query execution plans","Stores saved PS Query definitions"],ans:1,exp:"Query View records are created by PS Query. They allow one query's results to be the source for another — enabling complex nested query scenarios."},
+
+  /* ── EFFECTIVE DATING (10) ── */
+  {cat:"Effective Dating",q:"What happens to PS_JOB when an employee gets a promotion?",opts:["The row is updated","The old row deleted, new one created","A new row inserted with promotion's EFFDT — old row stays permanently","Row archived to PS_JOB_HIST"],ans:2,exp:"Effective dating = INSERT not UPDATE. A new row is added with the new EFFDT and ACTION=PRO. The original hire row remains permanently."},
+  {cat:"Effective Dating",q:"What does EFFSEQ handle?",opts:["Display order on page","Multiple changes on the same Effective Date — sequenced 0, 1, 2","Version number of a record","Approval sequence"],ans:1,exp:"EFFSEQ distinguishes multiple changes on the same date. First change EFFSEQ=0, second EFFSEQ=1. The row with the highest EFFSEQ for a date is most current."},
+  {cat:"Effective Dating",q:"To get the current row from PS_JOB, your WHERE clause needs:",opts:["WHERE EFFDT = TODAY","WHERE CURRENT = Y","WHERE EFFDT = (SELECT MAX(EFFDT)...WHERE EFFDT <= today) AND EFFSEQ = MAX(EFFSEQ)","WHERE ROW_STATUS = CURRENT"],ans:2,exp:"Standard pattern: correlated subquery for MAX(EFFDT) on or before today, then MAX(EFFSEQ) for that date. Fundamental PeopleSoft SQL knowledge."},
+  {cat:"Effective Dating",q:"What is a future-dated row?",opts:["A deleted row kept for audit","A row with EFFDT > today — in DB now but not yet current","A row that failed validation","A row created overnight by batch"],ans:1,exp:"Future-dated rows have EFFDT > today. They exist in the DB now but won't become current until their date arrives."},
+  {cat:"Effective Dating",q:"Why might PS_JOB have 20+ rows for one employee?",opts:["Data integrity error","Each row is a job change (hire, transfer, promotion, pay change) — effective dating preserves all history","Each row is a different EMPL_RCD","Audit logging copies rows"],ans:1,exp:"Every job change (ACTION) creates a new PS_JOB row. An employee with 10+ years and many changes could easily have 30+ rows. This is by design."},
+  {cat:"Effective Dating",q:"What is Correction Mode?",opts:["Automatically fixes data errors","Allows authorized users to modify historical effective-dated rows","A read-only view of past data","A developer debug tool"],ans:1,exp:"Correction Mode lets authorized users modify historical rows directly. Tightly security-controlled because retroactive changes can trigger payroll recalculation."},
+  {cat:"Effective Dating",q:"Most common mistake querying PS_JOB?",opts:["Wrong database","Not including BUSINESS_UNIT","Missing effective dating WHERE clause — returns ALL historical rows causing duplicates","Using LIKE instead of ="],ans:2,exp:"Missing EFFDT criteria returns all 30+ rows per employee — causing duplicates and wrong calculations in any report or integration."},
+  {cat:"Effective Dating",q:"What does EFFDT_SBR typically contain?",opts:["EFFDT, EFFSEQ, STATUS","Only EFFDT","EFFDT and EFFSEQ","EFFDT and ACTION"],ans:2,exp:"EFFDT_SBR is a SubRecord containing EFFDT and EFFSEQ — included in hundreds of records to implement effective dating consistently."},
+  {cat:"Effective Dating",q:"What does the ACTION field in PS_JOB store?",opts:["Approval status","Type of change (HIR=Hire, PRO=Promotion, TER=Termination, PAY=Pay Change)","Unique ID of the change","Name of person who made the change"],ans:1,exp:"ACTION stores the type of job change. Combined with ACTION_REASON, it tells the complete story of every change in an employee's career history."},
+  {cat:"Effective Dating",q:"Why is effective dating critical for payroll?",opts:["It determines who processes payroll","It enables retroactive pay — backdated corrections allow recalculation of previous periods using historical rows","It prevents duplicate runs","It controls who gets paid"],ans:1,exp:"Effective dating enables retroactive payroll. Historical rows are never deleted, so payroll can recalculate any past period if a salary or job change is backdated."},
+
+  /* ── PAGES, COMPONENTS & NAVIGATION (10) ── */
+  {cat:"Pages & Components",q:"What is a Component in PeopleSoft?",opts:["A single page definition","Pages sharing the same buffer that save together as one transaction","A JavaScript widget","A reusable PeopleCode block"],ans:1,exp:"A Component groups related pages into one transaction. All pages share the Component Buffer and save atomically."},
+  {cat:"Pages & Components",q:"What does the Search Record define?",opts:["Stores PeopleCode programs","Fields in the search dialog before opening the component","Which App Server handles the request","Default values for the component"],ans:1,exp:"The Search Record drives the search dialog — which fields appear as criteria and which appear as result columns."},
+  {cat:"Pages & Components",q:"What is a Sub Page?",opts:["A secondary search dialog","A reusable page fragment embedded into other pages for common field groups","A hidden page","The second tab in a component"],ans:1,exp:"A Sub Page is a reusable page fragment embedded inside other pages. Used for common fields like address blocks that appear in multiple components."},
+  {cat:"Pages & Components",q:"What is a Content Reference (CREF) in Fluid?",opts:["A database view","A Portal Registry entry pointing to a component — required for users to navigate to it","A PeopleCode function type","A security role"],ans:1,exp:"A CREF registers a component in the Portal Registry with its label, location, and security. Without it users cannot navigate to the component."},
+  {cat:"Pages & Components",q:"Which control displays multiple child rows in a modern page?",opts:["Scroll Area","Group Box","Grid","Frame"],ans:2,exp:"Grid is the modern replacement for Scroll Area. Supports sorting, filtering, pagination. All new development uses Grids."},
+  {cat:"Pages & Components",q:"A user sees a page but all fields are gray and uneditable. Most likely cause?",opts:["Database is read-only","Permission List grants Display Only instead of Update/Display","App Server overloaded","Browser doesn't support the component"],ans:1,exp:"Display Only access mode in the Permission List means read-only. The administrator must change the access mode to Update/Display."},
+  {cat:"Pages & Components",q:"What does the Add Search Record define?",opts:["A secondary advanced filter search","The search record specifically for Add mode — can differ from main Search Record","For searching archived data","For admin access only"],ans:1,exp:"The Add Search Record is used when a user clicks Add. In Add mode, users enter key values for the new record being created."},
+  {cat:"Pages & Components",q:"What is a Work Page?",opts:["Visible to developers only","Hidden page backed by Derived/Work records — holds temporary values not shown to users","The first page users see","Used only during batch processing"],ans:1,exp:"Work Pages are hidden pages backed by Derived/Work records. They store temporary values and calculations needed by PeopleCode but not shown to users."},
+  {cat:"Pages & Components",q:"What are Folder Tabs in a Component?",opts:["File management tabs in App Designer","Tab labels at top of component for navigating between pages","User bookmarks","Navigation breadcrumbs"],ans:1,exp:"Folder Tabs appear when a component has multiple pages. Users click tabs to navigate between pages. All pages share the buffer and save together."},
+  {cat:"Pages & Components",q:"What is a Tile in Fluid UI?",opts:["A database partition","A large clickable button on a Fluid Homepage linking to a component","A PeopleCode event type","A breadcrumb"],ans:1,exp:"Tiles are the large clickable buttons on Fluid Homepages. Each is a CREF with an image and optional dynamic badge count."},
+
+  /* ── COMPONENT BUFFER & ROWSETS (8) ── */
+  {cat:"Component Buffer",q:"What is the Component Buffer?",opts:["HTML cache on web server","In-memory data structure in App Server holding all current transaction data","A DB table for temp data","Browser local storage"],ans:1,exp:"The Component Buffer holds all component transaction data in App Server memory. PeopleCode reads/writes here. Only Save writes to the database."},
+  {cat:"Component Buffer",q:"How do you get the Level 1 Rowset in PeopleCode?",opts:["GetRowset()","GetLevel1Rowset()","GetRowset(Scroll.RECORDNAME)","GetChildRowset(NAME)"],ans:2,exp:"GetRowset(Scroll.RECORDNAME) returns the Level 1 rowset. GetRowset() alone returns Level 0 (primary record, 1 row)."},
+  {cat:"Component Buffer",q:"Difference between ActiveRowCount and RowCount?",opts:["Identical","ActiveRowCount excludes deleted rows; RowCount includes them","ActiveRowCount includes future rows","RowCount is faster"],ans:1,exp:"Always use ActiveRowCount in loops — it excludes rows marked for deletion. RowCount includes deleted rows."},
+  {cat:"Component Buffer",q:"What does JOB.DEPTID.Value = 'HR001' in PeopleCode do?",opts:["Immediately updates PS_JOB in DB","Writes to Component Buffer only — DB updates only on Save","Creates a new PS_JOB row","Triggers a DB trigger"],ans:1,exp:"Field assignments write to the in-memory buffer. PS_JOB in DB still has the old value until SavePreChange executes the SQL."},
+  {cat:"Component Buffer",q:"Which class do you use to iterate multiple buffer rows?",opts:["Array","Rowset","RecordSet","DataBuffer"],ans:1,exp:"The Rowset class represents a collection of rows. GetRowset(), then GetRow(n), then ActiveRowCount for iteration count."},
+  {cat:"Component Buffer",q:"What is Level 0 in Component Buffer hierarchy?",opts:["The database tier","The primary record — always exactly one row","The first grid on the page","App Server memory layer"],ans:1,exp:"Level 0 is the primary record — always exactly one row. Child scrolls/grids are at Level 1."},
+  {cat:"Component Buffer",q:"What does GetRecord(Record.RECORDNAME) return?",opts:["A database result set","The Record object from the current row for accessing Field objects","A copy of the database table","A new empty record definition"],ans:1,exp:"GetRecord returns a Record object from which you access Field objects: &rec.DEPTID.Value."},
+  {cat:"Component Buffer",q:"What happens if you forget &sql.Close() after CreateSQL?",opts:["Nothing — auto-closes","A DB cursor remains open — can exhaust connection resources especially in RowInit","PeopleCode compile error","Next SQL fails"],ans:1,exp:"Forgetting .Close() leaves an open cursor. In RowInit with many rows this can exhaust database cursor limits. Always call &sql.Close()."},
+
+  /* ── PS QUERY & SECURITY (8) ── */
+  {cat:"PS Query & Security",q:"What are the three PS Query types based on sharing?",opts:["Public, Private, Admin","User (private), Role (shared), Public (all users with access)","Read-only, Read-write, Admin","Basic, Advanced, Expert"],ans:1,exp:"User Queries are private. Role Queries are shared with users having a specific Role. Public Queries are accessible to all users with Query access."},
+  {cat:"PS Query & Security",q:"PeopleSoft security hierarchy top to bottom?",opts:["Permission List → Role → User","User → Role → Permission List","Role → User → Permission List","Permission List → User → Role"],ans:1,exp:"Users are assigned Roles. Roles bundle Permission Lists. Permission Lists define actual security (pages, processes, query trees)."},
+  {cat:"PS Query & Security",q:"What does row-level security control?",opts:["Which DB rows the DBA sees","Which data rows a user can see within accessible components","How many rows a query returns","Sort order in grids"],ans:1,exp:"Row-level security controls which DATA rows a user accesses — not just pages. An HR admin with Job Data access may only see their authorized departments."},
+  {cat:"PS Query & Security",q:"What is a PS Query Prompt?",opts:["A help tooltip","A runtime parameter — user enters a filter value each time they run the query","A mandatory WHERE field","A join condition"],ans:1,exp:"Prompts make queries dynamic. Instead of hardcoding criteria, users enter values at runtime — making one query reusable for many use cases."},
+  {cat:"PS Query & Security",q:"Most dangerous mistake in a custom component showing employee data?",opts:["Too few grid columns","Using PS_JOB as Search Record instead of a security view — bypasses row-level security","Not registering in Portal","Too many tabs"],ans:1,exp:"Using PS_JOB directly as Search Record bypasses row-level security — all users see all employees. Always use a security view as the Search Record."},
+  {cat:"PS Query & Security",q:"What is a Translate Value (XLAT)?",opts:["Language translation of labels","Short code list (max 4 chars) in PSXLATITEM — for stable values like EMPL_STATUS and ACTION","A DB view for FK lookups","A PeopleCode string function"],ans:1,exp:"Translate Values (XLAT) store short stable code lists. EMPL_STATUS (A=Active, T=Terminated), ACTION (HIR, PRO, TER). Max 4-character values."},
+  {cat:"PS Query & Security",q:"Correct action when a Translate Value becomes obsolete but exists in live data?",opts:["Delete it","Mark Inactive with effective date — disappears from dropdowns but old data stays valid","Replace it everywhere","Leave it active"],ans:1,exp:"Never delete a live XLAT value — it breaks existing records. Mark it Inactive. New entries can't use it but historical records remain valid."},
+  {cat:"PS Query & Security",q:"What is a Query Access Tree?",opts:["Visual hierarchy of query results","Security configuration in Permission Lists controlling which DB tables users can query","Organization of saved queries","Performance optimization tool"],ans:1,exp:"Query Access Trees in Permission Lists control which PeopleSoft records users can build queries against — preventing access to sensitive tables."},
+
+  /* ── REAL PROJECT SCENARIOS (12) ── */
+  {cat:"Real Project Scenario",isScenario:true,q:"A page loads very slowly. SQL trace shows 500 identical SELECTs against PS_DEPT_TBL. What is the likely cause?",opts:["PS_DEPT_TBL needs an index","Developer put SQLExec in RowInit — grid has 500 rows = 500 SQL calls","DB server is undersized","Too few PSAPPSRV processes"],ans:1,exp:"Classic N+1 problem: SQLExec in RowInit × 500 rows = 500 SQL calls. Fix: pre-fetch in PostBuild once, or use a SQL View joining department names directly."},
+  {cat:"Real Project Scenario",isScenario:true,q:"User says: I can see the component but cannot save. No error appears. First check?",opts:["Restart App Server","Check Permission List access mode — likely Display Only instead of Update/Display","Check for DB locks","Clear browser cache"],ans:1,exp:"When a user can view but not save with no error, check the Permission List access mode first. Display Only = read only. Change to Update/Display for edit access."},
+  {cat:"Real Project Scenario",isScenario:true,q:"Custom component uses PS_JOB as Search Record. HR coordinator sees all employees in UAT — even outside their department. What is wrong?",opts:["PeopleCode is wrong","Search Record should be a security view joining PS_JOB with row-level security tables","Permission List needs update","Component needs a new key field"],ans:1,exp:"PS_JOB as Search Record bypasses row-level security. Replace with a security view (PS_JOB_SRCH_VW) that joins with the department security table — filters automatically."},
+  {cat:"Real Project Scenario",isScenario:true,q:"You define a new SQL Table record, save it, add it to a page. SQL error: 'PS_MYRECORD does not exist'. What did you forget?",opts:["Add fields","Run Build → Create Table to generate the physical database table","Register in Portal","Assign a search key"],ans:1,exp:"Defining the record only creates metadata. You must run Build → Current Object → Create Table to execute the CREATE TABLE DDL that creates the physical table."},
+  {cat:"Real Project Scenario",isScenario:true,q:"After a PeopleSoft upgrade, your customization is overwritten. What should you have done?",opts:["Never customize","Used Event Mapping (PT 8.55+) or cloned delivered objects with a custom prefix","Submitted a bug to Oracle","Created a separate database"],ans:1,exp:"Oracle-delivered objects are overwritten in upgrades. Best practice: clone with your prefix (ZZ_JOB) and modify the clone. For PT 8.55+, Event Mapping avoids touching delivered objects entirely."},
+  {cat:"Real Project Scenario",isScenario:true,q:"Payroll batch shows Error status in Process Monitor. First two steps to diagnose?",opts:["Restart DB server","Click into process → view log file, then check Run Control parameters","Call Oracle support","Resubmit unchanged"],ans:1,exp:"Step 1: Process Monitor → View Log Files → find the actual error message. Step 2: Check Run Control parameters — correct dates, valid data? 90% of batch failures are diagnosed from the log."},
+  {cat:"Real Project Scenario",isScenario:true,q:"Employee report shows wrong department for last January even though today's record looks correct. Why?",opts:["Report has a calculation bug","Report is not using effective dating — showing today's row instead of January's row","Record is corrupted","DB backup is outdated"],ans:1,exp:"The report fetches current data (today's row) instead of point-in-time data. Effective-dated reports need WHERE EFFDT <= report_date. Without it you always see today's state."},
+  {cat:"Real Project Scenario",isScenario:true,q:"Need to display department names in a custom grid with 200 employee rows. Most efficient approach?",opts:["SQLExec in RowInit per row","Create a SQL View joining PS_JOB with PS_DEPT_TBL — bind view to grid","Use PostBuild with 200 SQLExec calls","Hidden field in FieldChange"],ans:1,exp:"Create a SQL View joining PS_JOB and PS_DEPT_TBL with proper effective dating. The database JOIN runs once in one SQL statement instead of 200 individual lookups. Correct architectural approach."},
+  {cat:"Real Project Scenario",isScenario:true,q:"Client asks to add a new field to delivered record PS_JOB. What should you do?",opts:["Add field directly to PS_JOB","Create extension record (ZZ_JOB_EXT) with same keys + your custom fields","Create a completely new component","Ask Oracle to add the field"],ans:1,exp:"Never add fields to delivered records — overwritten in upgrades. Create an extension record with your prefix and the same key fields. Link it to the component alongside the delivered record. Upgrade-safe."},
+  {cat:"Real Project Scenario",isScenario:true,q:"PS Query joining PS_PERSONAL_DATA with PS_JOB returns 5x expected rows. Most likely cause?",opts:["Wrong join key","Missing effective dating on PS_JOB — all historical rows create a near-Cartesian product","Running against wrong DB","Syntax error in query"],ans:1,exp:"Missing EFFDT criteria on PS_JOB causes a cross-join: 1 PERSONAL_DATA row × 20+ JOB rows per employee. Always add MAX(EFFDT) <= today criteria on effective-dated tables in joins."},
+  {cat:"Real Project Scenario",isScenario:true,q:"Built and tested a component in DEV. Migrated to QA. Users say page doesn't appear in menu. What did you miss?",opts:["PeopleCode bug","Migrated App Designer objects but not the Portal Registry CREF — they must be migrated separately","Permission List not updated","DB table not built in QA"],ans:1,exp:"App Designer objects and Portal CREFs migrate separately. The CREF that makes the component appear in the NavBar is a Portal object — not in a standard App Designer project unless explicitly added."},
+  {cat:"Real Project Scenario",isScenario:true,q:"A PeopleCode variable is set in PostBuild but not used in the same program. In which scope was it declared?",opts:["Local — value is lost","Component — read by another event in the same transaction","Always useless","Global — set for another session"],ans:1,exp:"This is the correct use of Component scope: set a flag in PostBuild (&isNewHire = True) and read it later in SaveEdit. Component variables persist across all events in the transaction."},
+];
+
+/* ═══════════════════════════════════════════════
+   QUIZ STATE & ENGINE
+═══════════════════════════════════════════════ */
+let quizState = {
+  mode:null, selectedModule:-1, questions:[], current:0,
+  answers:[], timerInterval:null, timeLeft:30, startTime:0, answered:false,
+};
+
+const QUIZ_MODULE_CATEGORIES = [
+  {label:"🔰 History & Intro",   cat:"History & Introduction"},
+  {label:"🏗️ Architecture",      cat:"Architecture & PIA"},
+  {label:"💻 PeopleCode",        cat:"PeopleCode Basics"},
+  {label:"🗂️ Records & Fields",  cat:"Records & Fields"},
+  {label:"📅 Effective Dating",  cat:"Effective Dating"},
+  {label:"🖥️ Pages & Components",cat:"Pages & Components"},
+  {label:"📦 Buffer & Rowsets",  cat:"Component Buffer"},
+  {label:"🔍 Query & Security",  cat:"PS Query & Security"},
+  {label:"🏢 Real Scenarios",    cat:"Real Project Scenario"},
+];
+
+function showQuiz() {
+  ['homepageView','appView','glossaryView'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.style.display = 'none';
+  });
+  document.getElementById('quizView').style.display = 'block';
+  document.getElementById('quizHome').style.display = 'block';
+  document.getElementById('quizActive').style.display = 'none';
+  document.getElementById('quizResults').style.display = 'none';
+  quizState.mode = null; quizState.selectedModule = -1;
+  document.querySelectorAll('.quiz-mode-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('quizModuleSection').classList.remove('visible');
+  document.getElementById('quizStartBtn').disabled = true;
+  document.getElementById('quizStartInfo').textContent = 'Select a quiz mode above to begin';
+  buildQuizModuleGrid();
+  window.scrollTo(0,0);
+}
+
+function selectQuizMode(mode) {
+  quizState.mode = mode; quizState.selectedModule = -1;
+  document.querySelectorAll('.quiz-mode-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById(mode==='module'?'modeCardModule':'modeCardFull').classList.add('selected');
+  document.querySelectorAll('.qmod-btn').forEach(b=>b.classList.remove('active'));
+  if(mode==='module'){
+    document.getElementById('quizModuleSection').classList.add('visible');
+    document.getElementById('quizStartBtn').disabled = true;
+    document.getElementById('quizStartInfo').textContent = 'Now select a module to focus on';
+  } else {
+    document.getElementById('quizModuleSection').classList.remove('visible');
+    document.getElementById('quizStartBtn').disabled = false;
+    document.getElementById('quizStartInfo').innerHTML = '<strong>40 questions</strong> · All topics · Randomly mixed · 30s per question';
+  }
+}
+
+function buildQuizModuleGrid(){
+  const grid = document.getElementById('quizModuleGrid');
+  grid.innerHTML = '';
+  QUIZ_MODULE_CATEGORIES.forEach((mod,i)=>{
+    const count = QUIZ_BANK.filter(q=>q.cat===mod.cat).length;
+    const btn = document.createElement('button');
+    btn.className='qmod-btn';
+    btn.textContent=`${mod.label} (${count}Q)`;
+    btn.onclick=()=>selectQuizModule(i,btn);
+    grid.appendChild(btn);
+  });
+}
+
+function selectQuizModule(idx,btn){
+  quizState.selectedModule=idx;
+  document.querySelectorAll('.qmod-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const mod=QUIZ_MODULE_CATEGORIES[idx];
+  document.getElementById('quizStartBtn').disabled=false;
+  document.getElementById('quizStartInfo').innerHTML=`<strong>30 questions</strong> · Focused on ${mod.label} · 30s per question`;
+}
+
+function startQuiz(){
+  let pool=[];
+  if(quizState.mode==='full'){
+    pool=shuffleArr([...QUIZ_BANK]).slice(0,40);
+  } else {
+    const mod=QUIZ_MODULE_CATEGORIES[quizState.selectedModule];
+    const catQs=shuffleArr(QUIZ_BANK.filter(q=>q.cat===mod.cat));
+    const otherQs=shuffleArr(QUIZ_BANK.filter(q=>q.cat!==mod.cat));
+    pool=[...catQs,...otherQs].slice(0,30);
+  }
+  quizState.questions=pool;
+  quizState.current=0;
+  quizState.answers=new Array(pool.length).fill(null);
+  quizState.startTime=Date.now();
+  document.getElementById('quizHome').style.display='none';
+  document.getElementById('quizActive').style.display='block';
+  document.getElementById('quizResults').style.display='none';
+  renderQuizQuestion();
+}
+
+function shuffleArr(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+
+function renderQuizQuestion(){
+  const q=quizState.questions[quizState.current];
+  const total=quizState.questions.length;
+  const idx=quizState.current;
+  quizState.answered=false;
+  document.getElementById('quizQCounter').textContent=`Question ${idx+1} of ${total}`;
+  document.getElementById('quizCategoryChip').textContent=q.cat;
+  document.getElementById('quizProgressFill').style.width=`${(idx/total)*100}%`;
+  document.getElementById('quizQNum').textContent=`Q${idx+1}`;
+  document.getElementById('quizQText').textContent=q.q;
+  document.getElementById('quizScenarioBadge').style.display=q.isScenario?'inline-flex':'none';
+  document.getElementById('quizOptions').innerHTML=q.opts.map((opt,oi)=>`
+    <button class="quiz-opt" id="qopt-${oi}" onclick="answerQuiz(${oi})">
+      <span class="quiz-opt__letter">${String.fromCharCode(65+oi)}</span>
+      <span class="quiz-opt__text">${opt}</span>
+    </button>`).join('');
+  const exp=document.getElementById('quizExplanation');
+  exp.classList.remove('show'); exp.innerHTML='';
+  document.getElementById('quizSkipBtn').style.display='block';
+  document.getElementById('quizNextBtn').classList.remove('show');
+  document.getElementById('quizNextBtn').textContent=idx===total-1?'Finish Quiz →':'Next Question →';
+  startTimer();
+}
+
+function startTimer(){
+  clearInterval(quizState.timerInterval);
+  quizState.timeLeft=30;
+  updateTimerDisplay();
+  quizState.timerInterval=setInterval(()=>{
+    quizState.timeLeft--;
+    updateTimerDisplay();
+    if(quizState.timeLeft<=0){clearInterval(quizState.timerInterval);if(!quizState.answered)timeOut();}
+  },1000);
+}
+
+function updateTimerDisplay(){
+  const t=quizState.timeLeft;
+  const d=document.getElementById('quizTimerDisplay');
+  const f=document.getElementById('quizTimerFill');
+  d.textContent=t;
+  d.className='quiz-timer'+(t<=10?' danger':t<=20?' warning':'');
+  f.style.width=(t/30*100)+'%';
+  f.className='quiz-timer-fill '+(t<=10?'timer-red':t<=20?'timer-amber':'timer-green');
+}
+
+function timeOut(){
+  quizState.answered=true;
+  const q=quizState.questions[quizState.current];
+  quizState.answers[quizState.current]={chosen:-1,correct:q.ans,skipped:true,timedOut:true};
+  document.querySelectorAll('.quiz-opt').forEach((btn,i)=>{btn.disabled=true;if(i===q.ans)btn.classList.add('correct');});
+  showQExplanation(q);
+  document.getElementById('quizSkipBtn').style.display='none';
+  document.getElementById('quizNextBtn').classList.add('show');
+  document.getElementById('quizTimerDisplay').textContent='⏰';
+}
+
+function answerQuiz(chosen){
+  if(quizState.answered)return;
+  quizState.answered=true;
+  clearInterval(quizState.timerInterval);
+  const q=quizState.questions[quizState.current];
+  quizState.answers[quizState.current]={chosen,correct:q.ans,skipped:false,timedOut:false};
+  document.querySelectorAll('.quiz-opt').forEach((btn,i)=>{
+    btn.disabled=true;
+    if(i===q.ans)btn.classList.add('correct');
+    else if(i===chosen)btn.classList.add('wrong');
+    else btn.classList.add('reveal');
+  });
+  showQExplanation(q);
+  document.getElementById('quizSkipBtn').style.display='none';
+  document.getElementById('quizNextBtn').classList.add('show');
+}
+
+function skipQuestion(){
+  if(quizState.answered)return;
+  clearInterval(quizState.timerInterval);
+  const q=quizState.questions[quizState.current];
+  quizState.answers[quizState.current]={chosen:-1,correct:q.ans,skipped:true,timedOut:false};
+  quizState.answered=true;
+  document.querySelectorAll('.quiz-opt').forEach((btn,i)=>{btn.disabled=true;if(i===q.ans)btn.classList.add('correct');});
+  showQExplanation(q);
+  document.getElementById('quizSkipBtn').style.display='none';
+  document.getElementById('quizNextBtn').classList.add('show');
+}
+
+function showQExplanation(q){
+  const exp=document.getElementById('quizExplanation');
+  exp.innerHTML=`<strong>💡 Explanation:</strong> ${q.exp}`;
+  exp.classList.add('show');
+}
+
+function nextQuestion(){
+  quizState.current++;
+  if(quizState.current>=quizState.questions.length)showQuizResults();
+  else renderQuizQuestion();
+}
+
+function showQuizResults(){
+  clearInterval(quizState.timerInterval);
+  const totalTime=Math.round((Date.now()-quizState.startTime)/1000);
+  const total=quizState.questions.length;
+  const correct=quizState.answers.filter(a=>a&&!a.skipped&&a.chosen===a.correct).length;
+  const wrong=quizState.answers.filter(a=>a&&!a.skipped&&a.chosen!==a.correct).length;
+  const skipped=quizState.answers.filter(a=>a&&a.skipped).length;
+  const pct=Math.round((correct/total)*100);
+  document.getElementById('quizActive').style.display='none';
+  document.getElementById('quizResults').style.display='block';
+  document.getElementById('resultPct').textContent=pct+'%';
+  document.getElementById('resultCorrect').textContent=correct;
+  document.getElementById('resultWrong').textContent=wrong;
+  document.getElementById('resultSkipped').textContent=skipped;
+  const mins=Math.floor(totalTime/60),secs=totalTime%60;
+  document.getElementById('resultTime').textContent=mins>0?`${mins}m ${secs}s`:`${secs}s`;
+  let grade,sub,cls;
+  if(pct>=90){grade='🏆 Excellent!';sub='Outstanding — you really know your PeopleSoft!';cls='grade-excellent';}
+  else if(pct>=75){grade='🥈 Good Work!';sub='Solid foundation — review the questions you missed.';cls='grade-good';}
+  else if(pct>=55){grade='📚 Keep Going!';sub='On the right track — go back and review the topics.';cls='grade-ok';}
+  else{grade='🔄 Keep Practising';sub='Review the beginner modules and retake — you will improve!';cls='grade-retry';}
+  document.getElementById('resultGrade').textContent=grade;
+  document.getElementById('resultGrade').className='quiz-grade '+cls;
+  document.getElementById('resultGradeSub').textContent=sub;
+  drawScoreCircle(pct);
+  document.getElementById('quizReviewSection').classList.remove('open');
+  window.scrollTo(0,0);
+}
+
+function drawScoreCircle(pct){
+  const canvas=document.getElementById('scoreCanvas');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const cx=55,cy=55,r=46;
+  ctx.clearRect(0,0,110,110);
+  ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);
+  ctx.strokeStyle='rgba(255,255,255,0.08)';ctx.lineWidth=8;ctx.stroke();
+  const angle=(pct/100)*Math.PI*2-Math.PI/2;
+  const color=pct>=90?'#22c55e':pct>=75?'#f0a500':pct>=55?'#f59e0b':'#ef4444';
+  ctx.beginPath();ctx.arc(cx,cy,r,-Math.PI/2,angle);
+  ctx.strokeStyle=color;ctx.lineWidth=8;ctx.lineCap='round';ctx.stroke();
+}
+
+function toggleReview(){
+  const s=document.getElementById('quizReviewSection');
+  const btn=document.getElementById('reviewToggleBtn');
+  if(s.classList.contains('open')){s.classList.remove('open');btn.textContent='📋 Review Answers';}
+  else{s.classList.add('open');btn.textContent='▲ Hide Review';buildReview();}
+}
+
+function buildReview(){
+  const content=document.getElementById('quizReviewContent');
+  content.innerHTML=quizState.questions.map((q,i)=>{
+    const a=quizState.answers[i];
+    if(!a)return'';
+    const wasCorrect=!a.skipped&&a.chosen===a.correct;
+    const icon=a.skipped?'⏭️':wasCorrect?'✅':'❌';
+    let html='';
+    if(a.skipped){html=`<div class="review-answer correct-ans">✓ Correct: ${q.opts[a.correct]}</div>`;}
+    else if(!wasCorrect){
+      html+=`<div class="review-answer your-wrong">✗ Your answer: ${q.opts[a.chosen]}</div>`;
+      html+=`<div class="review-answer correct-ans">✓ Correct: ${q.opts[a.correct]}</div>`;
+    } else {
+      html=`<div class="review-answer your-correct">✓ ${q.opts[a.chosen]}</div>`;
+    }
+    return`<div class="review-item">
+      <div class="review-item__q">${icon} Q${i+1}. ${q.q}</div>
+      <div class="review-item__answers">${html}</div>
+      <div class="review-item__exp">💡 ${q.exp}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ═══════════════════════════════════════════════
    HOMEPAGE DATA
 ═══════════════════════════════════════════════ */
 const CURRICULUM_LIST = {
@@ -3222,10 +4033,20 @@ document.addEventListener('keydown', e => {
 /* ═══════════════════════════════════════════════
    VIEW MANAGEMENT
 ═══════════════════════════════════════════════ */
+function showHome() {
+  document.getElementById('homepageView').style.display = 'block';
+  document.getElementById('appView').style.display = 'none';
+  document.getElementById('glossaryView').style.display = 'none';
+  document.getElementById('quizView').style.display = 'none';
+  closeDrawer();
+  window.scrollTo(0,0);
+}
+
 function showApp() {
   document.getElementById('homepageView').style.display = 'none';
   document.getElementById('appView').style.display = 'block';
   document.getElementById('glossaryView').style.display = 'none';
+  document.getElementById('quizView').style.display = 'none';
 }
 
 function openTopic(index) {
@@ -3241,8 +4062,16 @@ function openTopic(index) {
   const countEl = document.getElementById('mobileTopicCount');
   if (titleEl) titleEl.textContent = topic.title;
   if (countEl) countEl.textContent = `${String(index+1).padStart(2,'0')}/${TOPICS.length}`;
+  // Update desktop back bar breadcrumb
+  const bc = document.getElementById('desktopTopicBreadcrumb');
+  if (bc) bc.textContent = `Topic ${index+1} of ${TOPICS.length} — ${topic.title}`;
   // Close drawer after topic selection on mobile
   closeDrawer();
+  // Auto-open first section
+  setTimeout(() => {
+    const firstHeader = document.querySelector('.section-block__header');
+    if (firstHeader) firstHeader.click();
+  }, 50);
 }
 
 /* ═══════════════════════════════════════════════
@@ -3770,18 +4599,23 @@ function toggleTheme() {
   const isLight = document.documentElement.getAttribute('data-theme') === 'light';
   const newTheme = isLight ? 'dark' : 'light';
   document.documentElement.setAttribute('data-theme', newTheme);
-  document.getElementById('themeKnob').textContent = newTheme === 'light' ? '☀️' : '🌙';
-  document.getElementById('themeLabel').textContent = newTheme === 'light' ? 'Day' : 'Night';
+  const knob = document.getElementById('themeKnob');
+  const label = document.getElementById('themeLabel');
+  if (knob) knob.textContent = newTheme === 'light' ? '☀️' : '🌙';
+  if (label) label.textContent = newTheme === 'light' ? 'Day' : 'Night';
   localStorage.setItem('pslearn-theme', newTheme);
 }
-// Restore saved theme
+// Restore saved theme on load
 (function(){
   const saved = localStorage.getItem('pslearn-theme') || 'dark';
   document.documentElement.setAttribute('data-theme', saved);
-  const knob = document.getElementById('themeKnob');
-  const label = document.getElementById('themeLabel');
-  if (knob) knob.textContent = saved === 'light' ? '☀️' : '🌙';
-  if (label) label.textContent = saved === 'light' ? 'Day' : 'Night';
+  // Labels set after DOM ready
+  window.addEventListener('DOMContentLoaded', () => {
+    const knob = document.getElementById('themeKnob');
+    const label = document.getElementById('themeLabel');
+    if (knob) knob.textContent = saved === 'light' ? '☀️' : '🌙';
+    if (label) label.textContent = saved === 'light' ? 'Day' : 'Night';
+  });
 })();
 
 function toggleSection(btn, si) {
@@ -4087,14 +4921,6 @@ function showGlossary() {
   document.getElementById('appView').style.display = 'none';
   document.getElementById('glossaryView').style.display = 'block';
   renderGlossary('', 'all');
-  window.scrollTo(0,0);
-}
-
-function showHome() {
-  document.getElementById('homepageView').style.display = 'block';
-  document.getElementById('appView').style.display = 'none';
-  document.getElementById('glossaryView').style.display = 'none';
-  closeDrawer();
   window.scrollTo(0,0);
 }
 
