@@ -1,0 +1,2080 @@
+/* PSLearn — Content Data */
+/* Topics, Quiz Bank, Glossary, Curriculum */
+
+const MODULES = [
+  { name:"Module 1: Foundations", icon:"🔰", color:"#818cf8" },
+  { name:"Module 2: Architecture & Environment", icon:"🏗️", color:"#f0a500" },
+  { name:"Module 3: UI & Navigation", icon:"🖥️", color:"#22c55e" },
+  { name:"Module 4: Application Designer & Data Model", icon:"🧱", color:"#22d3ee" },
+  { name:"Module 5: Development Basics", icon:"💻", color:"#8b5cf6" },
+  { name:"Module 6: Data & Query", icon:"📊", color:"#f59e0b" },
+  { name:"Module 7: Process & Security", icon:"⚙️", color:"#ef4444" },
+];
+
+const TOPICS = [
+  /* ── MODULE 1 ── */
+  {
+    id:"history", module:0, num:"01",
+    title:"PeopleSoft History & Evolution",
+    summary:"PeopleSoft started in 1987 as a simple HR payroll tool and grew into one of the world's largest enterprise software platforms. Understanding where it came from helps you understand why it's built the way it is.",
+    preChecklist:[
+      "Basic understanding of what ERP (Enterprise Resource Planning) software does",
+      "Familiarity with the concept of HR software (payroll, employee records)",
+      "No prior PeopleSoft knowledge needed — this is Topic 01",
+    ],
+    realWorld:"<strong>Scale context:</strong> PeopleSoft HCM runs payroll for organizations with 500,000+ employees in a single system. The US federal government, large public universities, and hospital networks all rely on PeopleSoft for their people operations. Understanding its history explains why it has so many layers and options — each feature was added to serve a specific enterprise need.",
+    mistakes:[
+      {title:"Confusing PeopleSoft with Oracle HCM Cloud (Fusion)", desc:"Many beginners think PeopleSoft and Oracle HCM Cloud are the same product. They are separate systems. PeopleSoft is on-premise or OCI hosted. Oracle HCM Cloud (Fusion) is SaaS-only. Different architecture, different codebase."},
+      {title:"Thinking Oracle discontinued PeopleSoft after the acquisition", desc:"A common misconception. Oracle has actively continued PeopleSoft development since 2005, releasing Fluid UI, Elasticsearch, PUM, and AI features. PeopleSoft is not a legacy dead product."},
+    ],
+    quiz:[
+      {q:"In what year did Oracle complete the acquisition of PeopleSoft?",options:["2003","2004","2005","2006"],answer:2,explanation:"Oracle completed the acquisition of PeopleSoft in January 2005 for $10.3 billion, after an 18-month hostile takeover battle that began in June 2003."},
+      {q:"What major architectural change did PeopleSoft 8 (2000) introduce?",options:["Support for Oracle Database","Pure Internet Architecture — browser-based access","Application Packages for OOP","Fluid UI for mobile devices"],answer:1,explanation:"PeopleSoft 8 introduced Pure Internet Architecture (PIA) in 2000 — users could now access PeopleSoft from any browser without installing a desktop client. Only developers still needed the Application Designer client."},
+      {q:"Who founded PeopleSoft in 1987?",options:["Larry Ellison","Dave Duffield and Ken Morris","Mark Hurd and Safra Catz","Craig Conway"],answer:1,explanation:"PeopleSoft was founded in 1987 by Dave Duffield and Ken Morris in Pleasanton, California. After the Oracle acquisition in 2005, Duffield went on to found Workday."},
+    ],
+    keyPoints:[
+      "Founded 1987 by Dave Duffield — originally focused on HR payroll and benefits",
+      "PeopleSoft 7 (1997) added Finance and Supply Chain modules",
+      "PeopleSoft 8 (2000) introduced Pure Internet Architecture — no more desktop client for users",
+      "Oracle acquired PeopleSoft in January 2005 after an 18-month hostile takeover battle",
+      "Oracle continues active development — PeopleTools 8.60+ and regular PUM updates",
+    ],
+    sections:[
+      {
+        title:"The Early Years (1987–1999)",
+        body:`PeopleSoft was founded in 1987 by Dave Duffield and Ken Morris in Pleasanton, California. Their first product was a client-server Human Resources application designed to replace green-screen mainframe HR systems that dominated corporate IT at the time.
+
+The name "PeopleSoft" reflected its purpose — software built to manage people. The early versions ran as thick Windows desktop clients connecting directly to an Oracle or Sybase database. Every user needed the PeopleSoft client installed on their workstation.
+
+**Key milestones in this era:**
+- 1987: First product launched — HR and Payroll for mid-sized companies
+- 1992: PeopleSoft went public (IPO), raising funds to expand product lines
+- 1994: First Financial Management module released (Accounts Payable, General Ledger)
+- 1997: PeopleSoft 7 released — added Supply Chain Management and expanded Finance. The company became a major ERP competitor to SAP and Oracle.`,
+      },
+      {
+        title:"The Web Revolution — PeopleSoft 8 (2000)",
+        body:`In 2000, PeopleSoft released version 8 with a completely redesigned architecture called Pure Internet Architecture (PIA). This was a landmark moment — users no longer needed to install anything on their computers. They could access PeopleSoft from any browser on any device.
+
+The PIA architecture introduced the three-tier model that still powers PeopleSoft today: browser → web server → application server → database. Only developers still needed to install Application Designer on their workstations.
+
+This shift was transformative for enterprise IT because it dramatically reduced the cost and complexity of deploying and maintaining PeopleSoft across thousands of users. Updates were applied on the server — not on thousands of desktops.`,
+      },
+      {
+        title:"The Oracle Acquisition (2003–2005)",
+        body:`In June 2003, Oracle Corporation launched a surprise hostile takeover bid for PeopleSoft at $5.1 billion. The PeopleSoft board and CEO Craig Conway rejected the offer repeatedly over 18 months. Oracle raised its offer multiple times, eventually reaching $10.3 billion.
+
+The battle was fiercely public — PeopleSoft offered customers a guarantee program promising refunds if Oracle destroyed the product. The US Department of Justice investigated the acquisition for antitrust concerns but ultimately allowed it.
+
+Oracle acquired PeopleSoft in January 2005 for $10.3 billion. Many in the industry feared Oracle would discontinue PeopleSoft in favor of Oracle E-Business Suite. Instead, Oracle committed to continuing PeopleSoft development — a commitment it has honored ever since.
+
+Dave Duffield left Oracle after the acquisition and went on to found Workday, which today is one of PeopleSoft's primary competitors in the cloud HCM space.`,
+      },
+      {
+        title:"PeopleSoft Under Oracle (2005–Present)",
+        body:`Under Oracle, PeopleSoft continued to evolve with major improvements:
+
+**2013 — Fluid UI introduced (PT 8.53):** The classic fixed-width desktop interface was replaced with a responsive HTML5 design that works on mobile and tablet.
+
+**2014 — PeopleSoft Update Manager (PUM):** Oracle replaced the old bundle patching model with a continuous delivery approach. Organizations can now pick and choose specific fixes and features from a PeopleSoft Image without waiting for a full bundle.
+
+**2015 — Elasticsearch integration (PT 8.55):** Full-text search replaced the older Verity search engine with modern Elasticsearch, giving users a Google-like search experience.
+
+**2019 — Selective Adoption:** Organizations can now adopt specific new features without taking all updates, giving them greater control over their upgrade cadence.
+
+**2023+ — AI Integration:** Oracle began integrating AI capabilities into PeopleSoft, including intelligent chatbots and AI-powered suggestions within HCM workflows.
+
+PeopleTools today is at version 8.60+ and PeopleSoft applications continue to receive regular quarterly updates via PUM Images.`,
+      },
+    ],
+  },
+  {
+    id:"intro", module:0, num:"02",
+    title:"Introduction to PeopleSoft",
+    summary:"PeopleSoft is Oracle's enterprise resource planning (ERP) platform that manages business operations across HR, Finance, Supply Chain, and Education. It is deployed by thousands of organizations worldwide across government, healthcare, universities, and large corporations.",
+    preChecklist:[
+      "You've read Topic 01 — PeopleSoft History & Evolution",
+      "You understand what an ERP system does at a high level",
+      "You know PeopleSoft is metadata-driven (objects defined in App Designer)",
+    ],
+    realWorld:"<strong>Why this matters for your career:</strong> When you join a PeopleSoft project, the first question a client asks is 'Which module are you experienced in?' Understanding all 8 product lines lets you speak confidently to HCM, FSCM, and Campus clients. Most consultants specialize in one — HCM is the most in-demand.",
+    mistakes:[
+      {title:"Treating PeopleSoft as a simple HR database", desc:"PeopleSoft is a full-stack enterprise platform with its own programming language, IDE, middleware, and integration framework. Beginners who treat it like a database miss the entire development and configuration model."},
+      {title:"Assuming all modules are the same to configure", desc:"HCM, FSCM, and Campus Solutions have completely different data models, terminology, and configuration patterns. Knowledge from one module does NOT automatically transfer to another."},
+    ],
+    quiz:[
+      {q:"How many major product lines does PeopleSoft have?",options:["4","6","8","12"],answer:2,explanation:"PeopleSoft has 8 major product lines: HCM, FSCM, Campus Solutions, ELM, CRM, EPM, SRM, and Supply Chain Management — with 201 modules total across all product lines."},
+      {q:"What makes PeopleSoft's development approach fundamentally different from traditional software?",options:["It uses Java for all development","It is metadata-driven — developers define objects in App Designer, not hardcoded files","It requires no database","It only runs on Oracle databases"],answer:1,explanation:"PeopleSoft is metadata-driven. Developers define Records, Pages, and Components as metadata in Application Designer. The PeopleSoft runtime engine reads this metadata and generates HTML, SQL, and business logic at runtime — nothing is hardcoded."},
+    ],
+    keyPoints:[
+      "PeopleSoft is a metadata-driven ERP — objects are defined in App Designer, not hardcoded",
+      "8 major product lines covering HR, Finance, Supply Chain, Campus, CRM, and more",
+      "Applications are built on top of PeopleTools — the development and runtime layer",
+      "Deployed on-premise, hosted, or on Oracle Cloud Infrastructure (OCI)",
+      "Runs on Oracle DB, Microsoft SQL Server, or IBM DB2",
+    ],
+    sections:[
+      {
+        title:"What is PeopleSoft?",
+        body:`PeopleSoft is not a single application — it is a platform. At its core is a technology layer called PeopleTools, on top of which Oracle has built multiple enterprise application suites. When someone says they "use PeopleSoft," they typically mean their organization runs one or more of these application suites.
+
+What makes PeopleSoft fundamentally different from traditional software is how it is built. In conventional software, developers write code that produces HTML pages, SQL statements, and business logic. In PeopleSoft, developers define metadata — objects like Records, Pages, and Components — using a tool called Application Designer. The PeopleSoft runtime engine reads this metadata and builds the actual pages, generates SQL, and enforces business rules at runtime.
+
+This means that when you look at a PeopleSoft page in your browser, you are not looking at static HTML files. You are looking at dynamically generated output produced by the Component Processor interpreting metadata stored in the database.`,
+      },
+      {
+        title:"The 8 PeopleSoft Product Lines",
+        body:`PeopleSoft is organized into 8 major product lines, each covering a different business domain:
+
+**1. Human Capital Management (HCM)**
+The most widely deployed PeopleSoft product. Manages the complete employee lifecycle: recruiting and onboarding, job data and position management, compensation and benefits, payroll processing, time and labor, absence management, and talent management. The core record is the employee (identified by EMPLID).
+
+**2. Financial Supply Chain Management (FSCM)**
+Covers all financial operations: General Ledger, Accounts Payable, Accounts Receivable, Asset Management, Purchasing, Inventory, Project Costing, and Billing. Financial data is organized using ChartFields (Account, Department, Business Unit, etc.).
+
+**3. Campus Solutions (CS)**
+Built specifically for higher education institutions. Manages student admissions, enrollment, scheduling, financial aid, student accounts, and academic records. Used by universities worldwide.
+
+**4. Enterprise Learning Management (ELM)**
+Online learning delivery, instructor-led training, certification tracking, and learning content management.
+
+**5. Customer Relationship Management (CRM)**
+Customer data management, service requests, help desk, and field service operations.
+
+**6. Enterprise Performance Management (EPM)**
+Business intelligence, analytics, budgeting, and financial reporting.
+
+**7. Supplier Relationship Management (SRM)**
+Procurement, sourcing, supplier contracts, and vendor management.
+
+**8. Supply Chain Management (SCM)**
+Inventory, order management, logistics, manufacturing, and demand planning.`,
+      },
+      {
+        title:"Why Organizations Choose PeopleSoft",
+        body:`Organizations choose PeopleSoft for several key reasons:
+
+**Deep configurability:** Unlike SaaS-only ERP systems, PeopleSoft allows organizations to build entirely custom objects, extend any delivered functionality, and configure the system to match their unique business processes.
+
+**Robust security model:** The multi-level security framework (users, roles, permission lists, row-level security) is battle-tested across government agencies and large enterprises with complex organizational structures.
+
+**On-premise or cloud flexibility:** Organizations that cannot or choose not to move to pure SaaS can still run PeopleSoft on their own infrastructure or on Oracle Cloud Infrastructure (OCI) while maintaining full control over their data and customizations.
+
+**Proven at scale:** PeopleSoft handles payroll for hundreds of thousands of employees in single implementations. It processes billions of financial transactions annually across its installed base.
+
+**However, PeopleSoft is complex.** The steep learning curve is real. Organizations need skilled technical consultants and developers to implement, maintain, and extend PeopleSoft. This complexity is precisely why PeopleSoft specialists command strong salaries and why there is consistent demand for those who truly understand the platform.`,
+      },
+    ],
+  },
+  {
+    id:"peopletools", module:0, num:"03",
+    title:"PeopleTools Overview",
+    summary:"PeopleTools is the complete development, administration, and runtime platform that powers every PeopleSoft application. All PeopleSoft applications — HCM, FSCM, Campus Solutions — are built, deployed, and maintained using PeopleTools.",
+    preChecklist:[
+      "You know what PeopleSoft is and its main product lines (Topic 02)",
+      "You understand that PeopleSoft is metadata-driven",
+      "You have a general idea of what an IDE (development tool) is",
+    ],
+    realWorld:"<strong>Version mismatch is a real problem:</strong> In a typical consulting engagement, the first thing you check when joining a new client is their PeopleTools version. A feature that works in PT 8.57 may not exist in PT 8.53. Consultants who don't check this version first often waste days building something the client's environment can't support.",
+    mistakes:[
+      {title:"Confusing PeopleTools version with Application version", desc:"HCM 9.2 is the application. PeopleTools 8.59 is the platform. They version separately. A client can run HCM 9.2 on PT 8.55, 8.57, or 8.60 — very different capabilities each time."},
+      {title:"Using Application Designer in 2-tier when 3-tier is required", desc:"Some features and PeopleCode functions only work in 3-tier mode. Beginners connecting in 2-tier (direct DB) sometimes can't understand why certain functionality isn't working."},
+    ],
+    quiz:[
+      {q:"Which PeopleTools version introduced the Fluid UI?",options:["PT 8.49","PT 8.51","PT 8.53","PT 8.55"],answer:2,explanation:"Fluid UI was introduced in PeopleTools 8.53. It replaced the classic fixed-width HTML interface with a responsive HTML5/CSS3 design. Activity Guides and Event Mapping came later in PT 8.55."},
+      {q:"What is Application Designer?",options:["A web-based reporting tool","A Windows desktop IDE where developers create PeopleSoft objects","A browser plugin for PeopleSoft","A database administration tool"],answer:1,explanation:"Application Designer is a Windows desktop IDE that connects to the PeopleSoft database. It is the primary tool for creating Records, Fields, Pages, Components, and writing PeopleCode. It stores all objects as metadata in the database."},
+      {q:"What does Data Mover (.DMS scripts) do in PeopleTools?",options:["Runs payroll calculations","Migrates data and objects between PeopleSoft environments","Monitors server performance","Creates Fluid UI pages"],answer:1,explanation:"Data Mover is a PeopleTools utility for migrating data between PeopleSoft environments using .DMS script files. It can export and import database tables and is commonly used during implementations and upgrades."},
+    ],
+    keyPoints:[
+      "PeopleTools is the foundation layer — HCM, FSCM, and all PS apps sit on top of it",
+      "Application Designer is the primary development IDE — Windows client only",
+      "Every PS object (records, pages, PeopleCode) is stored as metadata in the database",
+      "PeopleTools has its own version number separate from the application version",
+      "PT 8.53+ = Fluid UI · PT 8.55+ = Elasticsearch, Activity Guides, Event Mapping",
+    ],
+    sections:[
+      {
+        title:"What is PeopleTools?",
+        body:`PeopleTools is Oracle's proprietary development platform that sits underneath every PeopleSoft application. When you develop in PeopleSoft, you are always working inside PeopleTools. It provides all the development tools, runtime services, security infrastructure, and integration capabilities that PeopleSoft applications rely on.
+
+Think of PeopleTools as the operating system and PeopleSoft HCM or FSCM as the applications running on top of it. PeopleTools handles everything that is not specific to HR or Finance — the page rendering engine, the PeopleCode interpreter, the database communication layer, the security framework, and the integration platform.
+
+This separation means that Oracle can improve PeopleTools independently of the application — which is why a company can run HCM 9.2 on PeopleTools 8.57 or 8.60. PeopleTools upgrades bring new technology capabilities (like Fluid UI or Elasticsearch) without requiring an application upgrade.`,
+      },
+      {
+        title:"Core Tools Inside PeopleTools",
+        body:`PeopleTools contains a comprehensive set of development and administration tools:
+
+**Application Designer** — The primary IDE for all PeopleSoft development. A Windows desktop application that connects directly to the database. Used to create and modify Records, Fields, Pages, Components, Menus, PeopleCode, Application Packages, and many other object types. All objects created here are stored as metadata in the database.
+
+**PeopleCode** — The proprietary event-driven scripting language used to write business logic. Resembles a combination of Java and BASIC. Runs server-side within the Tuxedo App Server.
+
+**Application Engine (AE)** — Batch processing framework for large-scale data processing jobs. Runs outside the Component Processor and is managed by Process Scheduler.
+
+**Integration Broker (IB)** — Enterprise messaging platform for real-time and asynchronous integrations. Supports REST, SOAP, and internal PeopleSoft messaging.
+
+**PS Query / Query Manager** — Visual ad-hoc reporting tool that generates SQL. End users can build reports without writing code.
+
+**BI Publisher** — Oracle's formatted reporting engine. Separates data (from PS Query) from layout (RTF/Excel template) to produce PDF, Excel, HTML, and CSV output.
+
+**Data Mover** — Utility for migrating data between PeopleSoft environments using .DMS script files.
+
+**Process Scheduler** — Manages all batch job execution — application engines, SQR reports, BI Publisher reports, and COBOL programs.
+
+**Security Administrator** — Manages user profiles, roles, permission lists, and row-level security.
+
+**Approval Workflow Engine (AWE)** — Configurable workflow routing framework for transaction approvals.`,
+      },
+      {
+        title:"PeopleTools Versioning — Why It Matters",
+        body:`PeopleTools has its own version numbering that is completely separate from the application version. Understanding this distinction is critical.
+
+Example: A company might run **HCM 9.2** (the application) on **PeopleTools 8.59** (the development platform). The "9.2" refers to the PeopleSoft HCM feature set. The "8.59" determines which development and runtime capabilities are available.
+
+**Key version milestones:**
+- PT 8.52: Search Framework introduced (Verity engine)
+- PT 8.53: Fluid UI introduced — responsive HTML5 pages
+- PT 8.54: REST service support added to Integration Broker
+- PT 8.55: Elasticsearch replaces Verity, Activity Guides, Event Mapping
+- PT 8.56: Chatbot framework, Enhanced Fluid Navigation
+- PT 8.57: Improved Fluid Homepages and Tiles
+- PT 8.58: Drop Zone framework for customizations
+- PT 8.59: WebLogic only for web server, Oracle JET updates
+- PT 8.60+: Oracle Cloud Infrastructure enhancements, AI capabilities
+
+Why this matters in practice: if a developer writes documentation saying "use Event Mapping for this customization," that feature only exists in PT 8.55+. A client running PT 8.53 cannot use it. Always check what PeopleTools version your environment runs before implementing any solution.`,
+        pbLink:{title:"PeopleTools: Getting Started with PeopleTools", url:"https://docs.oracle.com/en/applications/peoplesoft/peopletools/index.html"},
+      },
+    ],
+  },
+  {
+    id:"glossary", module:0, num:"04",
+    title:"PeopleSoft Terminology Glossary",
+    summary:"PeopleSoft has its own vocabulary. Before you can read documentation, ask questions, or understand any tutorial, you need to know what these terms actually mean. This glossary covers the most essential PeopleSoft-specific terms you will encounter immediately.",
+    preChecklist:[
+      "You've read Topics 01-03 (History, Introduction, PeopleTools)",
+      "You understand PeopleSoft has multiple product lines",
+      "No technical prerequisites — this is a vocabulary topic",
+    ],
+    realWorld:"<strong>First day on a project:</strong> In your first week on any PeopleSoft project, you will hear terms like EMPLID, Business Unit, SetID, ChartField, and Run Control in every meeting. Not knowing these creates a barrier to participation. Mastering this vocabulary is the single fastest way to start contributing.",
+    mistakes:[
+      {title:"Confusing 'Record' with a database row", desc:"In PeopleSoft, 'Record' means the metadata definition of a table or view — not a row of data. When someone says 'look at the JOB record,' they mean the Record object definition in App Designer, not a specific employee's job row."},
+      {title:"Mixing up Business Unit and Department", desc:"These are completely different concepts. Business Unit is the top-level financial/organizational entity. Department is a lower-level organizational unit that belongs to a Business Unit. Many beginners use them interchangeably — they should not."},
+    ],
+    quiz:[
+      {q:"What does EMPLID stand for and what is it used for?",options:["Employee Index — used for payroll only","Employee ID — the unique identifier for every employee across all HCM records","Employment ID — identifies a specific job, not a person","External ID — used for third-party integrations"],answer:1,explanation:"EMPLID is Employee ID — the unique identifier assigned to each employee in PeopleSoft HCM. Every HR table uses EMPLID as a primary key. One person always has one EMPLID, even if they hold multiple jobs (distinguished by EMPL_RCD)."},
+      {q:"What is a Run Control in PeopleSoft?",options:["A security setting that controls who can run batch processes","A database record that stores parameters a user enters before submitting a batch process","A type of PeopleCode event","A server configuration setting"],answer:1,explanation:"A Run Control is a database record that stores the parameters a user enters before running a batch process. Batch processes cannot prompt the user interactively, so they read their parameters from the saved Run Control record."},
+    ],
+    keyPoints:[
+      "EMPLID — the unique identifier for every employee across all PeopleSoft HCM records",
+      "Business Unit — the primary organizational unit for Finance (FSCM) data segregation",
+      "SetID — controls which setup/reference tables apply to each Business Unit",
+      "Effective Date (EFFDT) — PeopleSoft's mechanism for storing historical changes over time",
+      "Run Control — the record used to pass parameters to batch processes",
+    ],
+    sections:[
+      {
+        title:"People & HR Terminology",
+        body:`**EMPLID (Employee ID)**
+The unique identifier assigned to each employee in PeopleSoft HCM. Every HR table that holds employee data uses EMPLID as a primary key. It is typically a system-generated number but can be alphanumeric. One person always has one EMPLID, even if they hold multiple jobs.
+
+**EMPL_RCD (Employee Record Number)**
+Some employees have more than one concurrent employment (e.g., a professor who also works in administration). Each employment is tracked as a separate Employee Record, numbered 0, 1, 2, etc. EMPLID + EMPL_RCD together uniquely identify a single job.
+
+**Action / Action Reason**
+Every change to an employee's job record is recorded with an Action code (HIR = Hire, TER = Termination, PRO = Promotion, PAY = Pay Rate Change) and an Action Reason code (explains the why). This is how PeopleSoft tracks the complete story of every personnel change.
+
+**Position**
+A budgeted slot in the organization that can be filled by an employee. Positions belong to departments, have job codes, and carry salary grade information. Position Management links HR to Finance by connecting headcount to budget.
+
+**ChartField**
+The accounting code structure used in FSCM. Common ChartFields include Account, Department, Business Unit, Fund Code, Program Code, and Project. Every financial transaction is stamped with ChartField values that determine how it is recorded in the General Ledger.`,
+      },
+      {
+        title:"Technical Terminology",
+        body:`**Record**
+In PeopleSoft, "record" does not mean a row of data — it means the metadata definition of a table or view. A Record definition in Application Designer becomes a physical database table (prefixed with PS_) when built. So the Record named JOB becomes the database table PS_JOB.
+
+**Component Buffer**
+The in-memory data structure that holds all data for the current transaction. When a user opens a page, the Component Processor loads data from the database into the Component Buffer. PeopleCode reads and writes to this buffer. Only when the user saves does the buffer write back to the database.
+
+**Run Control**
+A record used to store and pass parameters to batch processes. When a user submits a report or AE program, they first enter their parameters (date range, department, etc.) on a Run Control page, save them, and then submit the process. The process reads those saved parameters from the Run Control table.
+
+**Meta-SQL**
+PeopleSoft-specific SQL functions that are database-independent. Instead of writing Oracle-specific date functions, developers write %CurrentDateIn and PeopleSoft translates it to the correct syntax for Oracle, SQL Server, or DB2 at runtime. This is what makes PeopleSoft code portable across databases.
+
+**Project (in App Designer)**
+A container that groups related PeopleSoft objects for migration between environments. When a developer finishes work in DEV, they add all changed objects to a Project and migrate it to QA or PROD. Projects are the unit of change management.
+
+**PUM Image**
+PeopleSoft Update Manager Image — a virtual machine snapshot containing cumulative PeopleSoft code fixes and new features. Organizations use PUM to selectively apply updates to their system without a traditional upgrade. Released quarterly by Oracle.`,
+      },
+      {
+        title:"Architecture Terminology",
+        body:`**PIA (PeopleSoft Internet Architecture)**
+The complete three-tier web architecture that powers PeopleSoft. Browser communicates with WebLogic web server, which communicates with Tuxedo App Server, which communicates with the database.
+
+**Domain**
+An instance of the Tuxedo Application Server or Process Scheduler. A single PeopleSoft environment typically has one App Server domain and one Process Scheduler domain, though high-availability setups can have multiple domains for load balancing.
+
+**JOLT**
+Java Object Linking and Transactions — the proprietary protocol used by WebLogic to communicate with the Tuxedo App Server. The JOLT port (typically 9000) is the connection point between the web tier and the application tier.
+
+**PSAPPSRV**
+The core Application Server process in Tuxedo. Handles component buffer operations, PeopleCode execution, and SQL generation. Multiple PSAPPSRV processes run simultaneously to handle concurrent user requests.
+
+**DPK (Deployment Package)**
+A PeopleSoft Deployment Package is a set of scripts and configuration files used to automate the installation and configuration of PeopleSoft environments. DPKs use Puppet for configuration management and are the standard way to set up both on-premise and cloud environments since PeopleTools 8.55.`,
+      },
+    ],
+  },
+  /* ── MODULE 2 ── */
+  {
+    id:"architecture", module:1, num:"05",
+    title:"PeopleSoft Architecture (PIA)",
+    summary:"PeopleSoft Pure Internet Architecture (PIA) is the three-tier web architecture that has powered PeopleSoft since version 8. Every user interaction flows through three tiers — browser, application server, and database — with each tier having a distinct role.",
+    preChecklist:[
+      "You know what a web server and database server are at a basic level",
+      "You've read Topic 03 — PeopleTools Overview",
+      "You understand PeopleSoft is accessed via a browser",
+    ],
+    realWorld:"<strong>Why this matters for debugging:</strong> When a page loads slowly, you need to know which tier is the bottleneck. Is it the network (browser to WebLogic)? Is it PeopleCode execution (App Server)? Is it SQL (Database)? Every PeopleSoft performance issue traces back to one of these three tiers. Knowing the architecture is the foundation of every diagnostic conversation.",
+    mistakes:[
+      {title:"Thinking business logic runs in the browser", desc:"Zero business logic runs in the browser. PeopleCode, field defaults, validations — all execute in the Tuxedo App Server. The browser is purely a display mechanism."},
+      {title:"Forgetting that App Designer uses a separate 2-tier connection", desc:"When you open App Designer, it connects directly to the database (2-tier) — bypassing the Tuxedo App Server. This is different from how end users connect (3-tier through WebLogic). Some PeopleCode features only work in 3-tier mode."},
+    ],
+    quiz:[
+      {q:"What protocol does WebLogic use to communicate with the Tuxedo App Server?",options:["HTTP","JDBC","JOLT","SOAP"],answer:2,explanation:"WebLogic communicates with the Tuxedo App Server using JOLT (Java Object Linking and Transactions) — Oracle's proprietary protocol. The JOLT port is typically 9000 and is the connection point between the web and application tiers."},
+      {q:"Which App Server process handles PeopleCode execution and page rendering?",options:["PSQRYSRV","PSSAMSRV","PSAPPSRV","PSDSTSRV"],answer:2,explanation:"PSAPPSRV is the core Application Server process in Tuxedo. It handles component buffer operations, PeopleCode execution, and SQL generation. Multiple PSAPPSRV processes run simultaneously to serve concurrent users."},
+      {q:"In PeopleSoft's 3-tier architecture, where does all business logic execute?",options:["In the browser (JavaScript)","In the WebLogic web server","In the Tuxedo Application Server","In the database (stored procedures)"],answer:2,explanation:"All PeopleSoft business logic — PeopleCode, field validation, Component Processor events — executes in the Tuxedo Application Server (Tier 2). The browser is purely a display layer and contains no business logic."},
+    ],
+    keyPoints:[
+      "Browser ↔ WebLogic (HTTP/HTTPS) ↔ Tuxedo App Server (JOLT) ↔ Database (SQL)",
+      "No business logic runs in the browser — all PeopleCode executes in the App Server",
+      "Tuxedo manages multiple server processes: PSAPPSRV, PSQRYSRV, PSSAMSRV",
+      "2-tier = App Designer connects directly to DB · 3-tier = via App Server",
+      "Process Scheduler runs batch jobs asynchronously — decoupled from user sessions",
+    ],
+    sections:[
+      {
+        title:"The Three-Tier Architecture in Detail",
+        diagram:"pia",
+        body:`PeopleSoft's architecture is built on three clearly separated tiers, each with a specific responsibility:
+
+**Tier 1 — Web Tier (Oracle WebLogic)**
+The web tier is the entry point for all browser-based access. Oracle WebLogic Server hosts PeopleSoft's Java-based web application (PIA). When a user navigates to the PeopleSoft URL, their browser communicates with WebLogic over HTTP or HTTPS.
+
+WebLogic's role is purely presentational — it receives requests, routes them to the App Server, receives responses, and sends HTML back to the browser. It contains no business logic of its own. As of PeopleTools 8.59, Oracle WebLogic is the only supported web server.
+
+**Tier 2 — Application Tier (Oracle Tuxedo)**
+This is the brain of PeopleSoft. The Application Server runs on Oracle Tuxedo, a powerful middleware platform originally developed by BEA Systems and acquired by Oracle. Tuxedo manages a pool of server processes that handle user requests.
+
+Key App Server processes:
+- PSAPPSRV — handles page builds, PeopleCode execution, Component Processor operations
+- PSQRYSRV — dedicated to PS Query execution
+- PSSAMSRV — handles security validation (sign-on, permission checks)
+- PSQCKSRV — handles fast, read-only component operations
+- PSRENSRV — handles report distribution
+
+**Tier 3 — Database Tier**
+All PeopleSoft data lives in the relational database. This includes both application data (actual business data like employee records, journal entries) and PeopleTools metadata (the definitions of records, pages, components, and PeopleCode programs stored as data in system tables).
+
+PeopleSoft supports Oracle Database, Microsoft SQL Server, IBM DB2, and in recent versions, PostgreSQL.`,
+        pbLink:{title:"PeopleTools: System and Server Administration — PIA Overview", url:"https://docs.oracle.com/en/applications/peoplesoft/peopletools/index.html"},
+      },
+      {
+        title:"2-Tier vs 3-Tier Connection Mode",
+        body:`PeopleSoft supports two connection modes for Application Designer — and understanding the difference matters for developers:
+
+**2-Tier Mode (Direct DB Connection)**
+Application Designer connects directly to the database without going through the App Server. This is the most common mode for developers because it is simpler to set up. Drawbacks: some features are only available in 3-tier mode, and direct DB connections carry higher risk.
+
+In 2-tier, the connection uses standard database drivers (ODBC for SQL Server, native Oracle client for Oracle DB). The developer's workstation needs direct network access to the database server.
+
+**3-Tier Mode (Via App Server)**
+Application Designer connects to the App Server using the JOLT protocol, which then connects to the database. This adds a security layer and enables certain features (like the ability to test PeopleCode that calls PSAPPSRV-specific functions). 3-tier mode is required for environments where direct database access is restricted (common in tightly controlled production environments).
+
+To configure 3-tier, developers use PeopleSoft Configuration Manager to specify the App Server hostname, JOLT port, and domain name.`,
+      },
+      {
+        title:"Process Scheduler Architecture",
+        body:`Batch processing in PeopleSoft runs through a separate component called Process Scheduler (also known as PSPRCSRV). Process Scheduler is decoupled from the web/app server infrastructure, which is essential for running long batch jobs without affecting online user performance.
+
+**How it works:**
+1. A user submits a process request from the browser (e.g., runs a payroll calculation)
+2. A row is inserted into the PS_PRCSRQST (Process Request) table with status "Queued"
+3. The Process Scheduler daemon monitors this table and picks up queued requests
+4. The process executes on the batch server (could be the same machine or a dedicated server)
+5. Upon completion, the Distribution Agent moves output files to Report Repository
+6. The user views their report output in Report Manager
+
+**Process Monitor** — The browser-based tool where users and admins monitor process status in real-time. Shows current status (Queued, Initiated, Processing, Success, No Success, Error) and provides links to logs and output files.
+
+**Distribution Agent (PSDSTSRV)** — Transfers completed report files from the batch server to the Report Repository web server, making them accessible to users.`,
+      },
+    ],
+  },
+  {
+    id:"oci", module:1, num:"06",
+    title:"PeopleSoft Cloud & OCI Setup",
+    summary:"PeopleSoft can run on Oracle Cloud Infrastructure (OCI) as well as traditional on-premise servers. Oracle provides automated deployment tools — DPK and PUM — that simplify both initial setup and ongoing maintenance.",
+    preChecklist:["You understand PeopleSoft's three-tier architecture (Topic 05)","You know what a virtual machine (VM) is at a basic level","You understand the difference between on-premise and cloud hosting"],
+    realWorld:"<strong>Real project scenario:</strong> Many organizations use PeopleSoft Images (VMs) as their DEV or SIT environments because they can be spun up in hours using DPK. Before DPKs, setting up a new PeopleSoft environment took 2-3 days of manual work. Now a senior admin can script it to run overnight.",
+    mistakes:[
+      {title:"Confusing PeopleSoft on OCI with Oracle HCM Cloud (Fusion)", desc:"PeopleSoft running on OCI is your own PeopleSoft instance hosted on Oracle's cloud hardware — all your customizations intact. Oracle HCM Cloud is a completely separate SaaS product. They share an owner but not code, architecture, or data."},
+      {title:"Applying PUM updates without testing in a lower environment first", desc:"PUM allows selective patching — but even a small patch can affect customizations. Always apply to DEV/TEST first, run your test scripts, then promote to PROD."},
+    ],
+    quiz:[
+      {q:"What tool does Oracle use to automate PeopleSoft environment setup from PT 8.55+?",options:["PSADMIN","PUM Images","DPK (Deployment Package)","Change Assistant"],answer:2,explanation:"DPK (Deployment Package) uses Puppet-based scripts to automate the complete installation and configuration of a PeopleSoft environment. It reduced a multi-day manual install to a few hours."},
+      {q:"What is a PeopleSoft Image?",options:["A screenshot of the PeopleSoft UI","An Oracle VirtualBox VM pre-built with PeopleTools patches and application fixes","A backup of a PeopleSoft database","A Docker container for PeopleSoft"],answer:1,explanation:"A PeopleSoft Image is an Oracle VirtualBox VM pre-built with all PeopleTools patches and application fixes up to a specific point. Organizations connect their environment to the Image via PUM to selectively apply updates."},
+    ],
+    keyPoints:[
+      "OCI = Oracle Cloud Infrastructure — Oracle's cloud platform for running PeopleSoft",
+      "DPK (Deployment Package) = automated install scripts using Puppet — standard from PT 8.55+",
+      "PUM (PeopleSoft Update Manager) = selective patching via PeopleSoft Image virtual machines",
+      "PeopleSoft Image = an Oracle VirtualBox VM with pre-built, fully configured PS environment",
+      "Cloud Manager = Oracle's PaaS tool for managing PS environments on OCI",
+    ],
+    sections:[
+      {
+        title:"Why Cloud for PeopleSoft?",
+        body:`PeopleSoft has traditionally been an on-premise application — organizations install and maintain it on their own servers. Oracle Cloud Infrastructure now provides an alternative that reduces infrastructure management overhead while preserving the full PeopleSoft feature set.
+
+Key benefits of running PeopleSoft on OCI:
+- **No hardware management** — Oracle handles the physical infrastructure
+- **Elastic scaling** — add capacity during peak periods (e.g., open enrollment, year-end payroll)
+- **Oracle support integration** — direct connection to Oracle's support infrastructure
+- **PeopleSoft Cloud Manager** — automated lifecycle management tool for OCI-hosted environments
+
+Important distinction: PeopleSoft on OCI is NOT the same as Oracle HCM Cloud (Fusion). Organizations running PeopleSoft on OCI still run their own PeopleSoft instance with all their customizations intact. They simply run it on Oracle's cloud hardware instead of their own.`,
+      },
+      {
+        title:"DPK — Deployment Package",
+        body:`Starting with PeopleTools 8.55, Oracle standardized PeopleSoft installation using Deployment Packages (DPKs). A DPK is a collection of scripts and configuration files that automate the entire installation and configuration of a PeopleSoft environment.
+
+DPKs use Puppet (an infrastructure automation tool) to define the desired state of the environment. Running the DPK setup script will install the web server, configure WebLogic, set up Tuxedo, apply PeopleTools, and configure the environment — all automatically.
+
+**Types of DPKs:**
+- **PeopleTools DPK** — installs and configures the PeopleTools technology stack (WebLogic, Tuxedo, App Server, Web Server)
+- **Application DPK** — installs the PeopleSoft application layer (HCM, FSCM, CS, etc.)
+- **Update DPK** — applies PUM patches and updates
+
+Before DPKs, PeopleSoft installation was a multi-day manual process. DPKs have reduced initial setup to hours, making it practical for organizations to build and rebuild environments quickly.`,
+      },
+      {
+        title:"PUM — PeopleSoft Update Manager",
+        body:`PeopleSoft Update Manager (PUM) replaced the old bundle patching model starting around 2014. Instead of waiting for quarterly bundles and applying everything at once, PUM allows organizations to selectively adopt individual fixes and features from a PeopleSoft Image.
+
+**PeopleSoft Image:**
+A PeopleSoft Image is an Oracle VirtualBox virtual machine (VM) that comes pre-built with all PeopleTools patches, application fixes, and new features up to a certain point. Oracle releases new Images regularly (typically every 3-4 months for each product line).
+
+Organizations use the Image as a "source" of updates. They connect their production system to the Image, browse available updates through the PUM interface, select exactly what they want, and generate a Change Package to apply to their environment.
+
+**The PUM workflow:**
+1. Download the latest PeopleSoft Image from Oracle's support site
+2. Load the Image into Oracle VirtualBox or OCI
+3. Connect your environment to the Image via PUM
+4. Browse and select updates in the PUM browser interface
+5. Generate and apply the Change Package to your environment
+6. Test and deploy
+
+This approach gives organizations much finer control over what changes they take. A team can apply only the critical security fixes without taking the new UI features they haven't tested yet.`,
+        pbLink:{title:"PeopleSoft Update Manager — Oracle Documentation", url:"https://docs.oracle.com/cd/F28299_01/pt857pbr3/eng/pt/tpum/concept_PeopleSoftUpdateManagerOverview-0750d5.html"},
+      },
+    ],
+  },
+  /* ── MODULE 3 ── */
+  {
+    id:"nav-ui", module:2, num:"07",
+    title:"PeopleSoft Navigation & User Interface",
+    summary:"Before developing in PeopleSoft, you need to understand how to use it as a user. PeopleSoft has two distinct UI paradigms — Classic (the older fixed-width interface) and Fluid (the modern responsive interface introduced in PT 8.53).",
+    preChecklist:["You've read Topic 05 — PeopleSoft Architecture","You understand PeopleSoft is browser-based (no desktop install for users)","You know PeopleTools 8.53+ introduced Fluid UI"],
+    realWorld:"<strong>Developer tip:</strong> Before writing a single line of PeopleCode, spend time navigating PeopleSoft as a regular user. Open components, run searches, add new records, check all tabs. Understanding the user experience is critical for building things that actually make sense to use.",
+    mistakes:[
+      {title:"Assuming Classic and Fluid pages use the same controls", desc:"Fluid pages use completely different controls — Layout GroupBoxes, Banner controls, Related Actions. A Classic page developer cannot just 'convert' a page to Fluid by changing a setting."},
+      {title:"Not registering a new component in the Portal after creating it", desc:"A component that exists in App Designer but is not registered as a Content Reference (CREF) in the Portal is invisible to users. This is one of the most common beginner mistakes after building their first component."},
+    ],
+    quiz:[
+      {q:"What is a Tile in PeopleSoft Fluid UI?",options:["A database partition","A clickable icon on a Fluid Homepage that links to a component","A type of PeopleCode event","A security permission"],answer:1,explanation:"Tiles are large clickable buttons on Fluid Homepages that link to components or show dynamic data. Each Tile is a Content Reference (CREF) with an image and optional dynamic count badge (e.g., '3 pending approvals')."},
+      {q:"What is the NavBar in PeopleSoft Fluid?",options:["The top navigation bar in Classic PeopleSoft","A slide-out panel with Recent Places, Favorites, and Navigator for browsing all components","The breadcrumb trail at the top of each page","The menu bar in Application Designer"],answer:1,explanation:"The NavBar is the slide-out navigation panel in Fluid PeopleSoft, opened by clicking the hamburger menu icon. It contains Recent Places (last 10 visited), Favorites (bookmarked pages), and Navigator (a full browsable tree of all accessible components)."},
+    ],
+    keyPoints:[
+      "Classic UI = fixed-width, desktop-only, gray interface — still used in many organizations",
+      "Fluid UI = responsive HTML5, works on mobile/tablet, modern design — standard from PT 8.53+",
+      "NavBar = the slide-out navigation panel in Fluid with Recent Places, Favorites, Navigator",
+      "Homepages = Fluid landing pages with tiles — each tile links to a component",
+      "Breadcrumbs in Fluid show users where they are in the navigation hierarchy",
+    ],
+    sections:[
+      {
+        title:"Classic vs Fluid Interface",
+        body:`PeopleSoft has two visual modes that users might encounter depending on their organization's PeopleTools version and configuration:
+
+**Classic Interface**
+The original PeopleSoft web interface introduced with PIA in PeopleSoft 8 (2000). It uses fixed-width HTML tables, produces a distinctive gray-and-blue look, and works best on desktop browsers. Classic pages cannot adapt to different screen sizes — they look the same on a 27-inch monitor and a 13-inch laptop.
+
+Navigation in Classic uses a hierarchical menu bar at the top. Users click through menus and sub-menus to reach components. The "bread and butter" of PeopleSoft for over a decade.
+
+**Fluid Interface**
+Introduced in PeopleTools 8.53 (2013), Fluid completely redesigned how PeopleSoft looks and feels. Fluid pages use responsive HTML5 and CSS3 that adapts to any screen size — desktop, tablet, or smartphone. The visual design is modern and clean.
+
+Fluid uses Homepages with Tiles, a slide-out NavBar for navigation, and a more intuitive user experience. Oracle has committed to building all new functionality in Fluid and is progressively migrating Classic components to Fluid.
+
+Many organizations run both — some components have been migrated to Fluid while others remain Classic. Users may see both interfaces within the same PeopleSoft session.`,
+      },
+      {
+        title:"Fluid Navigation — Homepages, Tiles & NavBar",
+        body:`**Homepages**
+The Fluid landing page after login. A Homepage displays a collection of Tiles — large clickable buttons that link to components or show dynamic data. Users can have multiple Homepages (like tabs) for different roles. Example: an HR manager might have a "Manager Self Service" homepage with tiles for team approvals, leave requests, and job changes.
+
+Administrators configure which Tiles appear on each Homepage. Tiles can show dynamic counts (e.g., "3 pending approvals") using Tile Wizards that query live data.
+
+**NavBar (Navigation Bar)**
+The slide-out navigation panel opened by clicking the hamburger menu icon. Contains:
+- **Recent Places** — last 10 pages visited
+- **Favorites** — user-bookmarked pages
+- **Navigator** — a browsable tree of all accessible components, organized by category
+- **Classic Menu** — (when Classic navigation is enabled) the traditional menu hierarchy
+
+**Breadcrumbs**
+Fluid automatically generates breadcrumb navigation showing where the user is in the portal hierarchy. Clicking a breadcrumb navigates back up the tree.
+
+**Search Bar**
+If Elasticsearch is configured, a Global Search bar appears in the header. Users can type any name, ID, or description and get results across all PeopleSoft modules they have access to.`,
+      },
+      {
+        title:"Working with Components — A User's View",
+        body:`When a user navigates to a PeopleSoft component, they typically encounter a Search Page first:
+
+**The Search Page**
+Before seeing any data, the user must search for existing records or indicate they want to add a new one. The search page shows fields defined as Search Keys in the component's Search Record. For example, navigating to "Employee Job Data" shows a search page with fields for Employee ID, Name, or Department.
+
+**Search Results**
+After submitting search criteria, PeopleSoft displays a list of matching rows. Each row shows the List Box Item fields. The user clicks a row to open that record in the component.
+
+**The Component**
+Once a record is selected, the component opens showing one or more page tabs (folder tabs). The user can navigate between tabs — all tabs share the same data buffer and save together. Common examples: the Job Data component has tabs for Work Location, Job Information, Compensation, and Employment.
+
+**Toolbar buttons** at the bottom: Save, Return to Search, Next in List, Previous in List, Notify (sends a workflow notification).
+
+**Action Modes**
+Components can be accessed in different modes: Add (create a new record), Update/Display (view and edit existing data), Update Display All (see all historical rows), Correction (fix historical data). The available modes depend on the user's permission list.`,
+      },
+    ],
+  },
+  {
+    id:"menus", module:2, num:"08",
+    title:"Menus & Navigation",
+    summary:"Navigation in PeopleSoft defines how users find and access components. Understanding both Classic menu structure and Fluid Portal Registry is essential — both as a user and as a developer registering new components.",
+    preChecklist:["You understand Classic vs Fluid UI (Topic 07)","You know what a Component is in PeopleSoft","You understand Permission Lists control what users can access"],
+    realWorld:"<strong>Common support ticket:</strong> 'I created a new component but users can't find it.' Almost always the cause is a missing Content Reference (CREF) in the Portal Registry, or the CREF exists but wasn't granted to the correct permission list. Portal registration is non-optional.",
+    mistakes:[
+      {title:"Building a component and forgetting to register it in the Portal", desc:"Every custom component needs a CREF in the Portal Registry. Without it, users cannot navigate to it. There is no automatic registration."},
+      {title:"Granting the CREF but not the Component in the Permission List", desc:"Two separate grants are needed: the CREF must be accessible (portal security) AND the component must be in the user's Permission List (page security). Missing either one blocks access."},
+    ],
+    quiz:[
+      {q:"What is a Content Reference (CREF) in PeopleSoft Fluid?",options:["A database view for reporting","A pointer to a component in the Portal Registry that makes it navigable","A type of PeopleCode function","A security role"],answer:1,explanation:"A Content Reference (CREF) is a pointer in the Portal Registry that points to a component (or external URL) and defines its label, folder location, and security settings. Without a CREF, a component cannot appear in the NavBar Navigator or on a Homepage tile."},
+      {q:"In Classic PeopleSoft, what is the navigation hierarchy?",options:["Homepage → Tile → Component","Root Menu → Menu → Bar Name → Component","NavBar → Navigator → Module → Component","Permission List → Role → Component"],answer:1,explanation:"Classic PeopleSoft navigation is a four-level hierarchy: Root Menu → Menu Bar → Menu Item/Bar Name → Component Link. Developers register components into this hierarchy in Application Designer by creating Menu objects."},
+    ],
+    keyPoints:[
+      "Classic nav: Root Menu → Menu → Bar Name → Item → Component",
+      "Fluid nav: Portal Registry of Content References (CREFs) organized in a hierarchy",
+      "Every component must be registered (as a CREF) to appear in navigation",
+      "Permission Lists control which CREFs (navigation items) a user can see and access",
+      "Tiles on Fluid Homepages are CREFs with an image and optional dynamic count",
+    ],
+    sections:[
+      {
+        title:"Classic Menu Structure",
+        body:`In Classic PeopleSoft, navigation is structured as a four-level hierarchy:
+
+1. **Root Menu** — the top-level navigation (e.g., "Main Menu")
+2. **Menu Bar** — second level (e.g., "Workforce Administration")
+3. **Menu Item / Bar Name** — third level (e.g., "Job Information")
+4. **Component Link** — the actual component (e.g., "Job Data")
+
+Developers register components into this hierarchy in Application Designer by creating Menu objects and associating components with menu items. The menu definition also specifies which action modes are available (Add, Update, Display).
+
+This classic menu system still works in PT 8.55+ when Classic navigation is enabled. Many organizations run in a mixed mode where the Fluid NavBar is the primary navigation but Classic menu paths still work via bookmarks and direct URLs.
+
+**Classic Navigation URL format:**
+PeopleSoft classic pages are accessed via URLs like:
+\`/psp/ps/EMPLOYEE/HRMS/c/ROLE_EMPLOYEE.JOB_DATA.GBL\`
+Where HRMS is the database name, c/ indicates a component, ROLE_EMPLOYEE is the menu, JOB_DATA is the component name, and GBL is the market.`,
+      },
+      {
+        title:"Fluid Portal Registry & Content References",
+        body:`Fluid navigation replaces the classic menu with a Portal Registry. Every navigable item in Fluid is a Content Reference (CREF) — a pointer to a component with its URL, label, and access properties.
+
+**Content Reference (CREF)**
+A CREF defines:
+- The target component (or URL for external links)
+- The display label shown in navigation
+- The folder/category it lives in
+- Security settings (which permission lists can see it)
+- Tile configuration (if it appears as a tile on a Homepage)
+
+**Portal Registry Structure**
+CREFs are organized in a folder hierarchy in the Portal Registry. This hierarchy determines how items appear in the NavBar Navigator. For example:
+- Portal Root → PeopleSoft Menu → Workforce Administration → Job Information → Job Data
+
+**Registering a New Component**
+When a developer creates a new component in Application Designer, they must:
+1. Open Portal → Structure & Content in the browser
+2. Create a new Content Reference pointing to the component
+3. Place it in the appropriate folder in the Registry
+4. Set security (which permission lists can access it)
+5. Optionally create a Tile definition if it should appear on a Homepage
+
+A component that is not registered in the Portal Registry cannot be navigated to by users — it simply won't appear anywhere. This is one of the most common mistakes new PeopleSoft developers make.`,
+      },
+    ],
+  },
+  {
+    id:"pages-components", module:2, num:"09",
+    title:"Pages & Components",
+    summary:"Pages define the user interface layout. Components group one or more pages into a transaction. Together, they form the front-end layer of PeopleSoft — what users actually see and interact with.",
+    preChecklist:["You know what Records and Fields are (Topic 12 or basic understanding)","You've navigated PeopleSoft as a user and seen pages with tabs","You understand that PeopleSoft is metadata-driven"],
+    realWorld:"<strong>Transaction boundary is critical:</strong> On a real HCM implementation, the Job Data component has 8+ pages — Work Location, Job Information, Compensation, Employment, Earnings Distribution, etc. When a user saves, ALL of those pages commit together. This is why re-opening Job Data always shows consistent data across all tabs.",
+    mistakes:[
+      {title:"Trying to save data to a Derived/Work record field in a database", desc:"Fields on Derived/Work records exist only in memory. You cannot SELECT them from the database because there is no database table for them. They are used for temporary calculations and UI-only values."},
+      {title:"Putting business logic on a page instead of the component", desc:"Business rules (validation, defaults) should be on records or at the component level. Page-level PeopleCode is only for UI behavior. Misplacing logic leads to it not firing in all contexts (e.g., Component Interfaces bypass page events)."},
+    ],
+    quiz:[
+      {q:"What is the key difference between a Grid and a Scroll Area in PeopleSoft?",options:["Grids are for Finance, Scroll Areas are for HCM","Grid is the modern replacement for Scroll Area — both display child rows but Grid supports sorting/filtering","Scroll Areas can save data; Grids cannot","There is no difference — they are the same control"],answer:1,explanation:"Grid is the modern control that replaced Scroll Area for displaying child record rows. Grids support sorting, filtering, and pagination. Scroll Areas are older Classic controls still seen in legacy pages. New development should always use Grids."},
+      {q:"If a component has 4 pages and a user edits fields on 3 of them, what happens when they click Save?",options:["Only the pages that were changed are saved","All 4 pages are validated and saved together as one atomic transaction","Each page saves independently","The last page edited is saved first"],answer:1,explanation:"A Component is the unit of a transaction. When a user saves, ALL pages in the component are validated and committed together as one atomic operation — either all succeed or none do. This is what makes the Component the logical unit of a business transaction."},
+    ],
+    keyPoints:[
+      "Pages are metadata layouts — not HTML — rendered into HTML by the App Server at runtime",
+      "Every field on a page must be bound to a Record.Field — no free-floating data",
+      "A Component groups pages into a single transaction — all pages save together",
+      "Grids display child rows (one-to-many data) — they replaced older Scroll Areas",
+      "Sub Pages are reusable page fragments embedded across multiple pages",
+    ],
+    sections:[
+      {
+        title:"Pages — Layout & Controls",
+        body:`A Page in PeopleSoft is the visual layout definition. You design pages in Application Designer by dragging and dropping controls onto a canvas. Pages are not HTML files — they are metadata stored in the database. The PeopleSoft App Server reads this metadata and generates the HTML that the browser displays.
+
+**Page Controls — the building blocks of every page:**
+
+- **Edit Box** — A text input field. Must be bound to a Record.Field (e.g., JOB.DEPTID). Validates against a prompt table or translate values if configured.
+- **Drop Down List** — A select box populated from Translate Values or a prompt table.
+- **Long Edit Box** — A textarea for long text entry (bound to a Long Character field).
+- **Check Box** — A boolean toggle. Bound to a Character field that stores 'Y' or 'N'.
+- **Radio Button** — For mutually exclusive options.
+- **Push Button / Hyperlink** — Triggers a PeopleCode FieldChange event or navigates elsewhere.
+- **Grid** — Displays multiple child rows of data (the modern replacement for Scroll Areas). Each row in the grid corresponds to a row in a child record. Grids support sorting, filtering, and pagination.
+- **Scroll Area** — The older control for displaying child record rows. Still seen in legacy Classic pages.
+- **Sub Page** — Embeds another page's controls inside this page. Used for common field groups shared across pages (e.g., address fields, effective date section).
+- **Group Box** — A visual border that groups related fields. No data binding — purely cosmetic organization.
+- **Static Text / Image** — Decorative text or images with no data binding.`,
+      },
+      {
+        title:"Components — The Transaction Unit",
+        body:`A Component is the unit of work in PeopleSoft. It groups one or more related pages into a single transaction. The defining characteristic of a component is that all pages share the same data buffer and save together as one atomic operation.
+
+**Component structure defined in App Designer:**
+
+1. **Component Properties**
+   - Search Record — the record used to build the search dialog
+   - Add Search Record — separate search record for Add mode
+   - Action modes — which modes are allowed (Add, Update, Display, Update All, Correction)
+
+2. **Component Pages**
+   - The ordered list of pages in the component
+   - Each page appears as a tab in the browser
+   - Tab order can be configured
+   - Pages can be hidden using PeopleCode based on business conditions
+
+3. **Component PeopleCode**
+   - PostBuild, PreBuild, SearchInit, SearchSave, SaveEdit, SavePreChange, SavePostChange
+   - These events fire at the component level, not the field level
+
+**Transaction Integrity**
+When a user saves a component, ALL data across ALL pages is validated and committed together. There is no partial save — either the entire transaction succeeds or none of it does. This is what makes the Component the logical unit of a business transaction.
+
+**Work Pages / Hidden Pages**
+Components can contain hidden pages that users never see. These are work pages backed by Derived/Work records. They store temporary values and intermediate calculations needed by PeopleCode but not relevant to the user.`,
+        pbLink:{title:"Application Designer Developer's Guide — Creating Pages and Components", url:"https://docs.oracle.com/cd/F70250_01/psft/pdf/pt860tapd-b092022.pdf"},
+      },
+    ],
+  },
+  {
+    id:"search-records", module:2, num:"10",
+    title:"Search Records & Add/Search Page",
+    summary:"Every component uses a Search Record to build the search dialog that users see before opening a transaction. Understanding how search records work — both from a user perspective and a developer perspective — is fundamental to PeopleSoft development.",
+    preChecklist:["You understand what Records are in PeopleSoft (Topic 12)","You know what a Component is and how it groups pages","You've seen the PeopleSoft search dialog as a user"],
+    realWorld:"<strong>Security through Search Records:</strong> In a large university's Campus Solutions system, a financial aid advisor can search for and see only their own students — even though they access the same component as an advisor in another college. This is implemented entirely through a security view used as the Search Record. No PeopleCode needed.",
+    mistakes:[
+      {title:"Using the base SQL table as the Search Record for components showing employee data", desc:"If you use PS_JOB directly as your Search Record, any user with access to your component can see ALL employees regardless of their row-level security settings. Always use a security view."},
+      {title:"Marking too many fields as Search Keys without supporting indexes", desc:"Every field marked as a Search Key causes PeopleSoft to include it in the SQL WHERE clause. Without a database index, this causes a full table scan. Only mark fields as Search Keys if you also have (or create) a database index for them."},
+    ],
+    quiz:[
+      {q:"What does a 'List Box Item' field property do on a Search Record?",options:["Makes the field searchable by users","Makes the field appear as a column in the search results list","Creates a database index on the field","Hides the field from the search dialog"],answer:1,explanation:"Fields marked as List Box Items (L) appear as columns in the search results list after a user submits search criteria. They help users identify which row to select — e.g., showing Name, Job Title, and Department alongside the Employee ID."},
+      {q:"Why should you use a SQL View as the Search Record instead of the base table when showing employee data?",options:["Views are faster than tables","Views allow you to join additional data","Security views filter data based on the user's row-level security profile","Views allow Add mode"],answer:2,explanation:"Using a security view as the Search Record automatically filters results to only the rows the user is authorized to see. The view joins the base table with a security join table that enforces row-level security — without any PeopleCode needed."},
+    ],
+    keyPoints:[
+      "Search Record defines the fields in the component's search dialog (which keys users can search)",
+      "Add Search Record can differ from Search Record — used when adding new entries",
+      "Search Key fields become search inputs · List Box Items become result columns",
+      "Alternate Search Keys create additional search paths without being in the primary key",
+      "Row-level security is often implemented by using a security view as the Search Record",
+    ],
+    sections:[
+      {
+        title:"What is a Search Record?",
+        body:`When a user navigates to any PeopleSoft component, they first see a Search Page — a form asking them to enter criteria to find the record they want. The fields on this Search Page are driven entirely by the component's Search Record definition.
+
+The Search Record is a regular PeopleSoft record definition — typically the same record as the component's primary (Level 0) record, or a SQL View that joins and filters data for searching purposes.
+
+**From the user's perspective:**
+The Search Page has fields corresponding to the Search Keys defined on the Search Record. The user enters values (partial Employee ID, a name, a department) and clicks Search. PeopleSoft generates a SQL SELECT against the Search Record with the entered criteria.
+
+**The Search Results list:**
+After searching, a list of matching rows appears. The columns shown in this list are the fields marked as List Box Items in the Search Record. The user clicks a row to load that record into the component.
+
+**Add Mode:**
+If the user clicks the "Add" button on the Search Page, PeopleSoft uses the Add Search Record (which may differ from the main Search Record). In Add mode, the user typically enters the key values for the new record they want to create.`,
+      },
+      {
+        title:"Search Key Types in App Designer",
+        body:`When defining fields on a record in Application Designer, you assign each field a "Use" property that determines its role:
+
+**Key (K)**
+A field that is part of the database primary key. All Key fields appear in the search dialog and are required for retrieving a specific row. PeopleSoft generates a clustered primary key index on Key fields.
+
+**Alternate Search Key (A)**
+Creates an additional search path that is not part of the primary key. For example, on the JOB record, EMPLID is the Key but you might also want to search by Name (stored in a different record). An Alternate Search Key creates a database index on that field to support efficient searching. Users see it as an optional search field.
+
+**List Box Item (L)**
+A field that appears as a column in the search results list. These help users identify which row they want to select. For example, searching for employees by department might show EMPLID, Name, Job Title, and Hire Date as List Box Items so users can distinguish between employees with similar names.
+
+**Search Key (S)**
+Appears as a searchable field in the dialog but does NOT create a database index. Used for fields that are either already indexed through another mechanism or where the search is acceptable without an index.
+
+**Performance implication:**
+Every field you mark as an Alternate Search Key or Search Key causes PeopleSoft to include that field in the WHERE clause when users enter values. If there is no supporting index, this causes a full table scan. Proper key design directly impacts the performance of the search dialog.`,
+      },
+      {
+        title:"Security Views as Search Records",
+        body:`One of the most important uses of custom Search Records is row-level security implementation. PeopleSoft's security framework allows you to restrict which data rows a user can see — not just which pages they can access.
+
+**How row-level security works through Search Records:**
+
+Instead of using the base SQL table as the Search Record, developers create a SQL View that joins the base table with a security join table. The security join table filters rows based on the user's security profile.
+
+Example: Instead of using PS_JOB as the search record for Job Data, use a view like PS_JOB_SRCH_VW that joins PS_JOB with PS_DEPT_SECURITY (a security view that only includes departments the current user is authorized to see).
+
+When a user searches for employees, the view's WHERE clause automatically filters out departments they don't have access to — without any PeopleCode needed.
+
+**This is a critical concept for developers** because forgetting to use a security view on a custom component that displays employee data means any user with access to that component can see all employee data regardless of their row-level security settings. This is a common security vulnerability in custom PeopleSoft development.`,
+        pbLink:{title:"Application Designer Developer's Guide — Defining Search Records", url:"https://docs.oracle.com/cd/F70250_01/psft/pdf/pt860tapd-b092022.pdf"},
+      },
+    ],
+  },
+  /* ── MODULE 4 ── */
+  {
+    id:"app-designer", module:3, num:"11",
+    title:"Application Designer Basics",
+    summary:"Application Designer (App Designer) is the primary development IDE for PeopleSoft. It is a Windows desktop application where developers create and manage all PeopleSoft objects — records, fields, pages, components, menus, and PeopleCode.",
+    preChecklist:["You understand what PeopleTools is (Topic 03)","You know PeopleSoft is metadata-driven — objects are stored in the database","You have basic familiarity with an IDE concept"],
+    realWorld:"<strong>Custom prefix is law:</strong> In every real project, your organization assigns a custom prefix (e.g., 'ZZ_', 'ACME_', 'UNI_') for all custom objects. This is not optional. Delivered PeopleSoft upgrades can overwrite objects without a custom prefix. A consultant who modifies a delivered record directly causes upgrade nightmares for the client's team years later.",
+    mistakes:[
+      {title:"Modifying Oracle-delivered objects directly", desc:"Never change delivered records, pages, or PeopleCode directly. Clone them with your custom prefix and modify the clone. Direct modifications get overwritten during PeopleSoft upgrades and create painful merge conflicts."},
+      {title:"Forgetting to Build (Create/Alter) the table after defining a record", desc:"Defining a SQL Table record in App Designer only creates the metadata definition. You must run Build → Current Object → Create Table to actually create the physical database table. Many beginners define the record but wonder why they can't insert data."},
+      {title:"Not adding objects to a Project before migrating", desc:"If you forget to add a changed object to your migration Project, it won't move to QA or PROD. Always check your Project before migration."},
+    ],
+    quiz:[
+      {q:"After defining a new SQL Table record in Application Designer, what must you do to create the actual database table?",options:["Save the record definition — the table is created automatically","Run Build → Current Object → Create Table","Submit a request to the DBA","Restart the App Server"],answer:1,explanation:"Saving a record definition only stores the metadata. To create the physical database table, you must run Build → Current Object → Create Table. This generates and executes the DDL (CREATE TABLE statement) against the database."},
+      {q:"What is the purpose of a Project in Application Designer?",options:["To organize objects for display only","To group related objects for migration between environments (DEV → QA → PROD)","To create a new PeopleSoft database","To run batch processes"],answer:1,explanation:"A Project in Application Designer groups related PeopleSoft objects (records, pages, components, PeopleCode) for migration between environments. When development is complete in DEV, the Project is migrated to QA and eventually PROD."},
+      {q:"Why must all custom PeopleSoft objects use a company-specific prefix?",options:["It makes the code run faster","It prevents naming conflicts with Oracle-delivered objects during upgrades","It is required by the database","It enables integration with external systems"],answer:1,explanation:"Oracle-delivered PeopleSoft objects don't use custom prefixes. If your custom object has the same name as a delivered object, a PeopleSoft upgrade can overwrite your customization. Custom prefixes (e.g., ZZ_JOB, ACME_PAGE) prevent this collision."},
+    ],
+    keyPoints:[
+      "App Designer is a Windows-only client — must be installed on your development workstation",
+      "Connects to the PeopleSoft database (2-tier) or App Server (3-tier)",
+      "All PeopleSoft objects are metadata stored in DB — App Designer is just an editor for that metadata",
+      "Projects group related objects for migration between environments (DEV → QA → PROD)",
+      "Build → Current Object physically creates/alters the database table from record definition",
+    ],
+    sections:[
+      {
+        title:"The App Designer Interface",
+        uiIllustration:"appdesigner",
+        body:`Application Designer opens with a workspace divided into several panels:
+
+**Project Workspace (left panel)**
+Shows a tree of all objects included in the current Project. Organized by object type — Records, Fields, Pages, Components, PeopleCode, etc. Double-clicking any object opens it in the Object Workspace.
+
+**Object Workspace (center panel)**
+The main editing area. Opens record definitions (showing field columns), page layouts (showing the drag-and-drop canvas), component definitions, and PeopleCode editors. Multiple objects can be open simultaneously as tabs.
+
+**Output Window (bottom panel)**
+Shows messages, errors, and results from operations like:
+- Compile errors when saving PeopleCode
+- Results from Find In / Find Object
+- SQL Build logs (when creating/altering tables)
+- Upgrade comparison results
+
+**Definition Properties panel**
+Context-sensitive properties for the currently selected object or field. Accessible via right-click on any object.
+
+**Sign-on**
+To open App Designer: Start → PeopleTools → Application Designer. At the sign-on dialog, enter:
+- Database Name (for 2-tier) or Application Server Name (for 3-tier)
+- User ID and Password (must have App Designer access in permission list)
+- Connection Type (Oracle, SQL Server, DB2, etc. for 2-tier)`,
+      },
+      {
+        title:"Projects — Organizing Your Work",
+        body:`A Project in Application Designer is a container that groups related objects for development and migration. Every developer should work within a named project from day one.
+
+**Creating a project:**
+File → New → Project. Give it a meaningful name following your organization's naming convention (e.g., "HCM_CUSTOM_HIRE_2025").
+
+**Adding objects to a project:**
+- Right-click on any object in the Object Workspace → Insert Into Project
+- Or drag objects from search results into the project tree
+- Or use Insert → Current Object to add the currently open object
+
+**Why projects matter — migration:**
+When you finish development in DEV, you migrate your changes to QA and eventually PROD. You do this by migrating the Project. The project contains all the objects you changed, ensuring nothing is missed or left behind.
+
+**Migration methods:**
+- **Copy To Database**: Directly copies objects from one DB to another (requires network connection to both)
+- **Export to File / Import from File**: Creates an export file (.PTP) that can be transported and imported
+- **Change Package**: The modern approach using PeopleSoft Update Manager to package and apply changes
+
+**Project naming best practices:**
+- Include a ticket or change request number
+- Include the date or release identifier
+- Use uppercase with underscores
+- Example: "CRP_CUSTOM_OB_2025Q1" for a customization related to onboarding in Q1 2025`,
+      },
+      {
+        title:"Creating Objects in App Designer — The Workflow",
+        body:`The typical development workflow in Application Designer follows a structured sequence. This is the same sequence Oracle uses to build PeopleSoft itself:
+
+**Step 1: Define Fields**
+Fields are defined globally — independent of any record. File → New → Field. Set the name, type (Character, Date, Number, etc.), and size. Because fields are global, the same field can be reused across hundreds of records. If you update the field's label, it updates everywhere.
+
+**Step 2: Define Records**
+File → New → Record. Add fields to the record by typing their names or searching. Set key properties for each field (Key, Search Key, List Box Item, etc.). Set the Record Type (SQL Table, SQL View, Derived/Work, etc.).
+
+For SQL Table records, you must physically build the table: Build → Current Object → Create Table. This runs the DDL against the database.
+
+**Step 3: Design Pages**
+File → New → Page. Drag controls from the control palette onto the canvas. Bind each control to a Record.Field by double-clicking and setting the record/field properties. Set tab order, group boxes, and page properties.
+
+**Step 4: Create Components**
+File → New → Component. Add pages to the component in order. Set the Search Record and Add Search Record. Configure action modes (Add, Update, Correction, etc.). Add component-level PeopleCode if needed.
+
+**Step 5: Register in Portal**
+Navigate in the browser to PeopleTools → Portal → Structure and Content. Create a Content Reference pointing to the new component. Assign to permission lists so authorized users can navigate to it.
+
+**Step 6: Write PeopleCode**
+Open the record or component in App Designer. Click the PeopleCode toolbar icon (or View → PeopleCode) to open the PeopleCode editor. Select the event and write code.`,
+        pbLink:{title:"Application Designer Developer's Guide — Creating Definitions", url:"https://docs.oracle.com/cd/F70250_01/psft/pdf/pt860tapd-b092022.pdf"},
+      },
+    ],
+  },
+  {
+    id:"records-fields", module:3, num:"12",
+    title:"Records & Fields",
+    summary:"Records and Fields are the foundation of PeopleSoft's data model. Every page, every component, and every line of PeopleCode ultimately reads from or writes to a Record. Understanding their types, properties, and relationships is the most critical foundation skill.",
+    preChecklist:["You've opened Application Designer (Topic 11)","You understand what metadata-driven development means","You know the difference between a database table and a view"],
+    realWorld:"<strong>Global fields save hours:</strong> In a real enterprise PeopleSoft system, the field EMPLID exists in 400+ records. When the business asked to change the Employee ID label from 'Empl ID' to 'Employee ID' for accessibility compliance, it took one developer 5 minutes — change the field definition once, PeopleSoft propagated it to every page, search dialog, and grid automatically. In a traditional system this would have been weeks of work.",
+    mistakes:[
+      {title:"Defining fields directly on records instead of globally", desc:"Fields must be defined globally first (File → New → Field) and then added to records. If you define the same concept twice as separate fields on different records, changing the label later means updating every occurrence individually."},
+      {title:"Forgetting effective dating WHERE clauses when querying PS_JOB", desc:"PS_JOB has one row per job action per employee. A single employee might have 20 rows in PS_JOB across their career. If you SELECT without effective dating WHERE clauses, you get all 20 rows — causing duplicate data and wrong results."},
+      {title:"Using a SQL Table record where a Derived/Work record is appropriate", desc:"If a field is only needed for temporary calculation during a component session and never needs to be stored, use a Derived/Work record. Creating unnecessary database tables wastes space and causes confusion."},
+    ],
+    quiz:[
+      {q:"What database table does the PeopleSoft record named 'JOB' create?",options:["JOB","PSJOB","PS_JOB","PS.JOB"],answer:2,explanation:"PeopleSoft prefixes all SQL Table database tables with PS_. The record named JOB in Application Designer creates the physical database table PS_JOB. This naming convention distinguishes PeopleSoft application tables from PeopleTools metadata tables."},
+      {q:"Which record type should you use for fields that only exist in memory during a transaction and are never saved to the database?",options:["SQL Table","SQL View","Derived/Work","SubRecord"],answer:2,explanation:"Derived/Work records exist only in the component buffer during a transaction and never create a database object. They are used for computed values, push buttons, and temporary variables that are needed during processing but don't need to be stored."},
+      {q:"A field named DEPTID is defined once globally. It is used in 500 records. If you change its label, what happens?",options:["You must update all 500 records manually","Only the first record is updated","The label change applies everywhere DEPTID is used automatically","You need to rebuild all 500 tables"],answer:1,explanation:"Because fields are defined globally in PeopleSoft, a label change to the field definition automatically applies everywhere that field is used — all 500 records, all pages, all search dialogs, and all reports. This is one of the key advantages of the global field definition approach."},
+    ],
+    keyPoints:[
+      "7 record types: SQL Table, SQL View, Dynamic View, Derived/Work, SubRecord, Query View, Temp Table",
+      "SQL Table records create physical database tables prefixed with PS_ (e.g., JOB → PS_JOB)",
+      "Derived/Work records exist only in memory — never create a DB object",
+      "Fields are defined globally — change the field definition once, it applies everywhere it's used",
+      "Key fields define the primary key; Alternate Search Keys create additional DB indexes",
+    ],
+    sections:[
+      {
+        title:"The 7 Record Types",
+        diagram:"recordtypes",
+        uiIllustration:"recorddef",
+        body:`Every Record in PeopleSoft has a type that determines how it behaves and whether it creates a database object:
+
+**1. SQL Table**
+The most common record type. Creates a physical database table named PS_<RECORDNAME> in the database. All application data lives here — PS_JOB, PS_PERSONAL_DATA, PS_DEPT_TBL. When you define a SQL Table record and run Build → Current Object → Create Table, PeopleSoft generates and executes the DDL to create the table.
+
+**2. SQL View**
+Creates a database view that joins data from one or more SQL Tables. Used for reporting, joining related data, and implementing row-level security. SQL Views are read-only — you can display data from a View but you cannot save to it directly.
+
+**3. Dynamic View**
+Similar to SQL View but the SQL is defined and resolved at runtime rather than being stored as a permanent database view. Used when the SQL needs to incorporate run-time information (like the current user's settings). Dynamic Views do not create any database object.
+
+**4. Derived/Work Record**
+Does NOT create any database object. Exists only in the component buffer during a transaction. Used for: computed/derived values shown on a page, push buttons that trigger PeopleCode, temporary values needed during processing, and Function Library programs. Fields in Derived/Work records never get saved to a table.
+
+**5. SubRecord**
+A reusable set of fields that can be embedded into other records. When you include a SubRecord in a record definition, PeopleSoft includes all of its fields in the parent record's table. SubRecords are used for common field groups — the most important example is EFFDT_SBR (containing EFFDT and EFFSEQ) which is included in hundreds of effective-dated records.
+
+**6. Query View**
+A record that is created and managed by PS Query. Primarily used when a PS Query result needs to be used as the source for another query.
+
+**7. Temporary Table**
+Used specifically by Application Engine for parallel batch processing. Multiple instances of a Temp Table can exist simultaneously in the database (e.g., MYTEMP_AET, MYTEMP_AET1, MYTEMP_AET2), allowing parallel AE processes to work on different data sets without interfering with each other.`,
+        pbLink:{title:"Application Designer Developer's Guide — Records & Fields", url:"https://docs.oracle.com/cd/F70250_01/psft/pdf/pt860tapd-b092022.pdf"},
+      },
+      {
+        title:"Field Types & Properties",
+        body:`Fields in PeopleSoft are defined at the global level before being added to records. This is fundamentally different from traditional database design where you define columns within a table. In PeopleSoft, a field like EMPLID exists as a standalone definition that is then referenced by every record that needs it.
+
+**Core Field Types:**
+
+- **Character** — Variable-length text. Most common. Can be up to 32,767 characters. Stored as VARCHAR or CHAR in the database depending on size settings.
+- **Long Character** — For large text blocks. Stored as CLOB (Character Large Object) in Oracle. Used for descriptions, notes, and text areas.
+- **Number** — Integer or decimal. Define the number of integer digits and decimal places.
+- **Signed Number** — Same as Number but allows negative values.
+- **Date** — Stores a date. Internally stored as CHAR(10) in YYYY-MM-DD format in PeopleSoft's system tables, but the database stores it natively as a DATE type.
+- **Time** — Stores a time of day (hours, minutes, seconds).
+- **DateTime** — Combined date and time value.
+- **Image** — Stores binary image data directly in the database.
+- **ImageReference** — Stores a reference (path/URL) to an image file rather than the image itself.
+
+**Why global field definitions matter:**
+If a field named DEPTID has a label "Department" and a maximum length of 10, that is true everywhere DEPTID appears across all 500 records that use it. If Oracle releases an update changing the DEPTID label to "Department ID," that change automatically flows to all pages, all search dialogs, and all reports that use DEPTID — without any developer work.`,
+      },
+    ],
+  },
+  {
+    id:"data-model", module:3, num:"13",
+    title:"PeopleSoft Data Model Basics",
+    summary:"PeopleSoft organizes data through a set of key structural concepts — Business Units, SetIDs, and TableSets — that allow a single PeopleSoft system to serve multiple organizations while sharing common setup data.",
+    preChecklist:["You understand Records & Fields (Topic 12)","You know the difference between HCM and FSCM modules","You have a basic understanding of database tables and keys"],
+    realWorld:"<strong>Real multi-national scenario:</strong> A global company runs one PeopleSoft system for 40 countries. All countries share the same Department and Job Code tables (SetID = SHARE) but each country has its own Regulatory Region, Pay Groups, and Tax tables (country-specific SetIDs). Without SetID architecture, they would need 40 separate systems or 40 copies of every reference table.",
+    mistakes:[
+      {title:"Forgetting BUSINESS_UNIT in WHERE clauses for FSCM tables", desc:"Most FSCM tables have BUSINESS_UNIT as part of the primary key. A SQL query without a Business Unit filter returns data mixed from all Business Units — often causing incorrect financial reports."},
+      {title:"Confusing PS_ tables with PSREC* tables", desc:"PS_JOB is application data. PSRECDEFN is PeopleTools metadata. Beginners sometimes accidentally query or modify PeopleTools system tables, which can corrupt the environment."},
+    ],
+    quiz:[
+      {q:"What is the purpose of a SetID in PeopleSoft?",options:["It identifies a specific employee","It controls which setup/reference tables apply to each Business Unit","It is the primary key for financial transactions","It identifies a specific server instance"],answer:1,explanation:"SetIDs allow multiple Business Units to share common reference data (like Department codes) while maintaining separate data for region-specific configurations. Multiple Business Units can point to the same SetID, meaning they share that reference data."},
+      {q:"What prefix do all PeopleSoft application data tables use in the database?",options:["PS.","PST_","PS_","PSAPP_"],answer:2,explanation:"Every PeopleSoft application data table is prefixed with PS_. The record JOB becomes PS_JOB, PERSONAL_DATA becomes PS_PERSONAL_DATA. This distinguishes application tables from PeopleTools metadata tables (PSRECDEFN, PSDBFIELD, etc.)."},
+    ],
+    keyPoints:[
+      "Business Unit = the primary organizing unit for transactions (company, division, institution)",
+      "SetID = controls which setup/reference tables apply to each Business Unit via TableSets",
+      "TableSet sharing allows multiple Business Units to share the same department or job code tables",
+      "Installation Table = the global configuration table for the entire PeopleSoft system",
+      "PS_ prefix = every application table · PSREC* / PSDBFIELD = PeopleTools metadata tables",
+    ],
+    sections:[
+      {
+        title:"Business Units — The Core Organizing Concept",
+        body:`A Business Unit is the fundamental organizational entity in PeopleSoft — particularly in FSCM (Finance). Every financial transaction is associated with a Business Unit. It represents a distinct part of an organization that maintains its own set of financial books.
+
+Examples of Business Units:
+- A holding company might have Business Units for each subsidiary
+- A university might have Business Units for different campuses
+- A government agency might have Business Units for different departments with separate budgets
+
+Business Units in HCM and FSCM serve slightly different purposes:
+
+**HCM Business Unit (HR Business Unit):**
+Groups employees for HR processing purposes. Pay groups, benefit programs, and regulatory compliance are configured at the Business Unit level.
+
+**FSCM Business Unit (GL Business Unit / AP Business Unit / etc.):**
+Each FSCM module has its own set of Business Units. The GL Business Unit is the core financial entity. AP, AR, and other modules have Business Units that must be linked to a GL Business Unit.
+
+**Why this matters for developers:**
+Many PeopleSoft tables have BUSINESS_UNIT as part of their primary key. When writing SQL or PeopleCode that queries financial tables, you must always include the Business Unit in your WHERE clause — otherwise you'll get data from all Business Units mixed together.`,
+      },
+      {
+        title:"SetIDs & TableSet Sharing",
+        body:`SetIDs are one of the most misunderstood PeopleSoft concepts for beginners. They solve a very specific problem: how do you let multiple Business Units share common reference data while still allowing each to have its own unique reference data when needed?
+
+**The problem SetIDs solve:**
+Imagine a company with 10 Business Units spread across 3 countries. They share the same Department codes and Job Codes, but each country has different Regulatory Regions and Pay Groups. Without SetIDs, you would either:
+- Duplicate all reference data for each Business Unit (wasteful, maintenance nightmare)
+- Force all Business Units to share all reference data (inflexible, can't accommodate differences)
+
+**How SetIDs work:**
+SetIDs are codes assigned to setup tables. Instead of reading "Department 10000 for Business Unit USA001," PeopleSoft reads "Department 10000 for SetID SHARE." Multiple Business Units can point to the same SetID, meaning they share that reference data.
+
+**TableSet Controls:**
+The link between Business Units and SetIDs is defined in TableSet Controls (PS_SET_CNTRL_TBL). For each Business Unit, you define which SetID to use for each record group. This allows:
+- Business Unit USA001 → Uses SetID SHARE for Department codes, SetID USA for Regulatory data
+- Business Unit GBR001 → Uses SetID SHARE for Department codes, SetID GBR for Regulatory data
+
+Both US and UK Business Units share the same Department structure but maintain separate regulatory configurations.`,
+      },
+      {
+        title:"PeopleSoft Database Structure",
+        body:`Understanding how PeopleSoft's database is organized helps you navigate it and write efficient queries.
+
+**Application Tables (PS_ prefix)**
+Every application data table in PeopleSoft starts with PS_. When you define a SQL Table record named JOB, the physical database table is PS_JOB. This prefix distinguishes PeopleSoft application tables from the database's own system tables.
+
+**PeopleTools Metadata Tables (PSREC*, PSDBFIELD, PSPNLFIELD, etc.)**
+PeopleTools stores its metadata — the definitions of all records, fields, pages, components, PeopleCode programs — in database tables that start with PS (no underscore) or PSTOOLS. Examples:
+- PSRECDEFN — record definitions
+- PSDBFIELD — field definitions
+- PSPNLDEFN — page definitions
+- PSPCMPROG — PeopleCode programs
+- PSPRCSRQST — Process Request table (all batch job requests)
+
+**System Tables (PSSTATUS, PSDBOWNER, etc.)**
+Installation-level information and database ownership tables.
+
+**The Installation Table:**
+PSOPTIONS and PS_INSTALLATION contain system-wide configuration settings: the PeopleTools version, enabled modules, base currency, default language, and many global settings. Developers and administrators frequently reference these tables.
+
+**A practical tip:**
+When you see a table name in PeopleSoft that starts with PS_ and is in ALL CAPS with underscores, it's an application data table. When you see PSREC*, PSPNL*, or PSPC*, you're looking at PeopleTools metadata. Learning to distinguish these quickly helps you understand whether you're looking at business data or system configuration.`,
+      },
+    ],
+  },
+  {
+    id:"effdt", module:3, num:"14",
+    title:"Effective Dating (EFFDT & EFFSEQ)",
+    summary:"Effective Dating is one of PeopleSoft's most distinctive and powerful concepts. Instead of overwriting data when something changes, PeopleSoft inserts a new row with a new Effective Date — preserving complete history.",
+    preChecklist:["You understand Records & Fields (Topic 12)","You know what a primary key is in a database","You understand basic SQL SELECT statements"],
+    realWorld:"<strong>Payroll depends on this:</strong> In a payroll system with 100,000 employees, retroactive pay corrections happen daily. An employee's salary was entered incorrectly in January — payroll needs to recalculate 3 months of paychecks. This is only possible because PS_JOB preserved the historical rows with EFFDT. Without effective dating, the old salary is gone and retroactive correction is impossible.",
+    mistakes:[
+      {title:"Querying PS_JOB without effective dating WHERE clause", desc:"PS_JOB has one row per job action per employee. An employee with 10 years of history might have 30+ rows. SELECT without EFFDT criteria returns all rows — causing duplicates in reports and wrong calculations."},
+      {title:"Using today's date as EFFDT for corrections that should be backdated", desc:"If an employee's department change should be effective from last month, entering today's date as EFFDT is wrong. Future reports for last month will show the wrong department."},
+      {title:"Forgetting EFFSEQ when two changes occur on the same date", desc:"If two job actions happen on the same date (e.g., promotion AND department transfer both on July 1st), EFFSEQ distinguishes them. Forgetting EFFSEQ in SQL gives you only the first change."},
+    ],
+    quiz:[
+      {q:"An employee gets promoted on July 1st. What does PeopleSoft do to the PS_JOB record?",options:["Updates the existing row with the new job code","Deletes the old row and creates a new one","Inserts a new row with EFFDT = July 1st, keeping the old row","Archives the old row to a history table"],answer:2,explanation:"PeopleSoft never overwrites or deletes effective-dated rows. It inserts a new row with the new Effective Date. The old row remains permanently, preserving the complete history of every job change."},
+      {q:"An employee has two job changes on the same date: a promotion (entered first) and a department transfer (entered second). What EFFSEQ values do they get?",options:["Both get EFFSEQ = 0","Promotion gets EFFSEQ = 0, Transfer gets EFFSEQ = 1","Transfer gets EFFSEQ = 0, Promotion gets EFFSEQ = 1","They cannot both have the same EFFDT"],answer:1,explanation:"EFFSEQ handles multiple changes on the same Effective Date. The first change gets EFFSEQ = 0, the second gets EFFSEQ = 1. The most current row for a given date is the one with the highest EFFSEQ."},
+      {q:"What SQL pattern does PeopleSoft use to retrieve the 'current' effective-dated row?",options:["WHERE EFFDT = TODAY","WHERE EFFDT = MAX(EFFDT) AND EFFSEQ = MAX(EFFSEQ)","WHERE EFFDT = (SELECT MAX(EFFDT) FROM ... WHERE EFFDT <= CURRENT_DATE)","WHERE CURRENT_ROW = 'Y'"],answer:2,explanation:"PeopleSoft uses a subquery pattern: the max EFFDT on or before today, then the max EFFSEQ for that date. This guarantees the most recent row is returned without returning future-dated rows."},
+    ],
+    keyPoints:[
+      "EFFDT (Effective Date) — the date from which a row is valid",
+      "EFFSEQ (Effective Sequence) — handles multiple changes on the same date, sequenced 0,1,2...",
+      "PeopleSoft always shows the 'current' row: max EFFDT where EFFDT <= today",
+      "Future-dated rows can be entered today and activate automatically on the specified date",
+      "Historical rows are never deleted — this enables retrospective reporting and retroactive payroll",
+    ],
+    sections:[
+      {
+        title:"The Problem Effective Dating Solves",
+        body:`Consider a simple employee salary record. In a traditional database, when an employee gets a raise, you update their salary record. The old salary is gone. You now have no record of what they earned before the raise. If auditors ask what the employee earned in Q1, you cannot answer.
+
+PeopleSoft solves this with Effective Dating. Instead of UPDATE, it does INSERT. Every change creates a new row with a new date. The old row remains permanently.
+
+**A real example with PS_JOB:**
+An employee is hired on January 1st as a Software Engineer with a salary of $80,000. On July 1st, they are promoted to Senior Software Engineer with a salary of $95,000.
+
+In the PS_JOB table, you would see:
+
+\`EMPLID   EFFDT       ACTION   JOBCODE   COMPRATE
+E12345   2025-01-01  HIR      SWENG     80000.000
+E12345   2025-07-01  PRO      SRSWENG   95000.000\`
+
+Both rows exist. The January row is not overwritten. PeopleSoft shows the July row as "current" because it has the latest EFFDT that is on or before today's date.
+
+If you run a headcount report for March 2025, PeopleSoft uses the January row — correctly reporting the employee as a Software Engineer at $80,000.`,
+      },
+      {
+        title:"How PeopleSoft Selects the Current Row",
+        body:`PeopleSoft uses a specific SQL pattern to retrieve the "current" effective-dated row. This pattern is fundamental and appears in hundreds of delivered queries and components.
+
+**Standard effective dating WHERE clause:**
+\`SELECT *
+FROM PS_JOB A
+WHERE A.EMPLID = :1
+AND A.EMPL_RCD = :2
+AND A.EFFDT = (
+    SELECT MAX(B.EFFDT)
+    FROM PS_JOB B
+    WHERE B.EMPLID = A.EMPLID
+    AND B.EMPL_RCD = A.EMPL_RCD
+    AND B.EFFDT <= %CurrentDateIn
+)
+AND A.EFFSEQ = (
+    SELECT MAX(C.EFFSEQ)
+    FROM PS_JOB C
+    WHERE C.EMPLID = A.EMPLID
+    AND C.EMPL_RCD = A.EMPL_RCD
+    AND C.EFFDT = A.EFFDT
+)\`
+
+This subquery pattern — "max EFFDT on or before today, then max EFFSEQ for that date" — is the universal PeopleSoft effective dating pattern.
+
+**EFFSEQ (Effective Sequence):**
+What happens if someone gets two changes on the same date? For example, a pay rate change AND a department transfer both effective July 1st? EFFSEQ handles this. The first change gets EFFSEQ=0, the second gets EFFSEQ=1. The most current row for a given date is the one with the highest EFFSEQ.`,
+        pbLink:{title:"PeopleSoft HCM: Understanding Effective Dates — PeopleBooks", url:"https://docs.oracle.com/cd/E17566_01/epm91pbr0/eng/psbooks/hrms/chapter.htm?File=hrms/htm/a_bs24ef.htm"},
+      },
+      {
+        title:"Future Dating & Historical Corrections",
+        body:`**Future Dating**
+PeopleSoft allows you to enter a row with a future effective date today. The row exists in the database right now but does not become "current" until its EFFDT is reached.
+
+Example: An employee's pay raise is approved today but effective on the first of next month. Enter it today with next month's date. Payroll processing will automatically use the new rate starting next month.
+
+This is extremely valuable for HR planning — you can enter an entire organizational restructuring in advance and it automatically activates on the planned date.
+
+**Viewing Historical Data**
+PeopleSoft components typically have an "Include History" toggle that shows all historical rows, not just the current one. In Job Data, enabling history shows every job action the employee ever had, in chronological order.
+
+**Correction Mode**
+PeopleSoft's Correction action mode allows authorized users to go back and change historical rows — for example, correcting a salary that was entered incorrectly for a past period. This is tightly controlled by security because retroactive changes can trigger payroll recalculations.
+
+**Why this matters for developers:**
+Any custom SQL or PeopleCode that queries effective-dated tables MUST include the effective dating WHERE clause. Forgetting it returns ALL rows for an employee — including historical ones — leading to duplicate data and incorrect results. This is one of the most common mistakes in custom PeopleSoft development.`,
+      },
+    ],
+  },
+  /* ── MODULE 5 ── */
+  {
+    id:"peoplecode", module:4, num:"15",
+    title:"PeopleCode Basics",
+    summary:"PeopleCode is PeopleSoft's proprietary event-driven programming language. It runs server-side within the Tuxedo App Server and is how all business logic, validations, defaults, and dynamic UI behavior is implemented.",
+    preChecklist:["You understand the Component Processor and its event model (Topic 05)","You know what Records, Fields, and Components are (Topics 12, 09)","You have some programming experience in any language — PeopleCode is beginner-friendly"],
+    realWorld:"<strong>The N+1 query problem in production:</strong> A client had a grid showing 500 employee records. A developer had written SQLExec in RowInit to look up the department name for each row. Result: 500 separate SQL calls every time the page loaded — 45 seconds load time. Moving the SQLExec to PostBuild with a single lookup reduced it to under 2 seconds. This is the most common performance fix on real PeopleSoft projects.",
+    mistakes:[
+      {title:"Putting SQLExec in RowInit", desc:"RowInit fires for every row in every grid. If a grid has 100 rows, SQLExec in RowInit executes 100 times. This is the #1 performance anti-pattern in PeopleSoft development. Pre-fetch in PostBuild or use a view join instead."},
+      {title:"Using Global scope when Local is sufficient", desc:"Global variables persist for the entire session and can be accidentally read by other components. Always use Local scope unless you specifically need the value to persist across components."},
+      {title:"Putting validation in FieldChange instead of SaveEdit", desc:"FieldChange fires when a user changes a field. If validation logic is in FieldChange, it fires repeatedly as the user types. Business rule validation belongs in SaveEdit, which fires once during the save process."},
+      {title:"Not checking for None() before using a SQLExec result", desc:"If SQLExec finds no rows, output variables are set to empty string or zero. Using an empty string without checking None() first can cause incorrect defaults or silent failures."},
+    ],
+    quiz:[
+      {q:"Which PeopleCode event fires ONCE after the entire component is fully loaded — ideal for show/hide logic?",options:["RowInit","FieldDefault","PostBuild","SearchInit"],answer:2,explanation:"PostBuild fires once after the entire component is fully built — after all RowInit and FieldDefault events have run for every row. It is the ideal location for show/hide logic and page configuration that depends on the fully loaded component state."},
+      {q:"What is the correct PeopleCode scope to use for a variable that should persist across multiple events within the same component transaction?",options:["Local","Component","Global","Session"],answer:1,explanation:"Component scope variables persist for the entire component transaction — from when the user opens the component to when they save or cancel. Use Component scope when you need to share a value between multiple events (e.g., set a flag in PostBuild, check it in SaveEdit)."},
+      {q:"Which function should you use when you need to iterate through multiple rows returned by a SQL query?",options:["SQLExec","FetchSQL","CreateSQL with a While loop","GetSQL"],answer:2,explanation:"CreateSQL returns a SQL object that you use in a While loop with the .Fetch() method to process each row. SQLExec is for single-row results only. CreateSQL is the correct approach for multi-row iteration."},
+    ],
+    keyPoints:[
+      "PeopleCode is always attached to an event on a specific object — never standalone",
+      "Three variable scopes: Local (current program only), Component (entire transaction), Global (full session)",
+      "SQLExec = single-row SQL result · CreateSQL = multi-row loop iteration",
+      "RowInit fires for EVERY row loaded — avoid heavy SQL here (N+1 problem)",
+      "SaveEdit is the standard event for final business rule validation before save",
+    ],
+    sections:[
+      {
+        title:"PeopleCode Language Fundamentals",
+        body:`PeopleCode is a strongly typed, case-insensitive scripting language that resembles a hybrid of Java and Basic. All PeopleCode runs server-side within the Tuxedo Application Server — never in the browser.
+
+**Variable declaration and types:**
+\`/* All variables must be declared */
+Local String &emplId;
+Local Number &salary;
+Local Date &hireDate;
+Local Boolean &isActive;
+Local Record &recJob;
+Local Rowset &rsJob;
+Local Array of String &deptList;\`
+
+**Assignment and basic operations:**
+\`&emplId = "E12345";
+&salary = 75000;
+&hireDate = %Date;  /* %Date = today's date */
+&isActive = True;\`
+
+**Conditional logic:**
+\`If &salary > 50000 Then
+   &grade = "Senior";
+Else
+   &grade = "Junior";
+End-If;\`
+
+**Loops:**
+\`For &i = 1 To &rsJob.ActiveRowCount
+   &row = &rsJob.GetRow(&i);
+   /* process each row */
+End-For;
+
+While &condition
+   /* loop body */
+End-While;\`
+
+**Key language rules:**
+- Variables are prefixed with & (ampersand)
+- No semicolons required but best practice to include them
+- Comments: /* comment */ for inline, /* on its own line for block comments
+- NOT case-sensitive for keywords (IF = If = if)
+- String concatenation uses the | operator: "Hello" | " " | "World"`,
+        pbLink:{title:"PeopleCode Language Structure — PeopleCode Developer's Guide", url:"https://docs.oracle.com/cd/F28299_01/pt857pbr3/eng/pt/tpcd/concept_PeopleCodeOverview-074b56.html"},
+      },
+      {
+        title:"Variable Scopes — Local, Component, Global",
+        body:`The scope of a variable determines how long it lives and which PeopleCode programs can access it. Choosing the wrong scope is one of the most common beginner mistakes.
+
+**Local Scope**
+\`Local String &myVar;\`
+Exists only for the duration of the current PeopleCode program execution. Once the event ends (e.g., FieldChange completes), the variable is destroyed. This is the safest scope and should be the default choice for most variables.
+
+**Component Scope**
+\`Component String &myCompVar;\`
+Persists for the entire component transaction — from when the user opens the component to when they save or cancel. Any PeopleCode program within the same component can read and write Component variables.
+
+Use Component scope when you need to pass values between different events in the same transaction. Example: Set a flag in PostBuild (Component &isNewHire = True) and check it later in SaveEdit to apply special validation rules.
+
+**Global Scope**
+\`Global String &myGlobalVar;\`
+Persists for the entire PeopleSoft session until the user logs out. Any component in the entire session can access Global variables.
+
+Use very sparingly. Global variables can cause subtle bugs when Component B unexpectedly reads a value set by Component A. Appropriate for truly session-wide data like user preferences loaded at sign-on.
+
+**Scope comparison:**
+\`/* In PostBuild */
+Local String &localVar;      /* dies when PostBuild ends */
+Component String &compVar;   /* lives until save/cancel */
+Global String &globalVar;    /* lives until logout */\``,
+      },
+      {
+        title:"PeopleCode Events — The Complete Event Flow",
+        diagram:"eventflow",
+        body:`PeopleCode is always attached to a specific event on a specific object. The event determines when the code runs. Understanding the full event lifecycle is THE most important concept in PeopleSoft development.
+
+**Component Load Sequence (when user opens a page):**
+1. SearchInit — fires before the search dialog opens (hide/show search fields)
+2. SearchSave — fires when user submits search criteria
+3. RowInit — fires for EVERY row loaded into the buffer (all scroll levels)
+4. FieldDefault — sets default values for fields that have no value
+5. FieldFormula — computes derived field values
+6. PostBuild — fires ONCE after the entire component is fully loaded ← most common location for show/hide logic
+
+**During user interaction:**
+7. Activate — fires each time a specific page tab is activated
+8. FieldEdit — fires when a field loses focus; return False to show error and prevent navigation
+9. FieldChange — fires when a user changes a field value ← most common for dynamic field updates
+
+**Component Save Sequence (when user clicks Save):**
+10. SaveEdit — final validation before save; Error or Warning stops the save ← go-to for business rules
+11. SavePreChange — fires just before SQL writes to DB; all buffer manipulation done here
+12. Workflow — fires workflow triggers
+13. SavePostChange — fires AFTER data is committed to DB; use for downstream updates, notifications
+
+**Row operations:**
+- RowInsert — when user adds a new row to a grid
+- RowDelete — when user deletes a row from a grid
+- RowSelect — during the SELECT that loads data; can filter rows using DiscardRow()`,
+        pbLink:{title:"PeopleCode Events — PeopleCode Developer's Guide", url:"https://docs.oracle.com/cd/F28299_01/pt857pbr3/eng/pt/tpcd/task_PeopleCodeEvents-074aba.html"},
+      },
+      {
+        title:"Working with Fields and Records",
+        body:`The most fundamental PeopleCode operation is reading from and writing to fields in the Component Buffer.
+
+**Direct dot notation — most common approach:**
+\`/* Read a field value */
+Local String &dept;
+&dept = JOB.DEPTID.Value;
+
+/* Write a field value */
+JOB.DEPTID.Value = "HR001";
+
+/* Check if field is empty */
+If None(JOB.EMPLID.Value) Then
+   Error "Employee ID is required.";
+End-If;
+
+/* Gray out a field (prevent editing) */
+JOB.SALARY.Enabled = False;
+
+/* Hide a field completely */
+JOB.BONUS_AMT.Visible = False;
+
+/* Set a field to read-only display */
+JOB.HIRE_DT.DisplayOnly = True;\`
+
+**Using GetRecord to work with records as objects:**
+\`Local Record &recJob;
+&recJob = GetRecord(Record.JOB);
+
+/* Access fields on the record object */
+&recJob.DEPTID.Value = "FIN001";
+&recJob.JOBCODE.Value = "ANALYST";\`
+
+**System variables you use constantly:**
+\`%EmployeeId   /* current user's Employee ID */
+%OperatorId    /* current user's Operator ID (User ID) */
+%Date          /* today's date */
+%DateTime      /* current date and time */
+%Mode          /* component mode: A=Add, U=Update, etc. */
+%Component     /* name of current component */
+%Page          /* name of current page */\``,
+      },
+      {
+        title:"SQL in PeopleCode — SQLExec and CreateSQL",
+        body:`PeopleCode frequently needs to retrieve data from the database that is not already in the Component Buffer. Two built-in functions handle this: SQLExec (single row) and CreateSQL (multiple rows).
+
+**SQLExec — for single-row results:**
+\`/* Basic form: SQL, bind values, output variables */
+Local String &deptName;
+SQLExec("SELECT DESCR FROM PS_DEPT_TBL WHERE DEPTID = :1
+         AND EFFDT = (SELECT MAX(EFFDT) FROM PS_DEPT_TBL
+                      WHERE DEPTID = :1
+                      AND EFFDT <= %CurrentDateIn)",
+         JOB.DEPTID.Value,   /* bind :1 */
+         &deptName);          /* receives first column */
+
+/* If no row found, &deptName is empty string */
+If None(&deptName) Then
+   Warning "Department not found.";
+End-If;\`
+
+**CreateSQL — for multi-row results:**
+\`Local SQL &sql;
+Local String &empId, &name;
+
+&sql = CreateSQL("SELECT EMPLID, NAME FROM PS_NAMES_VW
+                  WHERE DEPTID = :1
+                  ORDER BY NAME",
+                  JOB.DEPTID.Value);
+
+While &sql.Fetch(&empId, &name)
+   /* process each row */
+   WinMessage(&empId | ": " | &name);
+End-While;
+&sql.Close();\`
+
+**Using %Table and %CurrentDateIn Meta-SQL:**
+\`/* %Table() = resolves to PS_<recordname> */
+SQLExec("SELECT DESCR FROM %Table(DEPT_TBL)
+         WHERE DEPTID = :1
+         AND EFFDT <= %CurrentDateIn",
+         &deptId, &descr);\`
+
+**Performance rule:** SQLExec in RowInit is dangerous. If your component loads 200 rows, RowInit fires 200 times — meaning 200 separate SQL calls. Pre-fetch data in PostBuild or use a View to join the data instead.`,
+      },
+      {
+        title:"Real Scenarios & Sample Code",
+        body:`Here are practical PeopleCode patterns you will use on real projects:
+
+**Scenario 1: Validate that salary is within the pay grade range (SaveEdit)**
+\`Local Number &minRate, &maxRate;
+
+SQLExec("SELECT MIN_RT, MAX_RT FROM PS_SAL_GRADE_TBL
+         WHERE SETID = :1 AND SAL_ADMIN_PLAN = :2
+         AND GRADE = :3 AND CURRENCY_CD = :4
+         AND EFFDT = (SELECT MAX(EFFDT) FROM PS_SAL_GRADE_TBL
+                       WHERE SETID = :1 AND SAL_ADMIN_PLAN = :2
+                       AND GRADE = :3 AND CURRENCY_CD = :4
+                       AND EFFDT <= %CurrentDateIn)",
+         JOB.SETID.Value, JOB.SAL_ADMIN_PLAN.Value,
+         JOB.GRADE.Value, JOB.CURRENCY_CD.Value,
+         &minRate, &maxRate);
+
+If JOB.COMPRATE.Value < &minRate Or
+   JOB.COMPRATE.Value > &maxRate Then
+   Error "Salary " | JOB.COMPRATE.Value |
+         " is outside the grade range (" |
+         &minRate | " - " | &maxRate | ")";
+End-If;\`
+
+**Scenario 2: Default Department from Position (FieldChange on POSITION_NBR)**
+\`/* When user enters a position number, auto-fill the department */
+Local String &deptId;
+SQLExec("SELECT DEPTID FROM PS_POSITION_DATA
+         WHERE POSITION_NBR = :1
+         AND EFFDT = (SELECT MAX(EFFDT) FROM PS_POSITION_DATA
+                       WHERE POSITION_NBR = :1
+                       AND EFFDT <= %CurrentDateIn)",
+         JOB.POSITION_NBR.Value, &deptId);
+
+If Not None(&deptId) Then
+   JOB.DEPTID.Value = &deptId;
+End-If;\`
+
+**Scenario 3: Show/hide a field based on Mode (PostBuild)**
+\`/* In Add mode — show the Hire Date field */
+/* In Update mode — gray it out */
+If %Mode = "A" Then
+   JOB.HIRE_DT.Visible = True;
+   JOB.HIRE_DT.Enabled = True;
+Else
+   JOB.HIRE_DT.DisplayOnly = True;
+End-If;\``,
+      },
+    ],
+  },
+  {
+    id:"buffer", module:4, num:"16",
+    title:"Component Buffer Basics",
+    summary:"The Component Buffer is the in-memory data structure that holds all data for the currently active component transaction. Understanding how the buffer is organized, how data flows in and out, and how Rowsets work is fundamental to PeopleCode development.",
+    preChecklist:["You understand PeopleCode basics and events (Topic 15)","You know what Records, Fields, and Components are","You understand the Component Processor lifecycle"],
+    realWorld:"<strong>Buffer vs Database — a critical distinction:</strong> A common support issue: 'I updated the field in PeopleCode but it shows the old value in the database.' The developer wrote to the buffer but the user navigated away without saving. PeopleCode writes to the buffer — only the Save action writes to the database. Understanding this distinction eliminates a whole class of debugging confusion.",
+    mistakes:[
+      {title:"Confusing buffer writes with database writes", desc:"Setting JOB.DEPTID.Value = 'HR001' in PeopleCode writes to the in-memory buffer, not the database. The database only updates when the Component Processor executes SavePreChange and commits the transaction."},
+      {title:"Using GetRowset() at Level 0 when you need Level 1 data", desc:"GetRowset() with no arguments returns the Level 0 rowset (1 row). To access grid/scroll data, you need GetRowset(Scroll.RECORDNAME). Beginners often loop over Level 0 and wonder why they only get one row."},
+      {title:"Not calling &sql.Close() after CreateSQL", desc:"Forgetting to close a SQL cursor created with CreateSQL leaves a database connection open. In components with repeated calls (like RowInit), this can exhaust the connection pool."},
+    ],
+    quiz:[
+      {q:"When does PeopleCode write data from the Component Buffer to the actual database?",options:["When any field value is changed","Every 30 seconds automatically","When the Component Processor executes SavePreChange during the Save operation","When the user navigates between tabs"],answer:2,explanation:"PeopleCode writes to the in-memory Component Buffer, not the database directly. The database only gets updated when the Component Processor executes SavePreChange — during the Save sequence. Until then, all changes exist only in memory."},
+      {q:"How do you get the Level 1 rowset (the first grid/scroll) in PeopleCode?",options:["GetRowset()","GetRowset(Scroll.RECORDNAME)","GetLevel1Rowset()","GetBuffer(1)"],answer:1,explanation:"GetRowset(Scroll.RECORDNAME) returns the Level 1 rowset for the named scroll/grid. GetRowset() with no arguments returns the Level 0 rowset (the primary record, always 1 row). You must specify the scroll name to get child rows."},
+      {q:"What property of a Rowset tells you how many active (non-deleted) rows it contains?",options:["RowCount","TotalRows","ActiveRowCount","Length"],answer:2,explanation:"ActiveRowCount returns the number of active rows in a Rowset, excluding rows that have been marked for deletion. RowCount includes deleted rows. Always use ActiveRowCount when iterating to avoid processing rows that will be deleted on Save."},
+    ],
+    keyPoints:[
+      "Component Buffer = memory area storing ALL data for the current open component",
+      "Buffer is organized hierarchically: Level 0 (primary record) → Level 1 (child rows) → Level 2+",
+      "Data loads into buffer when component opens · writes to DB only on Save",
+      "Rowset class = a collection of Rows · Row class = one row containing Record objects",
+      "GetRowset(), GetRow(), GetRecord(), ActiveRowCount are the core buffer navigation methods",
+    ],
+    sections:[
+      {
+        title:"What is the Component Buffer?",
+        body:`The Component Buffer is a memory-based data structure managed by the Component Processor within the Tuxedo App Server. When a user opens a PeopleSoft component, the Component Processor executes SQL statements to fetch all related data from the database and loads it into the Component Buffer.
+
+From that point on, everything the user sees and everything PeopleCode reads is coming from the buffer — not directly from the database. PeopleCode that sets JOB.DEPTID.Value is writing to the buffer, not the database. The buffer only writes to the database when the user clicks Save.
+
+**Why this matters:**
+This means that multiple field changes a user makes during a session are all temporary until Save. If a user changes 5 fields and then navigates away without saving, none of those changes persist. The Component Processor enforces atomicity — all changes succeed together or none of them do.
+
+**Buffer vs. Database:**
+When you write \`JOB.DEPTID.Value = "HR001"\` in a FieldChange event, you are modifying the in-memory buffer. The PS_JOB table in the database still has the old value. Only when SavePreChange fires does the Component Processor generate and execute the UPDATE (or INSERT for effective-dated records) SQL statement.`,
+      },
+      {
+        title:"Buffer Hierarchy — Scroll Levels",
+        diagram:"bufferlevels",
+        body:`The Component Buffer is organized in a hierarchical structure that mirrors the scroll levels on the page:
+
+**Level 0 — The Primary Record**
+Every component has exactly one Level 0 record. This is the "parent" record — for example, PERSONAL_DATA for the Personal Information component or JOB for Job Data. Level 0 always has exactly one row.
+
+**Level 1 — Child Rows (First Scroll)**
+Child records attached to Level 0 through a common key. A Grid or Scroll Area on the page corresponds to Level 1. There can be many rows. For example, in the Job Data component, the JOB record is actually at Level 1 (multiple effective-dated job rows) while EMPLOYMENT is Level 0.
+
+**Level 2+ — Grandchild Rows**
+Scrolls within scrolls — grids within grids. These are less common but exist in complex components like payroll or benefit enrollment.
+
+**PeopleCode to navigate the buffer:**
+\`/* Get Level 0 rowset */
+Local Rowset &rsLevel0;
+&rsLevel0 = GetRowset();  /* returns Level 0 rowset */
+
+/* Get Level 1 rowset (by scroll name) */
+Local Rowset &rsJob;
+&rsJob = GetRowset(Scroll.JOB);
+
+/* Get a specific row */
+Local Row &row;
+&row = &rsJob.GetRow(1);  /* first row */
+
+/* Get a record from the row */
+Local Record &recJob;
+&recJob = &row.GetRecord(Record.JOB);
+
+/* Access a field on the record */
+Local String &dept;
+&dept = &recJob.DEPTID.Value;\``,
+      },
+      {
+        title:"Rowset, Row, Record & Field — The Four Buffer Classes",
+        body:`PeopleSoft's buffer has four interrelated object classes. Understanding all four is necessary to work with multi-row data.
+
+**Rowset Class**
+A collection of Row objects. Think of it as a table or grid with multiple rows.
+Key properties and methods:
+- ActiveRowCount — number of data rows (excludes deleted rows)
+- RowCount — total rows including deleted
+- GetRow(n) — returns the nth Row object
+- InsertRow(n) — inserts a new row after position n
+- DeleteRow(n) — marks a row for deletion
+- Flush() — clears all rows from the rowset
+
+**Row Class**
+Represents one row within a Rowset. Contains one or more Record objects.
+Key methods:
+- GetRecord(Record.RECORDNAME) — returns the Record object
+- IsDeleted — True if row is marked for deletion
+- ChildCount — number of child rowsets
+- GetRowset(Scroll.RECORDNAME) — gets child rowset
+
+**Record Class**
+Represents all fields of a single record definition within a row.
+Key methods and properties:
+- GetField(Field.FIELDNAME) — returns the Field object
+- FIELDNAME.Value — direct field access (shortcut for GetField)
+- CopyFieldsByName(targetRecord) — copies matching field values to another record
+- ExecuteEdits() — runs field edits programmatically
+
+**Field Class**
+Represents an individual field within a record.
+Key properties:
+- Value — the actual data value (read/write)
+- Enabled — controls whether the field is editable
+- Visible — controls whether the field is displayed
+- DisplayOnly — shows value but prevents editing
+- Label — the text label shown next to the field
+- Style — CSS class applied to the field
+
+\`/* Complete example: iterate Level 1 rows */
+Local Rowset &rsJob;
+Local Row &row;
+Local Record &recJob;
+Local Integer &i;
+
+&rsJob = GetRowset(Scroll.JOB);
+
+For &i = 1 To &rsJob.ActiveRowCount
+   &row = &rsJob.GetRow(&i);
+   &recJob = &row.GetRecord(Record.JOB);
+
+   /* Now work with the record */
+   If &recJob.EMPL_STATUS.Value = "T" Then
+      &recJob.DEPTID.Enabled = False;
+   End-If;
+End-For;\``,
+        pbLink:{title:"PeopleCode API Reference — Rowset, Row, Record & Field Classes", url:"https://docs.oracle.com/cd/F28299_01/pt857pbr3/eng/pt/tpcr/concept_PeopleCodeBuiltInFunctionsAndLanguageConstructs-074b50.html"},
+      },
+    ],
+  },
+  /* ── MODULE 6 ── */
+  {
+    id:"ps-query", module:5, num:"17",
+    title:"PS Query Fundamentals",
+    summary:"PS Query is PeopleSoft's built-in ad-hoc reporting tool. It allows users to build SQL-based queries using a visual interface — no SQL knowledge required.",
+    preChecklist:["You understand what Records and Fields are (Topic 12)","You know how PeopleSoft security works at a basic level (Topic 20)","You've navigated PeopleSoft and seen reports or data listings"],
+    realWorld:"<strong>PS Query misuse is common:</strong> A poorly written PS Query joining PS_JOB to PS_PERSONAL_DATA without effective dating criteria ran for 45 minutes and brought the DEV database to a crawl. On a system with 200,000 employees and 15 years of history, PS_JOB alone can have 3 million rows. Every query against large tables must include key field criteria and effective date filters.",
+    mistakes:[
+      {title:"Joining tables in PS Query without effective dating criteria", desc:"PS_JOB, PS_DEPT_TBL, and most HCM tables have multiple rows per key due to effective dating. Without EFFDT criteria in your PS Query joins, you get a Cartesian explosion — one result row per historical row per join."},
+      {title:"Using Public Query for sensitive data", desc:"Public Queries are accessible to all users with Query access. Never create a Public Query that returns salary, SSN, or other sensitive data unless row-level security on the underlying tables restricts the results appropriately."},
+      {title:"Not checking the SQL tab before running a large query", desc:"Always click the SQL tab to review the generated SQL before running. A query that looks simple in the visual builder might generate an inefficient SQL statement with missing indexes."},
+    ],
+    quiz:[
+      {q:"What type of PS Query is accessible to all users who have Query access in their Permission List?",options:["User Query","Role Query","Public Query","Admin Query"],answer:2,explanation:"Public Queries are accessible to all users with Query access granted in their Permission List. User Queries are private (creator only). Role Queries are shared with users who have a specific Role assigned."},
+      {q:"What does a 'Prompt' do in a PS Query?",options:["Opens a new browser window","Makes the query run faster","Creates a parameter that users enter at runtime, making the query reusable","Sends an email when the query runs"],answer:2,explanation:"Prompts make PS Queries dynamic. Instead of hardcoding a value in a criterion, you define a Prompt — the user enters the value each time they run the query. This lets one query serve many use cases (e.g., run for any department, any date range)."},
+    ],
+    keyPoints:[
+      "PS Query generates SQL — always check the SQL tab to understand what it produces",
+      "Three query types: User (private), Role (shared with a role), Public (all users)",
+      "Prompts make queries dynamic — users enter criteria values at run time",
+      "PS Query respects row-level security automatically when run online",
+      "Connected Queries link a parent and child query for master-detail reports",
+    ],
+    sections:[
+      {
+        title:"Building a PS Query — Step by Step",
+        body:`PS Query is accessed via Reporting Tools → Query → Query Manager in the PeopleSoft menu.
+
+**Step 1 — Select Records (the base tables)**
+Click "Add Record" and search for the PeopleSoft records (tables) you need. PS Query shows a list of all accessible records. Add the primary record first (e.g., PS_JOB for employee job data).
+
+**Step 2 — Join Related Records**
+Add additional records that you need to join. PS Query automatically suggests joins based on common fields (matching field names and types). You can accept the suggested join or manually define the join condition. Join types: Standard (INNER JOIN), Left Outer, Right Outer, Full Outer.
+
+**Step 3 — Select Output Fields**
+In the "Fields" tab, check the boxes next to the fields you want in your query output. Each selected field becomes a column in the results. You can rename columns, apply aggregate functions (SUM, COUNT, MAX, AVG), and format numeric output.
+
+**Step 4 — Add Criteria (WHERE clause)**
+In the "Criteria" tab, add filters to limit the data. Each criterion becomes a condition in the SQL WHERE clause. You can use operators: =, !=, <, >, BETWEEN, IN, LIKE, IS NULL, etc. Multiple criteria are combined with AND/OR.
+
+**Step 5 — Add Prompts (run-time parameters)**
+Instead of hardcoding a value in a criterion, make it a Prompt — a field where the user enters the value each time they run the query. This makes the query reusable for different parameters (different departments, different date ranges).
+
+**Step 6 — Set Output Order (ORDER BY)**
+In the "Having" tab (or field properties), specify sort order for results.
+
+**Step 7 — View SQL and Test**
+ALWAYS click the "SQL" tab to review the generated SQL. This shows exactly what query PS Query will execute. Verify it looks correct — especially that effective dating criteria are included for date-effective records.
+
+Run the query with sample data to validate results.`,
+        pbLink:{title:"PeopleTools: PS/nVision and PeopleSoft Query — Query Manager", url:"https://docs.oracle.com/cd/F28299_01/pt857pbr3/eng/pt/tqry/concept_PeopleSoftQueryOverview-0750c0.html"},
+      },
+      {
+        title:"Query Security & Access Control",
+        body:`**Query Types and Sharing:**
+
+- **User Queries** — Private. Only visible and accessible to the user who created them. Good for personal one-time queries or work-in-progress.
+
+- **Role Queries** — Shared with all users who have a specific PeopleSoft Role. The creator assigns the query to a Role. Any user with that Role can run (but not necessarily edit) the query.
+
+- **Public Queries** — Accessible to all users who have Query access in their Permission List. Typically used for organization-wide standard reports.
+
+**Row-Level Security:**
+When PS Query runs online (in the browser), it automatically respects PeopleSoft's row-level security. If a user only has access to departments 100 and 200, running a query on PS_JOB will only return employees in those departments.
+
+Important: When PS Query is scheduled as a batch process through Process Scheduler, it runs in the context of the submitting user's security. This means the same query can return different data depending on who submits it.
+
+**Query Access Trees:**
+Query access is controlled in Permission Lists via Query Trees. A Query Tree is a hierarchical structure of record groups. Users can only build queries against records in the Query Trees assigned to their permission lists. This prevents users from querying sensitive tables they should not see.
+
+**Query Viewer vs Query Manager:**
+- Query Viewer — read-only access. Users can run existing queries but cannot create or modify them.
+- Query Manager — full access. Users can create, edit, save, and run queries. Should be restricted to trained users.`,
+      },
+    ],
+  },
+  {
+    id:"translate-prompt", module:5, num:"18",
+    title:"Translate Values & Prompt Tables",
+    summary:"Two mechanisms control what values are valid for a field: Translate Values (for short, fixed lists) and Prompt Tables (for longer, database-driven lists). Understanding both is essential for any PeopleSoft developer or configurator.",
+    preChecklist:["You understand Records & Fields (Topic 12)","You've used drop-down fields in PeopleSoft as a user","You know what a lookup (prompt) icon looks like on a PeopleSoft page"],
+    realWorld:"<strong>Inactivating vs deleting Translate Values:</strong> A client wanted to remove the 'Contract' employment type from a drop-down. Deleting the XLAT value would break every historical record that used it. The correct approach is to set the Effective Date to today with Status = Inactive — it disappears from the drop-down for new entries but remains valid for historical records.",
+    mistakes:[
+      {title:"Deleting a Translate Value that is already used in production data", desc:"Never delete an XLAT value that exists in live data. Set it to Inactive instead. Deleting breaks existing records that reference that value and can cause page errors."},
+      {title:"Using a Translate Value for a list that has more than 4-character codes", desc:"Translate Values are limited to 4-character codes. If your valid values need longer codes (e.g., country codes, GL account types), use a Prompt Table backed by a database record instead."},
+    ],
+    quiz:[
+      {q:"What is the maximum field value length for Translate Values (XLAT)?",options:["1 character","4 characters","10 characters","30 characters"],answer:1,explanation:"Translate Values are limited to a maximum of 4 characters for the code value. If your valid values need longer codes, use a Prompt Table (database-backed lookup) instead."},
+      {q:"When should you use a Prompt Table instead of Translate Values for field validation?",options:["When the values change frequently or there are many values stored in a database table","When you want a Drop Down control","When the field is numeric","When the values are less than 4 characters"],answer:0,explanation:"Use a Prompt Table when valid values come from a database table (like departments, job codes, locations) — especially when there are many values or they change frequently. Use Translate Values for small, stable code lists (like status, gender, full/part time)."},
+    ],
+    keyPoints:[
+      "Translate Values = a special PeopleTools table for short code lists (max 4 characters)",
+      "Translate Values are effective-dated — you can add new values or inactivate old ones",
+      "Prompt Table = a record or view used to validate field input from a database table",
+      "A Drop Down field uses Translate Values · An Edit Box with prompt uses a Prompt Table",
+      "Prompt Tables can be static (set in field definition) or dynamic (set via PeopleCode)",
+    ],
+    sections:[
+      {
+        title:"Translate Values — The XLAT Table",
+        body:`Translate Values (often called XLAT values) are stored in the PSXLATITEM table — a universal lookup table built into PeopleTools. They are used for short, relatively stable code lists.
+
+**Characteristics of Translate Values:**
+- Field values must be 4 characters or less
+- Each field can have its own set of translate values
+- Values are effective-dated — you can mark an old value as Inactive rather than deleting it
+- Values have both a short name (the code) and a long name (the display description)
+
+**Examples of fields using Translate Values:**
+- EMPL_STATUS: A=Active, I=Inactive, L=Leave, S=Suspended, T=Terminated
+- ACTION: HIR=Hire, TER=Termination, PRO=Promotion, PAY=Pay Rate Change, XFR=Transfer
+- FULL_PART_TIME: F=Full-Time, P=Part-Time
+- GENDER: M=Male, F=Female, U=Unknown
+
+**How to manage Translate Values:**
+In Application Designer, open a Field definition. Go to the Translate Values tab. Add, modify, or inactivate values here. The Effective Date controls when a value becomes available or inactive.
+
+**On pages:**
+Fields bound to XLAT values display as Drop Down lists in the browser. The user sees the long description (e.g., "Full-Time") but the database stores the short code (e.g., "F").
+
+**In PeopleCode:**
+\`/* Read a translate value description */
+Local String &statusDescr;
+SQLExec("SELECT XLATLONGNAME FROM PSXLATITEM
+         WHERE FIELDNAME = 'EMPL_STATUS'
+         AND FIELDVALUE = :1
+         AND EFFDT = (SELECT MAX(EFFDT) FROM PSXLATITEM
+                       WHERE FIELDNAME = 'EMPL_STATUS'
+                       AND FIELDVALUE = :1
+                       AND EFFDT <= %CurrentDateIn)",
+         JOB.EMPL_STATUS.Value, &statusDescr);\``,
+        pbLink:{title:"Application Designer Developer's Guide — Translate Values", url:"https://docs.oracle.com/cd/F70250_01/psft/pdf/pt860tapd-b092022.pdf"},
+      },
+      {
+        title:"Prompt Tables — Database-Driven Validation",
+        body:`Prompt Tables (also called lookup tables or edit tables) are used when the valid values come from a database table rather than the Translate Values list. Prompt Tables handle fields with larger code sets that change frequently.
+
+**Examples of Prompt Table fields:**
+- DEPTID — validated against PS_DEPT_TBL (hundreds to thousands of departments)
+- JOBCODE — validated against PS_JOBCODE_TBL
+- LOCATION — validated against PS_LOCATION_TBL
+- CURRENCY_CD — validated against CURRENCY_CD_TBL
+
+**How a Prompt Table works:**
+When a user tabs out of a field that has a Prompt Table defined, PeopleSoft checks whether the entered value exists in that table (as of the effective date). If not found, an error appears.
+
+When the user clicks the lookup button (magnifying glass icon) next to the field, PeopleSoft opens a pop-up search dialog showing available values from the Prompt Table. The user can scroll through or search the list and click a value to populate the field.
+
+**Defining a Prompt Table in App Designer:**
+In the Record Field Properties for a field:
+- Edit Type: Prompt Table Edit
+- Prompt Table: the name of the record to validate against
+
+The Prompt Table must have its Search Keys defined — these determine what columns appear in the lookup dialog.
+
+**Dynamic Prompt Tables (set via PeopleCode):**
+Sometimes the valid values depend on another field's value. For example, the valid Job Codes might depend on the selected Department. PeopleCode in FieldChange can dynamically change the Prompt Table:
+\`/* In DEPTID FieldChange — change the JOBCODE prompt table */
+JOB.JOBCODE.PromptTable = "DEPT_JOBCODE_VW";\`
+
+This is a powerful technique for implementing cascading field validation.`,
+      },
+    ],
+  },
+  /* ── MODULE 7 ── */
+  {
+    id:"process-monitor", module:6, num:"19",
+    title:"Process Monitor & Report Manager",
+    summary:"Every batch job, report, and scheduled process in PeopleSoft runs through Process Scheduler. Process Monitor and Report Manager are the tools users and administrators use to submit, track, and view process output.",
+    preChecklist:["You understand what batch processing means at a high level","You've read PeopleTools Overview (Topic 03)","No development experience needed — this is an operational topic"],
+    realWorld:"<strong>Payroll runs on Process Scheduler:</strong> Processing payroll for 50,000 employees is not done by a user clicking through screens. It's a Process Scheduler job that runs overnight, processes millions of calculations, and deposits the output into Report Repository by morning. Understanding Process Monitor is how payroll admins verify the run succeeded — or diagnose why it failed at 2 AM.",
+    mistakes:[
+      {title:"Running batch processes manually from the command line in production", desc:"Never run SQR, AE, or COBOL processes manually from the server command line in production. Always use Process Scheduler. Manual runs bypass logging, output management, and Run Control parameter passing."},
+      {title:"Not checking the process log when a process shows Error status", desc:"The Process Monitor status 'Error' tells you something went wrong but not what. Always click into the process details and view the log file. The actual error message is in the log, not the status."},
+      {title:"Submitting the same process multiple times thinking it didn't run", desc:"Beginners often resubmit a process because it stayed in 'Queued' status. Check Process Monitor first — the original submission may be queued waiting for a server slot. Double submissions cause duplicate output and wasted processing."},
+    ],
+    quiz:[
+      {q:"What does a 'No Success' status mean in Process Monitor?",options:["The process failed with an error","The process completed but encountered a data condition (e.g., no records to process)","The process is still running","The process was cancelled by a user"],answer:1,explanation:"'No Success' means the process completed its execution without a system error, but encountered a data condition that prevented normal processing — for example, a report found no data matching the criteria. It is distinct from 'Error' which means the process crashed."},
+      {q:"What is the purpose of a Run Control?",options:["To control who can run a process","A database record that stores the parameters a user enters before submitting a batch process","To schedule a process to run at a specific time","To control the server a process runs on"],answer:1,explanation:"A Run Control is a database record that stores the parameters entered before running a batch process. Processes cannot prompt the user interactively while running, so they read their parameters (date ranges, departments, etc.) from the saved Run Control table."},
+    ],
+    keyPoints:[
+      "Process Monitor: PeopleTools → Process Scheduler → Process Monitor — see all job statuses",
+      "Status flow: Queued → Initiated → Processing → Success / Error / No Success",
+      "Report Manager: PeopleTools → Process Scheduler → Report Manager — view output files",
+      "Run Control: the page where users enter parameters before submitting a process",
+      "Process Types: Application Engine, SQR Report, BI Publisher, COBOL, Crystal, nVision",
+    ],
+    sections:[
+      {
+        title:"Process Scheduler — How Batch Jobs Work",
+        body:`Process Scheduler is the PeopleSoft engine that manages execution of all batch processes. It operates independently of the web/app server to ensure batch jobs don't interfere with online user performance.
+
+**The full lifecycle of a process request:**
+
+1. **User submits a process** — the user fills in a Run Control page with parameters (date range, report scope, etc.), clicks Save, then clicks Run. A dialog asks for server, output type (PDF, Excel, etc.), and format.
+
+2. **Request recorded** — a row is inserted into PS_PSPRCSRQST (the Process Request table) with status "Queued."
+
+3. **Process Scheduler picks it up** — the PSPRCSRV daemon monitors PS_PSPRCSRQST. When it finds a Queued request and an available server slot, it updates the status to "Initiated" and spawns the process.
+
+4. **Process executes** — the Application Engine, SQR, or other process type runs on the batch server. The status updates to "Processing."
+
+5. **Completion** — when finished, the status becomes "Success" (completed normally), "No Success" (completed but with no data/errors to report), or "Error" (failed with errors). The Distribution Agent moves output files to the Report Repository.
+
+6. **User views output** — the user opens Report Manager to find and view their output files.`,
+        pbLink:{title:"PeopleTools: Process Scheduler — Using Process Monitor", url:"https://docs.oracle.com/cd/F28299_01/pt857pbr3/eng/pt/tpsc/concept_UnderstandingPeopleSoftProcessScheduler-074aa0.html"},
+      },
+      {
+        title:"Using Process Monitor",
+        body:`Process Monitor (PeopleTools → Process Scheduler → Process Monitor) is where you track the status of submitted processes.
+
+**What Process Monitor shows:**
+- Process instance number (unique identifier for each submission)
+- Process Name and Description
+- Server name it's running on
+- Run Date/Time — when it was submitted and when it ran
+- Status — Queued, Initiated, Processing, Success, No Success, Error, Hold, Cancel, Delete
+- Run Status — a more detailed status for in-progress jobs
+- Distribution Status — whether output has been distributed to Report Repository
+
+**Refreshing the view:**
+Process Monitor shows a snapshot. Click "Refresh" to update. For active processes, set Auto-Refresh to update every 30 seconds.
+
+**Viewing process details:**
+Click on any process to see its detail page. From here you can:
+- View the process log (messages, errors, execution steps)
+- View trace files (if SQL trace was enabled)
+- Cancel or hold a queued process
+- Restart a failed Application Engine process from its last checkpoint
+
+**Common statuses explained:**
+- Queued: waiting for an available server slot
+- Initiated: Process Scheduler has started it, waiting for OS to spawn the process
+- Processing: actively executing
+- Success: completed without errors
+- No Success: completed but encountered a data condition (e.g., no records to process)
+- Error: failed with an error — check the log file for details`,
+      },
+      {
+        title:"Report Manager & Run Controls",
+        body:`**Report Manager**
+Report Manager (PeopleTools → Process Scheduler → Report Manager) is where users access output files from completed processes.
+
+When a process completes, the Distribution Agent (PSDSTSRV) automatically copies output files from the batch server to the Report Repository. The output is stored and accessible through the Report Manager web interface.
+
+Report Manager shows:
+- Report name and description
+- The process that generated it
+- Run date/time
+- Output format (PDF, XLS, CSV, HTML, TXT)
+- A link to view or download the file
+
+Output files are retained in Report Repository for a configurable number of days (typically 7-30 days) before being purged.
+
+**Run Controls**
+A Run Control is a database record that stores the parameters a user enters before running a process. Run Controls solve a key problem: batch processes cannot ask the user for input while running. So the user enters their parameters on a Run Control page in advance, saves them, and the process reads them from the database.
+
+Run Controls are keyed by OPRID (user ID) and RUN_CNTL_ID (a user-defined name). A user can have multiple saved run controls for the same process with different parameters. For example, a payroll administrator might have run controls named "WEEKLY_USA", "BIWEEKLY_CAN", and "MONTHLY_GBR" for different pay group runs.
+
+**Creating a Run Control:**
+1. Navigate to the process's run control page (e.g., Payroll → Pay Period Processing → Run Control)
+2. Click "Add" and give the run control an ID
+3. Enter parameters (dates, departments, pay groups, etc.)
+4. Click Save
+5. Click Run → select server and output → click OK
+6. Track in Process Monitor`,
+      },
+    ],
+  },
+  {
+    id:"security-basics", module:6, num:"20",
+    title:"PeopleSoft Security Basics",
+    summary:"PeopleSoft security controls what users can access, what they can do, and which data they can see. The security model uses a four-level hierarchy — User Profiles, Roles, Permission Lists, and Row-Level Security — giving administrators fine-grained control over access.",
+    preChecklist:["You understand what Components and Pages are (Topic 09)","You've navigated PeopleSoft and noticed some pages you could/couldn't access","You understand the concept of role-based access control"],
+    realWorld:"<strong>Security misconfiguration is the most common production incident:</strong> A new HR coordinator was given the wrong Role during onboarding — one that included payroll viewing access. She could see all employee salaries for the entire company. This was caught in audit 3 months later. PeopleSoft's security is powerful but only as strong as the initial Role design. On real projects, security design takes weeks and involves HR, legal, and IT compliance teams.",
+    mistakes:[
+      {title:"Assigning the PeopleSoft Administrator permission list to business users", desc:"PTPT1000 (or ALLPAGES) grants access to everything including Application Designer and Data Mover. Only technical administrators should ever have this. Assigning it to a business user creates a serious security vulnerability."},
+      {title:"Forgetting to include row-level security on custom components showing employee data", desc:"A custom component that uses PS_JOB directly as its Search Record (instead of a security view) bypasses row-level security. Any user with page access sees all employees — regardless of their department security settings."},
+      {title:"Testing security only with a super-user account", desc:"Always test new components by logging in as a test user with the actual role the business users will have. Super-user accounts bypass many security checks. What works for admin may be completely blocked for the actual user."},
+    ],
+    quiz:[
+      {q:"In PeopleSoft's security hierarchy, what object contains the actual page access definitions?",options:["User Profile","Role","Permission List","Department Security Tree"],answer:2,explanation:"Permission Lists contain the actual security definitions — which components are accessible, in which modes (Add, Update, Display), which processes can be run, and which PS Query trees are accessible. Roles are bundles of Permission Lists. User Profiles are assigned Roles."},
+      {q:"What is row-level security in PeopleSoft?",options:["A security setting that controls which rows of SQL you can write","A mechanism that controls which DATA rows (records) a user can see, not just which pages they can access","A database table that stores security rules","A PeopleCode function that checks user permissions"],answer:1,explanation:"Row-level security controls which data rows a user can see within a component they have page access to. An HR admin might have access to the Job Data component but only see employees in their authorized departments — enforced through security views joined to the search record."},
+      {q:"A user can see a PeopleSoft page but cannot save changes. What is the most likely cause?",options:["The user's password has expired","The component's Permission List access is set to 'Display Only' instead of 'Update/Display'","The database is read-only","The App Server is down"],answer:1,explanation:"When a user can see a page but not save, the most common cause is the component access mode in their Permission List is set to 'Display Only' rather than 'Update/Display'. Display Only grants read access only — no saves are possible regardless of what the user changes on screen."},
+    ],
+    keyPoints:[
+      "User Profile → Roles → Permission Lists: the 3-level assignment chain",
+      "Permission Lists define page access (Add/Update/Display modes), process access, and query access",
+      "Row-level security controls which DATA rows a user can see — not just which pages",
+      "Department Security Trees implement row-level security in HCM by org hierarchy",
+      "Never assign the PeopleSoft Administrator permission list to regular business users",
+    ],
+    sections:[
+      {
+        title:"The Security Hierarchy",
+        body:`PeopleSoft's security model has four distinct levels, each serving a different purpose:
+
+**Level 1 — User Profile**
+The individual user account in PeopleSoft. Defined in Security → User Profiles. Each User Profile has:
+- User ID and password
+- Email address
+- Primary Permission List (for system-level access)
+- Row Security Permission List (for data-level access)
+- One or more Roles assigned
+
+User Profiles in HCM are typically linked to an employee's EMPLID, though service accounts and integration users are not linked to employees.
+
+**Level 2 — Roles**
+Roles are bundles of Permission Lists. Instead of assigning Permission Lists directly to users (which would be unmanageable at scale), you assign Roles. A Role like "HR Manager" collects all the Permission Lists relevant to that function.
+
+Roles make security administration practical: to change what all HR Managers can do, you update the Role once instead of updating thousands of user profiles.
+
+A user can have multiple roles, and their effective access is the union of all Permission Lists across all their Roles.
+
+**Level 3 — Permission Lists**
+Permission Lists are the actual security definitions. They specify exactly what a user with that permission can do. A Permission List contains:
+- **Page Permissions** — which Components are accessible and in which modes (Add, Update/Display, Display Only)
+- **PeopleTools Permissions** — access to developer tools (Application Designer, Data Mover, Query Manager, etc.)
+- **Process Groups** — which batch processes the user can submit
+- **Query Access Trees** — which database tables the user can query in PS Query
+- **Web Services** — which Integration Broker service operations the user can call
+- **Sign-on Times** — optional time-of-day and day-of-week access restrictions
+
+**Level 4 — Row-Level Security (Data Permissions)**
+Controls which rows of data a user can see. Implemented separately from page-level security. A user might have permission to access the Job Data component but only see employees in their own department — even though the component shows the same page to everyone.`,
+        pbLink:{title:"PeopleTools: Security Administration — Understanding PeopleSoft Security", url:"https://docs.oracle.com/cd/F28299_01/pt857pbr3/eng/pt/tsec/concept_UnderstandingPeopleSoftSecurity-074ac9.html"},
+      },
+      {
+        title:"Row-Level Security in HCM",
+        body:`Row-level security in PeopleSoft HCM is primarily implemented through Department Security Trees. This allows HR administrators to control which employees each HR user can see and update based on organizational hierarchy.
+
+**How it works:**
+PeopleSoft maintains a security table (typically named with a _SEC or _SRCH_VW suffix) for each application area. This table joins the data table with the user's security profile. When a query runs against Job Data, PeopleSoft automatically joins to the security view, filtering out any employees the user is not authorized to see.
+
+**Department Security Tree:**
+An organizational tree where each node is a department. Users are granted access to specific tree nodes (branches). If a user is granted access to "West Region" in the security tree, they automatically have access to all departments within West Region — including any new departments added to that branch in the future.
+
+**Row Security Permission List:**
+The Row Security Permission List on a user's profile defines their data permissions. Unlike regular permission lists (which control page access), this one controls data access.
+
+**For developers:**
+When building a custom component that displays employee data, you MUST use a security view as the Search Record (not the raw PS_JOB table). Forgetting to do this means any user with access to your component can see all employee data regardless of their row security permissions. This is a critical security requirement.
+
+**Checking what a user can see:**
+To test row-level security: log in as the test user and navigate to the component. The search results should only show records within that user's authorized scope. If you see all data, the security view is missing or incorrectly configured.`,
+      },
+      {
+        title:"Common Security Tasks",
+        body:`**Creating a New User:**
+Security → User Profiles → Add a New Value
+Enter User ID, set password, assign email, select primary Permission List, assign Roles. In HCM, link to an Employee ID if the user is an employee.
+
+**Creating a Permission List:**
+Security → Permission Lists → Add
+Configure page permissions (add components with appropriate access modes), process groups, and query trees. Give it a descriptive name following your organization's naming convention.
+
+**Creating a Role:**
+Security → Roles → Add
+Add Permission Lists to the Role. Name it descriptively (e.g., "HCM_HR_MANAGER" not just "ROLE1").
+
+**Troubleshooting "you are not authorized" errors:**
+1. Check the user's Roles — do they have the correct Role?
+2. Check the Role's Permission Lists — is the component listed?
+3. Check the component's access mode — is Update/Display granted (not just Display)?
+4. Check if the component is registered in the Portal and accessible via a CREF
+5. Check row-level security — the user might have page access but not data access
+
+**The PeopleSoft Administrator Permission List:**
+PTPT1000 (or similar names like ALLPAGES) is the super-user permission list that grants access to everything including developer tools. NEVER assign this to business users. It should only be assigned to technical administrators and developers in non-production environments.`,
+      },
+    ],
+  },
+];
+
+const QUIZ_BANK = [
+  /* ── HISTORY & INTRODUCTION (10) ── */
+  {cat:"History & Introduction",q:"In what year was PeopleSoft founded?",opts:["1982","1987","1992","1995"],ans:1,exp:"PeopleSoft was founded in 1987 by Dave Duffield and Ken Morris in Pleasanton, California. Their first product was a client-server HR payroll application."},
+  {cat:"History & Introduction",q:"Who founded PeopleSoft?",opts:["Larry Ellison","Dave Duffield and Ken Morris","Craig Conway and Mark Hurd","Safra Catz and Jeff Henley"],ans:1,exp:"Dave Duffield and Ken Morris co-founded PeopleSoft in 1987. Duffield later founded Workday after Oracle's acquisition."},
+  {cat:"History & Introduction",q:"Oracle acquired PeopleSoft for approximately how much?",opts:["$2.1 billion","$5.8 billion","$10.3 billion","$15 billion"],ans:2,exp:"Oracle acquired PeopleSoft in January 2005 for $10.3 billion after an 18-month hostile takeover battle that started in June 2003."},
+  {cat:"History & Introduction",q:"Which PeopleSoft version first introduced browser-based access (PIA)?",opts:["PeopleSoft 6","PeopleSoft 7","PeopleSoft 8","PeopleSoft 9"],ans:2,exp:"PeopleSoft 8 (2000) introduced Pure Internet Architecture (PIA). Users no longer needed to install the desktop client — any browser could access PeopleSoft."},
+  {cat:"History & Introduction",q:"What does PeopleSoft metadata-driven architecture mean?",opts:["All code is stored in text files on the server","Every page, field and workflow is defined as metadata in database tables, not hardcoded files","PeopleSoft uses JSON files to drive the UI","Developers write SQL directly to create forms"],ans:1,exp:"PeopleSoft is metadata-driven — every Record, Page, Component, and PeopleCode program is stored as metadata in PeopleTools system tables. The runtime engine reads this metadata to generate pages and execute logic."},
+  {cat:"History & Introduction",q:"What is PeopleSoft Update Manager (PUM)?",opts:["A tool to monitor server performance","Oracle's selective patching system allowing organizations to pick specific fixes from a PeopleSoft Image","A backup utility for PeopleSoft databases","A deployment tool for moving code to production"],ans:1,exp:"PUM (introduced ~2014) replaced old bundle patching. Organizations download a PeopleSoft Image VM, browse available updates, and selectively apply only the fixes and features they need."},
+  {cat:"History & Introduction",q:"Which product did Dave Duffield found AFTER leaving Oracle?",opts:["SAP SuccessFactors","ServiceNow","Workday","Ceridian"],ans:2,exp:"After the Oracle acquisition of PeopleSoft, Dave Duffield founded Workday — now one of PeopleSoft HCM's primary cloud competitors."},
+  {cat:"History & Introduction",q:"PeopleSoft HCM is primarily used for:",opts:["Financial reporting and budgeting","Managing the complete employee lifecycle — hire to retire","Supply chain and inventory management","Customer relationship management"],ans:1,exp:"PeopleSoft HCM (Human Capital Management) manages the complete employee lifecycle — recruiting, onboarding, job data, compensation, benefits, payroll, time & labor, absence, and talent management."},
+  {cat:"History & Introduction",q:"Which PeopleTools version introduced Fluid UI?",opts:["PT 8.49","PT 8.51","PT 8.53","PT 8.57"],ans:2,exp:"Fluid UI was introduced in PeopleTools 8.53. It replaced the Classic fixed-width HTML interface with a responsive HTML5/CSS3 design that works on mobile, tablet, and desktop."},
+  {cat:"History & Introduction",q:"PeopleSoft can be deployed on:",opts:["On-premise only","Oracle Cloud (OCI) only","Both on-premise and Oracle Cloud Infrastructure (OCI)","Only on Amazon AWS"],ans:2,exp:"PeopleSoft supports both on-premise deployment and Oracle Cloud Infrastructure (OCI). Organizations running on OCI still maintain full control of their customizations."},
+
+  /* ── ARCHITECTURE & PIA (12) ── */
+  {cat:"Architecture & PIA",q:"In PeopleSoft three-tier architecture, where does all PeopleCode execute?",opts:["In the browser","In the WebLogic web server","In the Tuxedo Application Server","In the Oracle database"],ans:2,exp:"All PeopleCode executes in the Tuxedo Application Server (Tier 2). The browser is a pure display layer with no business logic."},
+  {cat:"Architecture & PIA",q:"What protocol does WebLogic use to communicate with the Tuxedo App Server?",opts:["HTTP","SOAP","JOLT","JDBC"],ans:2,exp:"WebLogic communicates with Tuxedo using JOLT (Java Object Linking and Transactions). The JOLT port is typically 9000."},
+  {cat:"Architecture & PIA",q:"What is PSAPPSRV responsible for?",opts:["Handling file uploads","Executing PeopleCode, Component Processor operations, and SQL generation","Managing DB connections only","Serving static HTML files"],ans:1,exp:"PSAPPSRV is the core Application Server process in Tuxedo. It handles component buffer operations, PeopleCode execution, and SQL generation."},
+  {cat:"Architecture & PIA",q:"What does PSQRYSRV handle?",opts:["Queue management for batch jobs","PS Query execution","Security validation","Report distribution"],ans:1,exp:"PSQRYSRV is dedicated to PS Query execution, separating query processing from component processing handled by PSAPPSRV."},
+  {cat:"Architecture & PIA",q:"In 2-tier App Designer mode, the connection goes:",opts:["Through the App Server","Directly to the database","Through WebLogic","Through the Process Scheduler"],ans:1,exp:"In 2-tier mode, Application Designer connects directly to the database, bypassing the App Server. In 3-tier, it connects via the App Server using JOLT."},
+  {cat:"Architecture & PIA",q:"Which web server is the ONLY supported option in PeopleTools 8.59+?",opts:["Apache Tomcat","IBM WebSphere","Oracle WebLogic","Microsoft IIS"],ans:2,exp:"As of PeopleTools 8.59, Oracle WebLogic is the only supported web server for PeopleSoft."},
+  {cat:"Architecture & PIA",q:"What does Process Scheduler (PSPRCSRV) do?",opts:["Manages user sessions","Runs batch jobs like App Engine, SQR, BI Publisher outside the online session","Handles DB connection pooling","Manages file uploads"],ans:1,exp:"Process Scheduler manages all batch process execution independently from the online web/app server to prevent batch jobs from affecting online user performance."},
+  {cat:"Architecture & PIA",q:"What is the Distribution Agent (PSDSTSRV)?",opts:["A tool for distributing updates","Moves completed batch output files to the Report Repository","A load balancer","A security component"],ans:1,exp:"PSDSTSRV transfers completed report output files from the batch server to the Report Repository, making them accessible in Report Manager."},
+  {cat:"Architecture & PIA",q:"Where is PeopleSoft application metadata stored?",opts:["XML files on the web server","In the database in PeopleTools system tables","In App Server memory cache","In flat files on the batch server"],ans:1,exp:"All PeopleSoft metadata — Records, Fields, Pages, Components, PeopleCode — is stored in the database in PeopleTools system tables like PSRECDEFN, PSDBFIELD, PSPNLDEFN."},
+  {cat:"Architecture & PIA",q:"What is a PeopleSoft DPK?",opts:["Dynamic Page Kit","Deployment Package — Puppet-based scripts automating environment installation","Database Patching Kit","Developer Process Kit"],ans:1,exp:"DPK (Deployment Package) uses Puppet scripts to automate PeopleSoft environment setup. Standard from PT 8.55+, reducing multi-day manual installs to hours."},
+  {cat:"Architecture & PIA",q:"What is a PeopleSoft Domain?",opts:["A business unit grouping","An instance of the Tuxedo App Server or Process Scheduler","The database schema","A set of navigation menus"],ans:1,exp:"A Domain is an instance of either the Tuxedo Application Server or Process Scheduler. A standard environment has one App Server domain and one Process Scheduler domain."},
+  {cat:"Architecture & PIA",q:"What happens atomically when a user saves in PeopleSoft?",opts:["Fields write one by one","All pages validate, SavePreChange fires, ALL data commits as one transaction, SavePostChange fires","Only the visible page saves","Browser writes data directly to DB"],ans:1,exp:"On Save: SaveEdit validates, SavePreChange fires before commit, ALL component data commits atomically to DB, then SavePostChange fires. Either all succeeds or none does."},
+
+  /* ── PEOPLECODE BASICS & EVENTS (16) ── */
+  {cat:"PeopleCode Basics",q:"Which PeopleCode event fires ONCE after the entire component is fully loaded?",opts:["RowInit","FieldDefault","PostBuild","SearchInit"],ans:2,exp:"PostBuild fires once after all RowInit and FieldDefault events have run. Best place for show/hide logic and component-level initialization."},
+  {cat:"PeopleCode Basics",q:"Which event is correct for final business rule validation before saving?",opts:["FieldChange","RowInit","PostBuild","SaveEdit"],ans:3,exp:"SaveEdit fires during the save sequence. Error() in SaveEdit stops the save and highlights the problem. Standard location for cross-field business rules."},
+  {cat:"PeopleCode Basics",q:"What is the main performance risk of SQLExec in RowInit?",opts:["SQLExec not supported in RowInit","RowInit fires for every row — SQLExec causes N+1 queries","SQLExec commits data early","It causes a deadlock"],ans:1,exp:"RowInit fires for EVERY row in EVERY grid. SQLExec in RowInit = one SQL per row. 200 rows = 200 SQLs. Most common performance anti-pattern in PeopleSoft."},
+  {cat:"PeopleCode Basics",q:"Which function handles queries returning MULTIPLE rows?",opts:["SQLExec","FetchSQL","CreateSQL with .Fetch() in a While loop","MultiRowSQL"],ans:2,exp:"CreateSQL returns a SQL object. Use While &sql.Fetch() to iterate rows. Always call .Close() when done. SQLExec only returns the first matching row."},
+  {cat:"PeopleCode Basics",q:"What does Component scope mean for a variable?",opts:["Exists only for one function call","Persists for the entire component transaction","Available across all components in the session","Stored in the database"],ans:1,exp:"Component scope variables persist from component open to save/cancel. Any event in that component can read and write them. Use when you need to pass values between different events."},
+  {cat:"PeopleCode Basics",q:"What fires FieldChange?",opts:["A user pressing Save","A user navigating between page tabs","A user changing a field value and tabbing out","The component first loading"],ans:2,exp:"FieldChange fires when a user changes a field value. Used for dynamic field updates — auto-populating related fields, showing/hiding controls based on the new value."},
+  {cat:"PeopleCode Basics",q:"What does %OperatorId return?",opts:["The current employee EMPLID","The current user login ID","The current component name","The current database name"],ans:1,exp:"%OperatorId returns the current user's login ID. %EmployeeId returns the linked EMPLID. %Date returns today's date."},
+  {cat:"PeopleCode Basics",q:"If SQLExec finds no rows, what happens to output variables?",opts:["Runtime error is thrown","Set to empty string or zero — no error","Last query values remain","PeopleCode skips the statement"],ans:1,exp:"If SQLExec finds no rows, output variables are set to empty string or 0. No error. Always use None() to check before using the value."},
+  {cat:"PeopleCode Basics",q:"Which event fires during the SQL SELECT that loads data into the buffer?",opts:["PostBuild","RowInit","RowSelect","SearchInit"],ans:2,exp:"RowSelect fires for each row being fetched. Use DiscardRow() to filter rows. Using SQL Views to filter is more efficient than RowSelect PeopleCode."},
+  {cat:"PeopleCode Basics",q:"What does Error() in FieldEdit do?",opts:["Logs to server console","Prevents tabbing out and highlights the field in red","Cancels the component","Sends an email"],ans:1,exp:"Error() in FieldEdit prevents accepting the new value. The field is highlighted and the user must correct it or revert. Use Warning() to allow the value but show a caution."},
+  {cat:"PeopleCode Basics",q:"Where does PeopleCode execute in PIA architecture?",opts:["In the browser","In Oracle PL/SQL","In the Tuxedo App Server","In WebLogic"],ans:2,exp:"All PeopleCode runs server-side in the Tuxedo Application Server. Zero business logic in the browser."},
+  {cat:"PeopleCode Basics",q:"What is Meta-SQL?",opts:["Syntax for creating DB tables","PeopleSoft SQL functions like %CurrentDateIn and %Table() that resolve correctly for any supported database","Pre-built SQL reports","Encrypted SQL"],ans:1,exp:"Meta-SQL makes PeopleCode database-independent. %CurrentDateIn resolves to the correct date syntax for Oracle/SQL Server/DB2. %Table(NAME) resolves to PS_NAME."},
+  {cat:"PeopleCode Basics",q:"What does SavePostChange fire after?",opts:["Before DB commit","After DB commit — for downstream updates","When user clicks Cancel","During search dialog"],ans:1,exp:"SavePostChange fires AFTER database commit. Cannot cancel the save. Use for downstream updates, notifications, integrations that depend on the committed data."},
+  {cat:"PeopleCode Basics",q:"How do you make a field visible but not editable in PeopleCode?",opts:["JOB.DEPTID.Enabled = False","JOB.DEPTID.DisplayOnly = True","JOB.DEPTID.Visible = False","JOB.DEPTID.ReadOnly = True"],ans:1,exp:"DisplayOnly = True shows the value but prevents editing. Enabled = False grays the field out. Visible = False hides it completely."},
+  {cat:"PeopleCode Basics",q:"When should you use Global scope?",opts:["For all variables","For values that persist across components for the entire user session","For loop counters","For DB query results"],ans:1,exp:"Global scope persists for the entire user session. Use very sparingly — only for truly session-wide data. Can cause subtle bugs between components."},
+  {cat:"PeopleCode Basics",q:"What does RowInsert fire in response to?",opts:["A row being loaded from DB","A user adding a new row to a grid","The component opening","A row being deleted"],ans:1,exp:"RowInsert fires when a user adds a new row. Note: RowInit always fires after RowInsert — don't duplicate initialization code or it runs twice."},
+
+  /* ── RECORDS, FIELDS & DATA MODEL (14) ── */
+  {cat:"Records & Fields",q:"What database table does record 'JOB' create?",opts:["PSJOB","JOB_TABLE","PS_JOB","PS.JOB"],ans:2,exp:"PeopleSoft prefixes all SQL Table database tables with PS_. Record JOB becomes PS_JOB."},
+  {cat:"Records & Fields",q:"Which record type should you use for values that should NEVER be stored in the database?",opts:["SQL Table","SQL View","Dynamic View","Derived/Work"],ans:3,exp:"Derived/Work records never create a database object. They exist only in the component buffer. Used for computed values, push buttons, and temporary variables."},
+  {cat:"Records & Fields",q:"What is a SubRecord?",opts:["A record within a grid","A reusable set of fields embedded into other records","A view joining two records","A temp record for batch"],ans:1,exp:"A SubRecord is a reusable field group. Including it in a record adds all its fields to the parent table. EFFDT_SBR (EFFDT + EFFSEQ) is the most important example."},
+  {cat:"Records & Fields",q:"PeopleSoft fields are defined:",opts:["Inside record definitions","Globally — one definition reused across hundreds of records","Per page","Inside PeopleCode"],ans:1,exp:"Fields are defined globally and independently. The same field EMPLID can be in 400+ records. Change the label once and it updates everywhere automatically."},
+  {cat:"Records & Fields",q:"What does an Alternate Search Key (A) field property do?",opts:["Makes the field the primary key","Creates a database index enabling efficient searching without making it the primary key","Prevents field from appearing in search results","Makes the field required"],ans:1,exp:"Alternate Search Key creates a DB index for efficient searching. For example, LAST_NAME as A on PS_NAMES allows fast employee name searches."},
+  {cat:"Records & Fields",q:"What does a SQL View record create?",opts:["A permanent read-write table","A database view — read-only","A temporary table","A stored procedure"],ans:1,exp:"SQL View records create a permanent read-only database view. Used for security views, reporting, and joining related tables."},
+  {cat:"Records & Fields",q:"What is the Temp Table record type used for?",opts:["Storing user session data","Parallel batch processing by Application Engine — multiple instances prevent collision","Storing debug logs","Caching reference data"],ans:1,exp:"Temp Tables allow multiple parallel AE instances (MYTEMP_AET, MYTEMP_AET1, MYTEMP_AET2) to work simultaneously without data collision."},
+  {cat:"Records & Fields",q:"What does a List Box Item (L) field property mean?",opts:["Field appears as search filter","Field appears as a column in the search results list","Field is required for Add mode","Field triggers a lookup"],ans:1,exp:"List Box Items appear as columns in the search results list — helping users identify which row to select."},
+  {cat:"Records & Fields",q:"After defining a SQL Table record, what creates the physical database table?",opts:["Saving the record definition","Build → Current Object → Create Table","Restarting the App Server","Running a DMS script"],ans:1,exp:"Saving only stores the metadata. Build → Create Table generates and executes the CREATE TABLE DDL to physically create PS_RECORDNAME in the database."},
+  {cat:"Records & Fields",q:"Why does the PS_ prefix exist on all PeopleSoft tables?",opts:["Performance improvement","Distinguishes application tables from PeopleTools metadata tables","Required by Oracle","Required for indexing"],ans:1,exp:"The PS_ prefix distinguishes PeopleSoft application data tables from PeopleTools system tables (PSRECDEFN, PSDBFIELD) and database system tables."},
+  {cat:"Records & Fields",q:"How many record types does PeopleSoft support?",opts:["3","5","7","10"],ans:2,exp:"7 record types: SQL Table, SQL View, Dynamic View, Derived/Work, SubRecord, Query View, and Temp Table."},
+  {cat:"Records & Fields",q:"How does a Dynamic View differ from a SQL View?",opts:["Dynamic Views are faster","Dynamic View resolves SQL at runtime with no DB object; SQL View creates a permanent DB view","Dynamic Views support inserts","No difference"],ans:1,exp:"SQL View creates a permanent database view object. Dynamic View stores SQL that resolves at runtime creating no database object — allowing runtime-specific filtering."},
+  {cat:"Records & Fields",q:"What happens when you change a global field label?",opts:["Only the first record updates","Must update each record separately","Updates everywhere the field is used automatically","Only takes effect after upgrade"],ans:2,exp:"Global field label changes propagate automatically to every record, page, grid, and search dialog that uses the field — no additional developer work."},
+  {cat:"Records & Fields",q:"What is a Query View record?",opts:["Created by App Designer for reporting","Created and managed by PS Query — used when a query result becomes source for another query","Displays query execution plans","Stores saved PS Query definitions"],ans:1,exp:"Query View records are created by PS Query. They allow one query's results to be the source for another — enabling complex nested query scenarios."},
+
+  /* ── EFFECTIVE DATING (10) ── */
+  {cat:"Effective Dating",q:"What happens to PS_JOB when an employee gets a promotion?",opts:["The row is updated","The old row deleted, new one created","A new row inserted with promotion's EFFDT — old row stays permanently","Row archived to PS_JOB_HIST"],ans:2,exp:"Effective dating = INSERT not UPDATE. A new row is added with the new EFFDT and ACTION=PRO. The original hire row remains permanently."},
+  {cat:"Effective Dating",q:"What does EFFSEQ handle?",opts:["Display order on page","Multiple changes on the same Effective Date — sequenced 0, 1, 2","Version number of a record","Approval sequence"],ans:1,exp:"EFFSEQ distinguishes multiple changes on the same date. First change EFFSEQ=0, second EFFSEQ=1. The row with the highest EFFSEQ for a date is most current."},
+  {cat:"Effective Dating",q:"To get the current row from PS_JOB, your WHERE clause needs:",opts:["WHERE EFFDT = TODAY","WHERE CURRENT = Y","WHERE EFFDT = (SELECT MAX(EFFDT)...WHERE EFFDT <= today) AND EFFSEQ = MAX(EFFSEQ)","WHERE ROW_STATUS = CURRENT"],ans:2,exp:"Standard pattern: correlated subquery for MAX(EFFDT) on or before today, then MAX(EFFSEQ) for that date. Fundamental PeopleSoft SQL knowledge."},
+  {cat:"Effective Dating",q:"What is a future-dated row?",opts:["A deleted row kept for audit","A row with EFFDT > today — in DB now but not yet current","A row that failed validation","A row created overnight by batch"],ans:1,exp:"Future-dated rows have EFFDT > today. They exist in the DB now but won't become current until their date arrives."},
+  {cat:"Effective Dating",q:"Why might PS_JOB have 20+ rows for one employee?",opts:["Data integrity error","Each row is a job change (hire, transfer, promotion, pay change) — effective dating preserves all history","Each row is a different EMPL_RCD","Audit logging copies rows"],ans:1,exp:"Every job change (ACTION) creates a new PS_JOB row. An employee with 10+ years and many changes could easily have 30+ rows. This is by design."},
+  {cat:"Effective Dating",q:"What is Correction Mode?",opts:["Automatically fixes data errors","Allows authorized users to modify historical effective-dated rows","A read-only view of past data","A developer debug tool"],ans:1,exp:"Correction Mode lets authorized users modify historical rows directly. Tightly security-controlled because retroactive changes can trigger payroll recalculation."},
+  {cat:"Effective Dating",q:"Most common mistake querying PS_JOB?",opts:["Wrong database","Not including BUSINESS_UNIT","Missing effective dating WHERE clause — returns ALL historical rows causing duplicates","Using LIKE instead of ="],ans:2,exp:"Missing EFFDT criteria returns all 30+ rows per employee — causing duplicates and wrong calculations in any report or integration."},
+  {cat:"Effective Dating",q:"What does EFFDT_SBR typically contain?",opts:["EFFDT, EFFSEQ, STATUS","Only EFFDT","EFFDT and EFFSEQ","EFFDT and ACTION"],ans:2,exp:"EFFDT_SBR is a SubRecord containing EFFDT and EFFSEQ — included in hundreds of records to implement effective dating consistently."},
+  {cat:"Effective Dating",q:"What does the ACTION field in PS_JOB store?",opts:["Approval status","Type of change (HIR=Hire, PRO=Promotion, TER=Termination, PAY=Pay Change)","Unique ID of the change","Name of person who made the change"],ans:1,exp:"ACTION stores the type of job change. Combined with ACTION_REASON, it tells the complete story of every change in an employee's career history."},
+  {cat:"Effective Dating",q:"Why is effective dating critical for payroll?",opts:["It determines who processes payroll","It enables retroactive pay — backdated corrections allow recalculation of previous periods using historical rows","It prevents duplicate runs","It controls who gets paid"],ans:1,exp:"Effective dating enables retroactive payroll. Historical rows are never deleted, so payroll can recalculate any past period if a salary or job change is backdated."},
+
+  /* ── PAGES, COMPONENTS & NAVIGATION (10) ── */
+  {cat:"Pages & Components",q:"What is a Component in PeopleSoft?",opts:["A single page definition","Pages sharing the same buffer that save together as one transaction","A JavaScript widget","A reusable PeopleCode block"],ans:1,exp:"A Component groups related pages into one transaction. All pages share the Component Buffer and save atomically."},
+  {cat:"Pages & Components",q:"What does the Search Record define?",opts:["Stores PeopleCode programs","Fields in the search dialog before opening the component","Which App Server handles the request","Default values for the component"],ans:1,exp:"The Search Record drives the search dialog — which fields appear as criteria and which appear as result columns."},
+  {cat:"Pages & Components",q:"What is a Sub Page?",opts:["A secondary search dialog","A reusable page fragment embedded into other pages for common field groups","A hidden page","The second tab in a component"],ans:1,exp:"A Sub Page is a reusable page fragment embedded inside other pages. Used for common fields like address blocks that appear in multiple components."},
+  {cat:"Pages & Components",q:"What is a Content Reference (CREF) in Fluid?",opts:["A database view","A Portal Registry entry pointing to a component — required for users to navigate to it","A PeopleCode function type","A security role"],ans:1,exp:"A CREF registers a component in the Portal Registry with its label, location, and security. Without it users cannot navigate to the component."},
+  {cat:"Pages & Components",q:"Which control displays multiple child rows in a modern page?",opts:["Scroll Area","Group Box","Grid","Frame"],ans:2,exp:"Grid is the modern replacement for Scroll Area. Supports sorting, filtering, pagination. All new development uses Grids."},
+  {cat:"Pages & Components",q:"A user sees a page but all fields are gray and uneditable. Most likely cause?",opts:["Database is read-only","Permission List grants Display Only instead of Update/Display","App Server overloaded","Browser doesn't support the component"],ans:1,exp:"Display Only access mode in the Permission List means read-only. The administrator must change the access mode to Update/Display."},
+  {cat:"Pages & Components",q:"What does the Add Search Record define?",opts:["A secondary advanced filter search","The search record specifically for Add mode — can differ from main Search Record","For searching archived data","For admin access only"],ans:1,exp:"The Add Search Record is used when a user clicks Add. In Add mode, users enter key values for the new record being created."},
+  {cat:"Pages & Components",q:"What is a Work Page?",opts:["Visible to developers only","Hidden page backed by Derived/Work records — holds temporary values not shown to users","The first page users see","Used only during batch processing"],ans:1,exp:"Work Pages are hidden pages backed by Derived/Work records. They store temporary values and calculations needed by PeopleCode but not shown to users."},
+  {cat:"Pages & Components",q:"What are Folder Tabs in a Component?",opts:["File management tabs in App Designer","Tab labels at top of component for navigating between pages","User bookmarks","Navigation breadcrumbs"],ans:1,exp:"Folder Tabs appear when a component has multiple pages. Users click tabs to navigate between pages. All pages share the buffer and save together."},
+  {cat:"Pages & Components",q:"What is a Tile in Fluid UI?",opts:["A database partition","A large clickable button on a Fluid Homepage linking to a component","A PeopleCode event type","A breadcrumb"],ans:1,exp:"Tiles are the large clickable buttons on Fluid Homepages. Each is a CREF with an image and optional dynamic badge count."},
+
+  /* ── COMPONENT BUFFER & ROWSETS (8) ── */
+  {cat:"Component Buffer",q:"What is the Component Buffer?",opts:["HTML cache on web server","In-memory data structure in App Server holding all current transaction data","A DB table for temp data","Browser local storage"],ans:1,exp:"The Component Buffer holds all component transaction data in App Server memory. PeopleCode reads/writes here. Only Save writes to the database."},
+  {cat:"Component Buffer",q:"How do you get the Level 1 Rowset in PeopleCode?",opts:["GetRowset()","GetLevel1Rowset()","GetRowset(Scroll.RECORDNAME)","GetChildRowset(NAME)"],ans:2,exp:"GetRowset(Scroll.RECORDNAME) returns the Level 1 rowset. GetRowset() alone returns Level 0 (primary record, 1 row)."},
+  {cat:"Component Buffer",q:"Difference between ActiveRowCount and RowCount?",opts:["Identical","ActiveRowCount excludes deleted rows; RowCount includes them","ActiveRowCount includes future rows","RowCount is faster"],ans:1,exp:"Always use ActiveRowCount in loops — it excludes rows marked for deletion. RowCount includes deleted rows."},
+  {cat:"Component Buffer",q:"What does JOB.DEPTID.Value = 'HR001' in PeopleCode do?",opts:["Immediately updates PS_JOB in DB","Writes to Component Buffer only — DB updates only on Save","Creates a new PS_JOB row","Triggers a DB trigger"],ans:1,exp:"Field assignments write to the in-memory buffer. PS_JOB in DB still has the old value until SavePreChange executes the SQL."},
+  {cat:"Component Buffer",q:"Which class do you use to iterate multiple buffer rows?",opts:["Array","Rowset","RecordSet","DataBuffer"],ans:1,exp:"The Rowset class represents a collection of rows. GetRowset(), then GetRow(n), then ActiveRowCount for iteration count."},
+  {cat:"Component Buffer",q:"What is Level 0 in Component Buffer hierarchy?",opts:["The database tier","The primary record — always exactly one row","The first grid on the page","App Server memory layer"],ans:1,exp:"Level 0 is the primary record — always exactly one row. Child scrolls/grids are at Level 1."},
+  {cat:"Component Buffer",q:"What does GetRecord(Record.RECORDNAME) return?",opts:["A database result set","The Record object from the current row for accessing Field objects","A copy of the database table","A new empty record definition"],ans:1,exp:"GetRecord returns a Record object from which you access Field objects: &rec.DEPTID.Value."},
+  {cat:"Component Buffer",q:"What happens if you forget &sql.Close() after CreateSQL?",opts:["Nothing — auto-closes","A DB cursor remains open — can exhaust connection resources especially in RowInit","PeopleCode compile error","Next SQL fails"],ans:1,exp:"Forgetting .Close() leaves an open cursor. In RowInit with many rows this can exhaust database cursor limits. Always call &sql.Close()."},
+
+  /* ── PS QUERY & SECURITY (8) ── */
+  {cat:"PS Query & Security",q:"What are the three PS Query types based on sharing?",opts:["Public, Private, Admin","User (private), Role (shared), Public (all users with access)","Read-only, Read-write, Admin","Basic, Advanced, Expert"],ans:1,exp:"User Queries are private. Role Queries are shared with users having a specific Role. Public Queries are accessible to all users with Query access."},
+  {cat:"PS Query & Security",q:"PeopleSoft security hierarchy top to bottom?",opts:["Permission List → Role → User","User → Role → Permission List","Role → User → Permission List","Permission List → User → Role"],ans:1,exp:"Users are assigned Roles. Roles bundle Permission Lists. Permission Lists define actual security (pages, processes, query trees)."},
+  {cat:"PS Query & Security",q:"What does row-level security control?",opts:["Which DB rows the DBA sees","Which data rows a user can see within accessible components","How many rows a query returns","Sort order in grids"],ans:1,exp:"Row-level security controls which DATA rows a user accesses — not just pages. An HR admin with Job Data access may only see their authorized departments."},
+  {cat:"PS Query & Security",q:"What is a PS Query Prompt?",opts:["A help tooltip","A runtime parameter — user enters a filter value each time they run the query","A mandatory WHERE field","A join condition"],ans:1,exp:"Prompts make queries dynamic. Instead of hardcoding criteria, users enter values at runtime — making one query reusable for many use cases."},
+  {cat:"PS Query & Security",q:"Most dangerous mistake in a custom component showing employee data?",opts:["Too few grid columns","Using PS_JOB as Search Record instead of a security view — bypasses row-level security","Not registering in Portal","Too many tabs"],ans:1,exp:"Using PS_JOB directly as Search Record bypasses row-level security — all users see all employees. Always use a security view as the Search Record."},
+  {cat:"PS Query & Security",q:"What is a Translate Value (XLAT)?",opts:["Language translation of labels","Short code list (max 4 chars) in PSXLATITEM — for stable values like EMPL_STATUS and ACTION","A DB view for FK lookups","A PeopleCode string function"],ans:1,exp:"Translate Values (XLAT) store short stable code lists. EMPL_STATUS (A=Active, T=Terminated), ACTION (HIR, PRO, TER). Max 4-character values."},
+  {cat:"PS Query & Security",q:"Correct action when a Translate Value becomes obsolete but exists in live data?",opts:["Delete it","Mark Inactive with effective date — disappears from dropdowns but old data stays valid","Replace it everywhere","Leave it active"],ans:1,exp:"Never delete a live XLAT value — it breaks existing records. Mark it Inactive. New entries can't use it but historical records remain valid."},
+  {cat:"PS Query & Security",q:"What is a Query Access Tree?",opts:["Visual hierarchy of query results","Security configuration in Permission Lists controlling which DB tables users can query","Organization of saved queries","Performance optimization tool"],ans:1,exp:"Query Access Trees in Permission Lists control which PeopleSoft records users can build queries against — preventing access to sensitive tables."},
+
+  /* ── REAL PROJECT SCENARIOS (12) ── */
+  {cat:"Real Project Scenario",isScenario:true,q:"A page loads very slowly. SQL trace shows 500 identical SELECTs against PS_DEPT_TBL. What is the likely cause?",opts:["PS_DEPT_TBL needs an index","Developer put SQLExec in RowInit — grid has 500 rows = 500 SQL calls","DB server is undersized","Too few PSAPPSRV processes"],ans:1,exp:"Classic N+1 problem: SQLExec in RowInit × 500 rows = 500 SQL calls. Fix: pre-fetch in PostBuild once, or use a SQL View joining department names directly."},
+  {cat:"Real Project Scenario",isScenario:true,q:"User says: I can see the component but cannot save. No error appears. First check?",opts:["Restart App Server","Check Permission List access mode — likely Display Only instead of Update/Display","Check for DB locks","Clear browser cache"],ans:1,exp:"When a user can view but not save with no error, check the Permission List access mode first. Display Only = read only. Change to Update/Display for edit access."},
+  {cat:"Real Project Scenario",isScenario:true,q:"Custom component uses PS_JOB as Search Record. HR coordinator sees all employees in UAT — even outside their department. What is wrong?",opts:["PeopleCode is wrong","Search Record should be a security view joining PS_JOB with row-level security tables","Permission List needs update","Component needs a new key field"],ans:1,exp:"PS_JOB as Search Record bypasses row-level security. Replace with a security view (PS_JOB_SRCH_VW) that joins with the department security table — filters automatically."},
+  {cat:"Real Project Scenario",isScenario:true,q:"You define a new SQL Table record, save it, add it to a page. SQL error: 'PS_MYRECORD does not exist'. What did you forget?",opts:["Add fields","Run Build → Create Table to generate the physical database table","Register in Portal","Assign a search key"],ans:1,exp:"Defining the record only creates metadata. You must run Build → Current Object → Create Table to execute the CREATE TABLE DDL that creates the physical table."},
+  {cat:"Real Project Scenario",isScenario:true,q:"After a PeopleSoft upgrade, your customization is overwritten. What should you have done?",opts:["Never customize","Used Event Mapping (PT 8.55+) or cloned delivered objects with a custom prefix","Submitted a bug to Oracle","Created a separate database"],ans:1,exp:"Oracle-delivered objects are overwritten in upgrades. Best practice: clone with your prefix (ZZ_JOB) and modify the clone. For PT 8.55+, Event Mapping avoids touching delivered objects entirely."},
+  {cat:"Real Project Scenario",isScenario:true,q:"Payroll batch shows Error status in Process Monitor. First two steps to diagnose?",opts:["Restart DB server","Click into process → view log file, then check Run Control parameters","Call Oracle support","Resubmit unchanged"],ans:1,exp:"Step 1: Process Monitor → View Log Files → find the actual error message. Step 2: Check Run Control parameters — correct dates, valid data? 90% of batch failures are diagnosed from the log."},
+  {cat:"Real Project Scenario",isScenario:true,q:"Employee report shows wrong department for last January even though today's record looks correct. Why?",opts:["Report has a calculation bug","Report is not using effective dating — showing today's row instead of January's row","Record is corrupted","DB backup is outdated"],ans:1,exp:"The report fetches current data (today's row) instead of point-in-time data. Effective-dated reports need WHERE EFFDT <= report_date. Without it you always see today's state."},
+  {cat:"Real Project Scenario",isScenario:true,q:"Need to display department names in a custom grid with 200 employee rows. Most efficient approach?",opts:["SQLExec in RowInit per row","Create a SQL View joining PS_JOB with PS_DEPT_TBL — bind view to grid","Use PostBuild with 200 SQLExec calls","Hidden field in FieldChange"],ans:1,exp:"Create a SQL View joining PS_JOB and PS_DEPT_TBL with proper effective dating. The database JOIN runs once in one SQL statement instead of 200 individual lookups. Correct architectural approach."},
+  {cat:"Real Project Scenario",isScenario:true,q:"Client asks to add a new field to delivered record PS_JOB. What should you do?",opts:["Add field directly to PS_JOB","Create extension record (ZZ_JOB_EXT) with same keys + your custom fields","Create a completely new component","Ask Oracle to add the field"],ans:1,exp:"Never add fields to delivered records — overwritten in upgrades. Create an extension record with your prefix and the same key fields. Link it to the component alongside the delivered record. Upgrade-safe."},
+  {cat:"Real Project Scenario",isScenario:true,q:"PS Query joining PS_PERSONAL_DATA with PS_JOB returns 5x expected rows. Most likely cause?",opts:["Wrong join key","Missing effective dating on PS_JOB — all historical rows create a near-Cartesian product","Running against wrong DB","Syntax error in query"],ans:1,exp:"Missing EFFDT criteria on PS_JOB causes a cross-join: 1 PERSONAL_DATA row × 20+ JOB rows per employee. Always add MAX(EFFDT) <= today criteria on effective-dated tables in joins."},
+  {cat:"Real Project Scenario",isScenario:true,q:"Built and tested a component in DEV. Migrated to QA. Users say page doesn't appear in menu. What did you miss?",opts:["PeopleCode bug","Migrated App Designer objects but not the Portal Registry CREF — they must be migrated separately","Permission List not updated","DB table not built in QA"],ans:1,exp:"App Designer objects and Portal CREFs migrate separately. The CREF that makes the component appear in the NavBar is a Portal object — not in a standard App Designer project unless explicitly added."},
+  {cat:"Real Project Scenario",isScenario:true,q:"A PeopleCode variable is set in PostBuild but not used in the same program. In which scope was it declared?",opts:["Local — value is lost","Component — read by another event in the same transaction","Always useless","Global — set for another session"],ans:1,exp:"This is the correct use of Component scope: set a flag in PostBuild (&isNewHire = True) and read it later in SaveEdit. Component variables persist across all events in the transaction."},
+];
+
+const GLOSSARY = [
+  // Architecture
+  {term:"PIA (Pure Internet Architecture)",cat:"architecture",def:"The three-tier web architecture PeopleSoft has used since version 8. Browser communicates with WebLogic web server, which communicates with Tuxedo App Server via JOLT, which communicates with the database via SQL. No business logic runs in the browser."},
+  {term:"Tuxedo",cat:"architecture",def:"Oracle Tuxedo is the middleware that powers PeopleSoft's Application Server tier. It manages server processes (PSAPPSRV, PSQRYSRV, PSSAMSRV) and handles all PeopleCode execution, Component Processor operations, and database communication."},
+  {term:"WebLogic",cat:"architecture",def:"Oracle WebLogic Server is the web tier in PeopleSoft PIA. It hosts PeopleSoft's Java-based web application and handles HTTP/HTTPS from browsers, forwarding requests to Tuxedo via the JOLT port. Contains zero business logic."},
+  {term:"JOLT",cat:"architecture",def:"Java Object Linking and Transactions — the proprietary protocol used by WebLogic to communicate with the Tuxedo Application Server. The JOLT port (typically 9000) is the connection point between the web tier and the application tier."},
+  {term:"PSAPPSRV",cat:"architecture",def:"The core Application Server process in Tuxedo. Handles component buffer operations, PeopleCode execution, and SQL generation. Multiple PSAPPSRV processes run simultaneously to handle concurrent users."},
+  {term:"Domain",cat:"architecture",def:"An instance of the Tuxedo Application Server or Process Scheduler. A single PeopleSoft environment typically has one App Server domain and one Process Scheduler domain. High-availability setups can have multiple domains for load balancing."},
+  {term:"DPK (Deployment Package)",cat:"architecture",def:"A set of Puppet-based scripts and configuration files used to automate the installation and configuration of PeopleSoft environments. Standard from PeopleTools 8.55+. Reduces a multi-day manual install to hours."},
+  {term:"PUM (PeopleSoft Update Manager)",cat:"architecture",def:"Oracle's selective patching tool introduced around 2014. Instead of applying full bundles, organizations browse a PeopleSoft Image VM and selectively apply individual fixes and features. Released quarterly per product line."},
+  {term:"PeopleSoft Image",cat:"architecture",def:"An Oracle VirtualBox virtual machine pre-built with all PeopleTools patches and application fixes up to a certain point. Used as the source for PUM updates. Organizations connect their environment to the Image to browse and apply updates."},
+  // Technical / Development
+  {term:"Record",cat:"technical",def:"In PeopleSoft, a Record is the metadata definition of a table or view — NOT a row of data. A SQL Table record named JOB creates the physical database table PS_JOB when built. Records are created and managed in Application Designer."},
+  {term:"PS_ Prefix",cat:"technical",def:"Every PeopleSoft application data table in the database is prefixed with PS_. The record named JOB becomes PS_JOB, the record PERSONAL_DATA becomes PS_PERSONAL_DATA. This distinguishes application tables from PeopleTools metadata tables."},
+  {term:"Component Buffer",cat:"technical",def:"The in-memory data structure managed by the Component Processor that holds all data for the current transaction. When a user opens a page, data loads into the buffer. PeopleCode reads/writes to the buffer. Only on Save does the buffer write to the database."},
+  {term:"Component Processor",cat:"technical",def:"The runtime engine within the Tuxedo App Server that manages the full lifecycle of a PeopleSoft transaction — loading data into the Component Buffer, firing PeopleCode events in the correct order, and writing changes back to the database on Save."},
+  {term:"Derived/Work Record",cat:"technical",def:"A record type that creates no database object. Exists only in the component buffer during a transaction. Used for computed values shown on pages, push buttons that trigger PeopleCode, and temporary variables. Fields in Derived/Work records are never saved to a table."},
+  {term:"SubRecord",cat:"technical",def:"A reusable set of fields that can be embedded into other records. When included, PeopleSoft adds all SubRecord fields to the parent record's table. The most important example is EFFDT_SBR (containing EFFDT and EFFSEQ) used in hundreds of effective-dated records."},
+  {term:"Temp Table",cat:"technical",def:"A record type used by Application Engine for parallel batch processing. Multiple instances (MYTEMP_AET, MYTEMP_AET1, MYTEMP_AET2) can exist simultaneously, allowing parallel AE processes to work on separate data sets without collisions."},
+  {term:"Meta-SQL",cat:"technical",def:"PeopleSoft-specific SQL functions that are database-independent. %CurrentDateIn resolves to the correct date format for Oracle, SQL Server, or DB2. %Table(RECORDNAME) resolves to PS_RECORDNAME. %Bind(FIELD) inserts a bind variable value."},
+  {term:"Translate Values (XLAT)",cat:"technical",def:"Short code lists stored in the PSXLATITEM table. Used for fields with short (max 4-character) stable values like EMPL_STATUS (A=Active, T=Terminated) and ACTION (HIR=Hire, PRO=Promotion). Values are effective-dated and display as Drop Down lists on pages."},
+  {term:"Prompt Table",cat:"technical",def:"A record or view used to validate field input against a database table. When a user enters a value, PeopleSoft checks it exists in the Prompt Table. A magnifying glass icon opens a lookup dialog showing available values."},
+  {term:"Run Control",cat:"technical",def:"A database record that stores parameters a user enters before running a batch process. Keyed by user ID and a user-defined name. The batch process reads parameters from the Run Control table since it cannot prompt the user interactively."},
+  {term:"Project",cat:"technical",def:"A container in Application Designer that groups related PeopleSoft objects for migration between environments. When development is complete in DEV, the Project is migrated to QA and then PROD. Projects are the unit of change management in PeopleSoft."},
+  // PeopleCode / Development
+  {term:"PeopleCode",cat:"development",def:"PeopleSoft's proprietary event-driven programming language. Runs server-side within the Tuxedo App Server. Always attached to a specific event on a specific object. Resembles a hybrid of Java and Basic. Case-insensitive for keywords."},
+  {term:"RowInit",cat:"development",def:"A PeopleCode event that fires for every row loaded into the component buffer. If a grid has 100 rows, RowInit fires 100 times. Placing SQLExec in RowInit causes N+1 query problems — one of the most common performance anti-patterns."},
+  {term:"PostBuild",cat:"development",def:"A component-level PeopleCode event that fires once after the entire component is fully built — after all RowInit and FieldDefault events have run. The ideal location for show/hide logic and page configuration that depends on the fully loaded component."},
+  {term:"SaveEdit",cat:"development",def:"A component-level PeopleCode event that fires during the save process. Using Error() in SaveEdit prevents the save and displays an error. The standard location for cross-field business rule validation. Most commonly used save event."},
+  {term:"FieldChange",cat:"development",def:"A field-level PeopleCode event that fires when a user changes a field value on the page. Used to dynamically update other fields, show/hide controls, or validate related fields based on the changed value."},
+  {term:"SavePostChange",cat:"development",def:"A component-level PeopleCode event that fires after data has been committed to the database. Used for downstream updates, notifications, and integration triggers. Cannot cancel the save — the DB commit has already happened."},
+  {term:"SQLExec",cat:"development",def:"A PeopleCode built-in function for single-row SQL queries. Takes a SQL string, bind values, and output variables. If no row is found, output variables are set to empty/zero. Avoid using SQLExec in RowInit — it creates N+1 query problems."},
+  {term:"CreateSQL",cat:"development",def:"A PeopleCode built-in function for multi-row SQL queries. Returns a SQL object. Use .Fetch() in a While loop to iterate through rows. Always call .Close() when done. More efficient than multiple SQLExec calls for multi-row results."},
+  {term:"Rowset",cat:"development",def:"A PeopleCode object representing a collection of rows — essentially a grid or scroll. Use GetRowset(Scroll.RECORDNAME) to get a Level 1 rowset. Navigate with GetRow(n), GetRecord(), and ActiveRowCount. The primary way to work with multi-row data in PeopleCode."},
+  {term:"Local / Component / Global",cat:"development",def:"PeopleCode variable scopes. Local: exists only for the current program execution. Component: persists for the entire component transaction. Global: persists for the entire user session. Always use Local unless you have a specific reason to use a wider scope."},
+  // HCM Terms
+  {term:"EMPLID",cat:"hcm",def:"Employee ID — the unique identifier assigned to each employee in PeopleSoft HCM. Every HR table uses EMPLID as a primary key. One person always has one EMPLID even if they hold multiple jobs (distinguished by EMPL_RCD)."},
+  {term:"EMPL_RCD (Employee Record Number)",cat:"hcm",def:"Some employees have more than one concurrent employment. Each employment is a separate Employee Record numbered 0, 1, 2, etc. EMPLID + EMPL_RCD together uniquely identify a single job in PS_JOB."},
+  {term:"EFFDT (Effective Date)",cat:"hcm",def:"A date field used in hundreds of PeopleSoft tables to implement effective dating. Instead of overwriting data, PeopleSoft inserts a new row with a new EFFDT. The 'current' row is the one with the max EFFDT on or before today."},
+  {term:"EFFSEQ (Effective Sequence)",cat:"hcm",def:"Handles multiple changes on the same effective date. First change = EFFSEQ 0, second = EFFSEQ 1. The most current row for a date is the one with the highest EFFSEQ. Works together with EFFDT to uniquely identify a point in time."},
+  {term:"Action / Action Reason",cat:"hcm",def:"Every change to PS_JOB is recorded with an Action code (HIR=Hire, TER=Termination, PRO=Promotion, PAY=Pay Rate Change) and an Action Reason code explaining why the change was made. Together they tell the complete story of every personnel change."},
+  {term:"Position",cat:"hcm",def:"A budgeted organizational slot that can be filled by an employee. Positions belong to departments, have job codes, and carry salary grade information. Position Management links HR headcount to Finance budget."},
+  {term:"HCM (Human Capital Management)",cat:"hcm",def:"The most widely deployed PeopleSoft product. Manages the complete employee lifecycle: recruiting, onboarding, job data, compensation, benefits, payroll, time & labor, absence management, and talent management."},
+  // FSCM Terms
+  {term:"FSCM (Financial Supply Chain Management)",cat:"fscm",def:"PeopleSoft's Finance module covering General Ledger, Accounts Payable/Receivable, Asset Management, Purchasing, Inventory, Project Costing, and Billing. Financial data is organized using ChartFields."},
+  {term:"ChartField",cat:"fscm",def:"The accounting code structure in FSCM. Common ChartFields include Account, Department, Business Unit, Fund Code, Program Code, and Project. Every financial transaction is stamped with ChartField values that determine how it posts to the General Ledger."},
+  {term:"Business Unit",cat:"fscm",def:"The primary organizational entity in PeopleSoft — especially in FSCM. Every financial transaction is associated with a Business Unit. Represents a distinct part of an organization that maintains its own financial books."},
+  {term:"SetID",cat:"fscm",def:"A code assigned to setup tables that controls which reference data applies to each Business Unit. Multiple Business Units can share the same SetID (and thus the same departments, job codes, etc.) while maintaining separate SetIDs for region-specific data."},
+  {term:"TableSet",cat:"fscm",def:"The mechanism that links Business Units to SetIDs. TableSet Controls (PS_SET_CNTRL_TBL) define which SetID each Business Unit uses for each record group. Enables sharing of common reference data while allowing exceptions per Business Unit."},
+];
+
+const CURRICULUM_LIST = {
+  b: TOPICS.map(t => t.title),
+  i: ["Application Designer Deep Dive","Application Engine","Component Interface","SQR Programming","BI Publisher Reports","Integration Broker","Security & Roles","Process Scheduler","Data Mover & Migration","PeopleSoft Update Manager (PUM)"],
+  a: ["Fluid UI Development","Fluid Tiles & Homepages","Application Packages (OOP)","REST & SOAP Web Services","Performance Tuning","PeopleTools Upgrades","Activity Guides","Event Mapping","Elasticsearch & Search Framework","PeopleCode Debugging Techniques"],
+};
