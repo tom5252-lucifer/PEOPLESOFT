@@ -75,7 +75,7 @@
         <button class="nav__link" onclick="showGlossary()" aria-label="Open Glossary">Glossary</button>
         <button class="nav__link" onclick="showQuiz()" aria-label="Open Quiz Engine">Quiz</button>
         <button class="nav__link" onclick="showInterview()" aria-label="Open Interview Q&A">Interview Prep</button>
-        <button class="nav__link" onclick="showSimulation()" aria-label="Open Simulation Lab">PeopleSoft Practice Arena 🧪</button>
+        <button class="nav__link" onclick="showLab()" aria-label="Open Simulation Lab">Lab 🧪</button>
         <button class="nav__link" onclick="showHome();setTimeout(()=>document.querySelector('.about-section').scrollIntoView({behavior:'smooth'}),100)" aria-label="About this platform">About</button>
       </div>
       <div class="nav__actions">
@@ -100,8 +100,8 @@
   <div class="container">
     <div class="hero__eyebrow">A Growing PeopleSoft Learning Platform</div>
     <h1 class="hero__headline">
-         Learn PeopleSoft 
-  <em>From Basics to Advance</em>
+      Learn PeopleSoft the Way
+      <em>Projects Actually Use It</em>
     </h1>
     <p class="hero__sub">From App Designer basics to real enterprise development — structured, practical, and built for freshers, support engineers, and developers moving into PeopleSoft.</p>
     <div class="hero__actions">
@@ -397,7 +397,7 @@
   <div class="cta-bg" aria-hidden="true"></div>
   <div class="container cta-inner">
     <div class="cta-tag reveal">Start Today — No Account Needed</div>
-    <h2 class="cta-title reveal">Learn PeopleSoft the Way <br><em>Projects Actually Use It</em></h2>
+    <h2 class="cta-title reveal">Learn PeopleSoft the Way<br><em>Projects Actually Use It</em></h2>
     <p class="cta-sub reveal">Structured, practical, enterprise-focused. Start the Beginner Path and build real foundational knowledge — for free.</p>
     <div class="cta-actions reveal">
       <button class="btn btn--gold btn--lg" onclick="openTopic(0)">🚀 Start Beginner Path</button>
@@ -430,7 +430,7 @@
           <div class="builder-card__avatar">KR</div>
           <div class="builder-card__name">Koushik Ram M</div>
           <div class="builder-card__role">PeopleSoft Technical Consultant</div>
-          <div class="builder-card__bio">Hands-on experience in HCM, FSCM implementations — production support, enhancement. Worked with PeopleCode, Application Engine, SQR, SQL, PS Query, Integration Broker, security configurations, and validations across enterprise environments.</div>
+          <div class="builder-card__bio">Hands-on experience in HCM, FSCM, and HRMS implementations — production support, enhancements, and full project cycles. Worked with PeopleCode, Application Engine, SQR, SQL, PS Query, Integration Broker, security configurations, and validations across enterprise environments.</div>
           <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px">
             <span class="about-source-chip" style="font-size:10px">PeopleCode</span>
             <span class="about-source-chip" style="font-size:10px">App Engine</span>
@@ -669,61 +669,423 @@
 <script src="pslearn-data.js"></script>
 <script src="pslearn-app.js"></script>
 
-<!-- INTERVIEW Q&A VIEW -->
-<div id="interviewView" style="display:none;position:relative;z-index:1;min-height:100vh;padding-top:60px;background:var(--base)" role="main" aria-label="Interview Q&A">
-  <div style="max-width:860px;margin:0 auto;padding:40px 24px">
-    <button onclick="showHome()" style="background:none;border:none;color:var(--soft);font-size:13px;cursor:pointer;padding:0 0 20px;font-family:var(--fb);display:flex;align-items:center;gap:6px" aria-label="Back to home">← Back to Home</button>
-    <div style="margin-bottom:32px">
-      <div style="font-family:var(--fm);font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--gold);margin-bottom:10px">💼 Interview Preparation</div>
-      <h1 style="font-family:var(--fd);font-size:clamp(26px,4vw,40px);font-weight:800;letter-spacing:-1.5px;color:var(--text);margin-bottom:8px">PeopleSoft <span style="color:var(--gold)">Interview Q&amp;A</span></h1>
-      <p style="font-size:15px;color:var(--soft);line-height:1.6;margin-bottom:24px">34 expert questions across Beginner, Intermediate, and Advanced levels — covering architecture, PeopleCode, records, security, and real project scenarios.</p>
-      <div style="display:flex;flex-wrap:wrap;gap:8px" role="group" aria-label="Filter by level">
-        <button class="iqa-filter active" onclick="setInterviewFilter('all',this)" aria-pressed="true">All Questions</button>
-        <button class="iqa-filter" onclick="setInterviewFilter('beginner',this)" aria-pressed="false">🌱 Beginner</button>
-        <button class="iqa-filter" onclick="setInterviewFilter('intermediate',this)" aria-pressed="false">⚡ Intermediate</button>
-        <button class="iqa-filter" onclick="setInterviewFilter('advanced',this)" aria-pressed="false">🔥 Advanced</button>
+<!-- INTERVIEW Q&A VIEW — PRO -->
+<div id="interviewView" style="display:none;position:relative;z-index:1;min-height:100vh;padding-top:60px;background:var(--base)" role="main" aria-label="Interview Preparation">
+
+  <!-- PRO HEADER -->
+  <div class="iqa-pro-header">
+    <div class="iqa-pro-header-inner">
+      <button onclick="showHome()" style="background:none;border:none;color:var(--soft);font-size:13px;cursor:pointer;padding:0 0 16px;font-family:var(--fb);display:flex;align-items:center;gap:6px">← Back to Home</button>
+      <div class="iqa-pro-tag">💼 Interview Preparation Hub</div>
+      <h1 class="iqa-pro-title">PeopleSoft <span>Interview Q&amp;A</span></h1>
+      <p class="iqa-pro-sub">Expert-level answers written for real technical interviews — from fresher to senior consultant level. Study, copy answers, bookmark what you need.</p>
+      <div class="iqa-pro-stats">
+        <div class="iqa-pro-stat"><strong id="iqaTotalCount">40</strong> Questions</div>
+        <div class="iqa-pro-stat"><strong>4</strong> Levels</div>
+        <div class="iqa-pro-stat"><strong>8</strong> Categories</div>
+        <div class="iqa-pro-stat" id="iqaReviewedStat"><strong id="iqaReviewedCount">0</strong> Reviewed</div>
+      </div>
+      <div class="iqa-pro-progress">
+        <div class="iqa-pro-progress-label">
+          <span>Your Progress</span>
+          <span id="iqaProgressLabel">0 / 40 reviewed</span>
+        </div>
+        <div class="iqa-pro-progress-bar"><div class="iqa-pro-progress-fill" id="iqaProgressFill" style="width:0%"></div></div>
       </div>
     </div>
-    <div id="interviewContent" aria-live="polite"></div>
+  </div>
+
+  <!-- BODY -->
+  <div class="iqa-pro-layout">
+    <!-- Search + filters -->
+    <div class="iqa-search-wrap">
+      <span class="iqa-search-icon">🔍</span>
+      <input class="iqa-search" id="iqaSearchBar" type="text" placeholder="Search any question — e.g. SaveEdit, Component Buffer, Integration Broker..." oninput="filterIQA()" autocomplete="off"/>
+    </div>
+    <div class="iqa-pro-filters" role="group" aria-label="Filter by level" style="margin-bottom:8px">
+      <button class="iqa-pro-filter active" onclick="setIQALevel('all',this)">All</button>
+      <button class="iqa-pro-filter f-beginner" onclick="setIQALevel('beginner',this)">🌱 Beginner</button>
+      <button class="iqa-pro-filter f-intermediate" onclick="setIQALevel('intermediate',this)">⚡ Intermediate</button>
+      <button class="iqa-pro-filter f-advanced" onclick="setIQALevel('advanced',this)">🔥 Advanced</button>
+      <button class="iqa-pro-filter f-scenario" onclick="setIQALevel('scenario',this)">🏢 Real Project</button>
+    </div>
+
+    <div class="iqa-body">
+      <!-- Category sidebar -->
+      <aside class="iqa-sidebar">
+        <div class="iqa-sidebar-title">Categories</div>
+        <div id="iqaCatSidebar"></div>
+      </aside>
+      <!-- Questions panel -->
+      <div class="iqa-questions-panel">
+        <div class="iqa-section-header">
+          <div class="iqa-section-title" id="iqaPanelTitle">All Questions</div>
+          <div class="iqa-section-count" id="iqaPanelCount"></div>
+        </div>
+        <div id="iqaContent" aria-live="polite"></div>
+      </div>
+    </div>
   </div>
 </div>
 
 
-<!-- SIMULATION VIEW (COMING SOON) -->
-<div id="simulationView" style="display:none;position:relative;z-index:1;min-height:100vh;padding-top:60px;background:var(--base)" role="main" aria-label="Practice Simulation">
-  <div style="max-width:720px;margin:0 auto;padding:80px 24px;text-align:center">
-    <button onclick="showHome()" style="background:none;border:none;color:var(--soft);font-size:13px;cursor:pointer;padding:0 0 40px;font-family:var(--fb);display:flex;align-items:center;gap:6px;margin:0 auto" aria-label="Back to home">← Back to Home</button>
-    <div style="font-size:64px;margin-bottom:20px" aria-hidden="true">🧪</div>
-    <h1 style="font-family:var(--fd);font-size:clamp(26px,4vw,38px);font-weight:800;letter-spacing:-1.5px;color:var(--text);margin-bottom:12px">Practice <span style="color:var(--gold)">Simulation Lab</span></h1>
-    <p style="font-size:16px;color:var(--soft);line-height:1.7;margin-bottom:32px">An interactive PeopleSoft practice environment is being built here. Coming in a future update.</p>
-    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;max-width:500px;margin:0 auto 32px">
-      <div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:18px;text-align:left">
-        <div style="font-size:22px;margin-bottom:8px">🔍</div>
-        <div style="font-family:var(--fd);font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px">Debug Mode</div>
-        <div style="font-size:12px;color:var(--faint)">Find the bug in PeopleCode snippets</div>
-        <div style="margin-top:10px;font-family:var(--fm);font-size:10px;color:var(--amber);background:rgba(245,158,11,0.1);border-radius:999px;padding:2px 10px;display:inline-block">Coming Soon</div>
+<!-- LAB SIMULATOR — 6 MODES -->
+<div id="labView" style="display:none;position:relative;z-index:1;min-height:100vh;padding-top:60px;background:var(--base)" role="main" aria-label="Practice Lab">
+
+  <!-- LAB HOME -->
+  <div id="labHome">
+    <div class="lab-home">
+      <button onclick="showHome()" style="background:none;border:none;color:var(--soft);font-size:13px;cursor:pointer;padding:0 0 20px;font-family:var(--fb);display:flex;align-items:center;gap:6px">← Back to Home</button>
+      <div class="lab-header">
+        <div class="lab-header__tag">🧪 Practice Simulation Lab</div>
+        <h1 class="lab-header__title">Learn by <span>Doing</span></h1>
+        <p class="lab-header__sub">Interactive PeopleSoft simulators — from debugging PeopleCode to navigating a real Fluid homepage. No system access needed.</p>
       </div>
-      <div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:18px;text-align:left">
-        <div style="font-size:22px;margin-bottom:8px">🗂️</div>
-        <div style="font-family:var(--fd);font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px">Object Matcher</div>
-        <div style="font-size:12px;color:var(--faint)">Match record types to use cases</div>
-        <div style="margin-top:10px;font-family:var(--fm);font-size:10px;color:var(--amber);background:rgba(245,158,11,0.1);border-radius:999px;padding:2px 10px;display:inline-block">Coming Soon</div>
-      </div>
-      <div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:18px;text-align:left">
-        <div style="font-size:22px;margin-bottom:8px">📋</div>
-        <div style="font-family:var(--fd);font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px">Scenario Mode</div>
-        <div style="font-size:12px;color:var(--faint)">Solve real enterprise scenarios</div>
-        <div style="margin-top:10px;font-family:var(--fm);font-size:10px;color:var(--amber);background:rgba(245,158,11,0.1);border-radius:999px;padding:2px 10px;display:inline-block">Coming Soon</div>
-      </div>
-      <div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:18px;text-align:left">
-        <div style="font-size:22px;margin-bottom:8px">⚡</div>
-        <div style="font-family:var(--fd);font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px">Event Flow Trainer</div>
-        <div style="font-size:12px;color:var(--faint)">Order PeopleCode events correctly</div>
-        <div style="margin-top:10px;font-family:var(--fm);font-size:10px;color:var(--amber);background:rgba(245,158,11,0.1);border-radius:999px;padding:2px 10px;display:inline-block">Coming Soon</div>
+      <div class="lab-modes-grid">
+        <!-- Mode 1: Debug -->
+        <div class="lab-mode-card" onclick="openLabMode('debug')">
+          <div class="lab-mode-card__top-bar" style="background:linear-gradient(90deg,var(--red),var(--amber))"></div>
+          <div class="lab-mode-card__icon">🔍</div>
+          <div class="lab-mode-card__title">Debug the PeopleCode</div>
+          <div class="lab-mode-card__desc">Spot the bug in real PeopleCode snippets. Click the wrong line and explain what's wrong.</div>
+          <span class="lab-mode-card__badge badge-live">● Live</span>
+        </div>
+        <!-- Mode 2: Event Flow -->
+        <div class="lab-mode-card" onclick="openLabMode('eventflow')">
+          <div class="lab-mode-card__top-bar" style="background:linear-gradient(90deg,var(--amber),var(--green))"></div>
+          <div class="lab-mode-card__icon">⚡</div>
+          <div class="lab-mode-card__title">Event Flow Trainer</div>
+          <div class="lab-mode-card__desc">Drag PeopleCode events into the correct sequence. Master the full component lifecycle.</div>
+          <span class="lab-mode-card__badge badge-live">● Live</span>
+        </div>
+        <!-- Mode 3: Object Matcher -->
+        <div class="lab-mode-card" onclick="openLabMode('matcher')">
+          <div class="lab-mode-card__top-bar" style="background:linear-gradient(90deg,var(--indigo),var(--cyan))"></div>
+          <div class="lab-mode-card__icon">🗂️</div>
+          <div class="lab-mode-card__title">Object Matcher</div>
+          <div class="lab-mode-card__desc">Given a scenario, pick the correct PeopleSoft object type — record, component, AE, CI, and more.</div>
+          <span class="lab-mode-card__badge badge-live">● Live</span>
+        </div>
+        <!-- Mode 4: Scenario Solver -->
+        <div class="lab-mode-card" onclick="openLabMode('scenario')">
+          <div class="lab-mode-card__top-bar" style="background:linear-gradient(90deg,var(--gold),var(--amber))"></div>
+          <div class="lab-mode-card__icon">📋</div>
+          <div class="lab-mode-card__title">Scenario Solver</div>
+          <div class="lab-mode-card__desc">Real enterprise problem. Diagnose the root cause from 4 options — just like production support.</div>
+          <span class="lab-mode-card__badge badge-live">● Live</span>
+        </div>
+        <!-- Mode 5: App Designer -->
+        <div class="lab-mode-card" onclick="openLabMode('appdesigner')">
+          <div class="lab-mode-card__top-bar" style="background:linear-gradient(90deg,#1f5a9a,#4a90d9)"></div>
+          <div class="lab-mode-card__icon">🖥️</div>
+          <div class="lab-mode-card__title">App Designer Simulator</div>
+          <div class="lab-mode-card__desc">Interactive mock Application Designer IDE. Create records, add fields, set keys, and build tables.</div>
+          <span class="lab-mode-card__badge badge-live">● Live</span>
+        </div>
+        <!-- Mode 6: PS Login + Home -->
+        <div class="lab-mode-card" onclick="openLabMode('pssim')">
+          <div class="lab-mode-card__top-bar" style="background:linear-gradient(90deg,#1e4d8c,#d4a017)"></div>
+          <div class="lab-mode-card__icon">🔐</div>
+          <div class="lab-mode-card__title">PeopleSoft Navigator</div>
+          <div class="lab-mode-card__desc">Sign into a mock PeopleSoft HCM environment. Navigate the Fluid homepage, tiles, and NavBar.</div>
+          <span class="lab-mode-card__badge badge-live">● Live</span>
+        </div>
       </div>
     </div>
-    <button onclick="showHome()" class="btn btn--ghost btn--md">← Back to Learning</button>
   </div>
+
+  <!-- MODE 1: DEBUG -->
+  <div id="labDebug" style="display:none">
+    <div class="lab-debug">
+      <button class="lab-debug__back" onclick="backToLab()">← Back to Lab</button>
+      <div class="lab-debug__header">
+        <div class="lab-debug__tag">🔍 Debug Mode</div>
+        <h2 class="lab-debug__title">Find the Bug</h2>
+        <p class="lab-debug__sub">Click the line of code that contains the bug. Then check your answer.</p>
+      </div>
+      <div class="lab-debug__meta">
+        <span class="lab-debug__counter" id="debugCounter">Challenge 1 of 6</span>
+        <div style="display:flex;gap:8px">
+          <span id="debugScore" style="font-family:var(--fm);font-size:12px;color:var(--green)">Score: 0</span>
+        </div>
+      </div>
+      <div class="lab-debug__scenario" id="debugScenario"></div>
+      <div class="lab-code-block" id="debugCode"></div>
+      <p class="lab-debug__hint" id="debugHint"></p>
+      <div class="lab-debug__actions">
+        <button class="btn btn--gold btn--sm" id="debugCheckBtn" onclick="checkDebugAnswer()" disabled>Check Answer →</button>
+        <button class="btn btn--ghost btn--sm" onclick="nextDebugChallenge()" id="debugNextBtn" style="display:none">Next Challenge →</button>
+      </div>
+      <div class="lab-result-box" id="debugResult"></div>
+    </div>
+  </div>
+
+  <!-- MODE 2: EVENT FLOW -->
+  <div id="labEventFlow" style="display:none">
+    <div class="lab-event-flow">
+      <button class="lab-debug__back" onclick="backToLab()">← Back to Lab</button>
+      <div class="lab-debug__header">
+        <div class="lab-debug__tag" style="color:var(--amber)">⚡ Event Flow Trainer</div>
+        <h2 class="lab-debug__title">Order the Events</h2>
+        <p class="lab-debug__sub">Drag the PeopleCode events into the correct execution order.</p>
+      </div>
+      <div id="efChallengeName" style="font-family:var(--fm);font-size:13px;color:var(--gold);margin-bottom:14px;background:rgba(240,165,0,0.08);border:1px solid rgba(240,165,0,0.2);border-radius:8px;padding:10px 16px"></div>
+      <div class="event-drag-list" id="eventDragList"></div>
+      <div class="lab-debug__actions">
+        <button class="btn btn--gold btn--sm" onclick="checkEventOrder()">Check Order →</button>
+        <button class="btn btn--ghost btn--sm" onclick="resetEventOrder()">🔀 Shuffle</button>
+        <button class="btn btn--ghost btn--sm" id="efNextBtn" style="display:none" onclick="nextEFChallenge()">Next →</button>
+      </div>
+      <div class="lab-result-box" id="efResult"></div>
+    </div>
+  </div>
+
+  <!-- MODE 3: OBJECT MATCHER -->
+  <div id="labMatcher" style="display:none">
+    <div class="lab-matcher">
+      <button class="lab-debug__back" onclick="backToLab()">← Back to Lab</button>
+      <div class="lab-debug__header">
+        <div class="lab-debug__tag" style="color:var(--cyan)">🗂️ Object Matcher</div>
+        <h2 class="lab-debug__title">Pick the Right Object</h2>
+        <p class="lab-debug__sub">Read the scenario and select the correct PeopleSoft object type.</p>
+      </div>
+      <div class="lab-debug__meta">
+        <span class="lab-debug__counter" id="matcherCounter">Scenario 1 of 10</span>
+        <span id="matcherScore" style="font-family:var(--fm);font-size:12px;color:var(--green)">Score: 0/0</span>
+      </div>
+      <div class="matcher-scenario"><div class="matcher-scenario__label">Scenario</div><div class="matcher-scenario__text" id="matcherScenario"></div></div>
+      <div class="matcher-options" id="matcherOptions"></div>
+      <div class="lab-result-box" id="matcherResult"></div>
+      <button class="btn btn--ghost btn--sm" id="matcherNextBtn" style="display:none;margin-top:12px" onclick="nextMatcher()">Next Scenario →</button>
+    </div>
+  </div>
+
+  <!-- MODE 4: SCENARIO SOLVER -->
+  <div id="labScenario" style="display:none">
+    <div class="lab-matcher">
+      <button class="lab-debug__back" onclick="backToLab()">← Back to Lab</button>
+      <div class="lab-debug__header">
+        <div class="lab-debug__tag" style="color:var(--gold)">📋 Scenario Solver</div>
+        <h2 class="lab-debug__title">Diagnose the Problem</h2>
+        <p class="lab-debug__sub">Real enterprise issue. Pick the correct root cause diagnosis.</p>
+      </div>
+      <div class="lab-debug__meta">
+        <span class="lab-debug__counter" id="scenarioCounter">Scenario 1 of 8</span>
+        <span id="scenarioScore" style="font-family:var(--fm);font-size:12px;color:var(--green)">Score: 0/0</span>
+      </div>
+      <div class="matcher-scenario" id="scenarioBox"><div class="matcher-scenario__label">🏢 Enterprise Scenario</div><div class="matcher-scenario__text" id="scenarioText"></div></div>
+      <div class="matcher-options" id="scenarioOptions"></div>
+      <div class="lab-result-box" id="scenarioResult"></div>
+      <button class="btn btn--ghost btn--sm" id="scenarioNextBtn" style="display:none;margin-top:12px" onclick="nextScenario()">Next Scenario →</button>
+    </div>
+  </div>
+
+  <!-- MODE 5: APP DESIGNER SIMULATOR -->
+  <div id="labAppDesigner" style="display:none">
+    <div class="lab-appdesigner">
+      <button class="lab-debug__back" onclick="backToLab()">← Back to Lab</button>
+      <div class="lab-debug__header">
+        <div class="lab-debug__tag" style="color:#4a90d9">🖥️ App Designer Simulator</div>
+        <h2 class="lab-debug__title">Build a Record</h2>
+      </div>
+      <div class="ads-instruction" id="adsInstruction">
+        <strong>Task:</strong> Create a new SQL Table record called <strong>EMP_DEPT_DATA</strong> with 4 fields — EMPLID (key), EFFDT (key), DEPTID, and SETID. Then click Build to create the table.
+      </div>
+      <div class="ads-task-list" id="adsTaskList"></div>
+      <!-- Mock App Designer window -->
+      <div class="appdesigner-window">
+        <div class="appdesigner-titlebar">
+          <div class="appdesigner-titlebar-text">
+            <span>🖥</span> PeopleSoft Application Designer — [EMP_DEPT_DATA (Record)]
+          </div>
+          <div style="display:flex;gap:4px">
+            <div style="width:14px;height:14px;border-radius:2px;background:rgba(255,255,255,0.3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff">—</div>
+            <div style="width:14px;height:14px;border-radius:2px;background:rgba(255,255,255,0.3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff">□</div>
+            <div style="width:14px;height:14px;border-radius:2px;background:#c0392b;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff">✕</div>
+          </div>
+        </div>
+        <div class="appdesigner-menubar">
+          <div class="appdesigner-menuitem">File</div>
+          <div class="appdesigner-menuitem">Edit</div>
+          <div class="appdesigner-menuitem">View</div>
+          <div class="appdesigner-menuitem">Insert</div>
+          <div class="appdesigner-menuitem" onclick="adsBuild()" style="font-weight:600">Build</div>
+          <div class="appdesigner-menuitem">Debug</div>
+          <div class="appdesigner-menuitem">Tools</div>
+          <div class="appdesigner-menuitem">Help</div>
+        </div>
+        <div class="appdesigner-body">
+          <!-- Tree -->
+          <div class="appdesigner-tree">
+            <div class="appdesigner-tree-header">Project Workspace</div>
+            <div class="appdesigner-tree-item selected">📁 PSLearn_Project</div>
+            <div class="appdesigner-tree-item" style="padding-left:28px">📋 Records</div>
+            <div class="appdesigner-tree-item selected" style="padding-left:40px;background:#316ac5;color:#fff">📄 EMP_DEPT_DATA</div>
+            <div class="appdesigner-tree-item" style="padding-left:28px">📝 Fields</div>
+            <div class="appdesigner-tree-item" style="padding-left:28px">🖼 Pages</div>
+          </div>
+          <!-- Workspace -->
+          <div class="appdesigner-workspace">
+            <div class="appdesigner-record-window">
+              <div class="appdesigner-record-titlebar">
+                <div class="appdesigner-record-title">EMP_DEPT_DATA (Record)</div>
+                <div style="display:flex;gap:4px">
+                  <div style="width:12px;height:12px;border-radius:2px;background:rgba(255,255,255,0.3)"></div>
+                  <div style="width:12px;height:12px;border-radius:2px;background:#c0392b"></div>
+                </div>
+              </div>
+              <div class="appdesigner-record-tabs">
+                <div class="appdesigner-record-tab active">Record Fields</div>
+                <div class="appdesigner-record-tab">Record Type</div>
+                <div class="appdesigner-record-tab">Use</div>
+                <div class="appdesigner-record-tab">PeopleCode</div>
+              </div>
+              <table class="appdesigner-record-table" id="adsFieldTable">
+                <thead><tr><th>#</th><th>Field Name</th><th>Type</th><th>Len</th><th>Key</th><th>Value</th></tr></thead>
+                <tbody id="adsFieldBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <!-- Properties -->
+          <div class="appdesigner-props" id="adsProps">
+            <div class="appdesigner-prop-row">
+              <div class="appdesigner-prop-label">Record Name</div>
+              <div class="appdesigner-prop-value">EMP_DEPT_DATA</div>
+            </div>
+            <div class="appdesigner-prop-row">
+              <div class="appdesigner-prop-label">Record Type</div>
+              <select class="appdesigner-prop-select" id="adsRecordType">
+                <option selected>SQL Table</option>
+                <option>SQL View</option>
+                <option>Dynamic View</option>
+                <option>Derived/Work</option>
+                <option>SubRecord</option>
+                <option>Temp Table</option>
+              </select>
+            </div>
+            <div class="appdesigner-prop-row">
+              <div class="appdesigner-prop-label">Table Name</div>
+              <div class="appdesigner-prop-value">PS_EMP_DEPT_DATA</div>
+            </div>
+            <div style="margin-top:14px">
+              <div class="appdesigner-prop-label">Add Field</div>
+              <select id="adsAddFieldSelect" class="appdesigner-prop-select" style="margin-bottom:6px">
+                <option value="">-- Select Field --</option>
+                <option value="EMPLID|CHAR|11">EMPLID (CHAR 11)</option>
+                <option value="EFFDT|DATE|">EFFDT (DATE)</option>
+                <option value="DEPTID|CHAR|10">DEPTID (CHAR 10)</option>
+                <option value="SETID|CHAR|5">SETID (CHAR 5)</option>
+                <option value="JOB_CODE|CHAR|6">JOB_CODE (CHAR 6)</option>
+              </select>
+              <button onclick="adsAddField()" style="width:100%;background:#1f5a9a;color:#fff;border:none;padding:5px;font-size:11px;cursor:pointer;border-radius:2px">+ Add Field</button>
+            </div>
+          </div>
+        </div>
+        <!-- Output -->
+        <div>
+          <div class="appdesigner-output-header">
+            <span class="appdesigner-output-tab active">Build</span>
+            <span class="appdesigner-output-tab">Upgrade</span>
+            <span class="appdesigner-output-tab">Results</span>
+            <span class="appdesigner-output-tab">Validate</span>
+          </div>
+          <div class="appdesigner-output" id="adsOutput">Ready.</div>
+        </div>
+      </div>
+      <div class="lab-result-box" id="adsResult" style="margin-top:16px"></div>
+    </div>
+  </div>
+
+  <!-- MODE 6: PS LOGIN + HOME SIMULATOR -->
+  <div id="labPSSim" style="display:none" class="lab-ps-sim">
+    <!-- Login Screen -->
+    <div id="psLoginScreen" class="ps-sim-screen active">
+      <div class="ps-login-outer">
+        <div class="ps-login-card">
+          <div class="ps-login-header">
+            <div class="ps-login-brand">PS Learn <span>| PeopleSoft Practice Arena</span></div>
+          </div>
+          <div class="ps-login-title">PS Learn</div>
+          <div class="ps-login-subtitle">HCM Demo Environment</div>
+          <div class="ps-login-error" id="psLoginError">Invalid User ID or Password. Please try again.</div>
+          <div class="ps-login-field">
+            <label class="ps-login-label" for="psUserId">User ID</label>
+            <input class="ps-login-input" id="psUserId" type="text" placeholder="Enter your User ID" autocomplete="off"/>
+          </div>
+          <div class="ps-login-field">
+            <label class="ps-login-label" for="psPassword">Password</label>
+            <input class="ps-login-input" id="psPassword" type="password" placeholder="Enter your password" onkeydown="if(event.key==='Enter')psSignIn()"/>
+          </div>
+          <button class="ps-login-btn" onclick="psSignIn()">Sign In</button>
+          <div class="ps-login-env">HCM Demo Environment</div>
+          <div class="ps-login-footer">
+            <span>HCM Demo Environment</span>
+            <span>Copyright © 2024 Oracle. All Rights Reserved.</span>
+          </div>
+        </div>
+      </div>
+      <button onclick="backToLab()" style="position:fixed;top:70px;left:16px;z-index:500;background:rgba(0,0,0,0.5);color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:12px;cursor:pointer">← Back to Lab</button>
+    </div>
+    <!-- Home Screen -->
+    <div id="psHomeScreen" class="ps-sim-screen">
+      <div class="ps-home-outer">
+        <div class="ps-home-topbar">
+          <div class="ps-home-brand">
+            PS Learn <span class="ps-home-brand-sub">| PeopleSoft Practice Arena</span>
+          </div>
+          <div class="ps-home-topicons">
+            <button class="ps-home-topicon" title="Home" onclick="psGoHome()">🏠</button>
+            <button class="ps-home-topicon" title="Search">🔍</button>
+            <button class="ps-home-topicon" title="Notifications" style="position:relative">
+              🔔<span class="ps-home-notif-badge">1</span>
+            </button>
+            <button class="ps-home-topicon" title="NavBar" onclick="psToggleNav()">⚙️</button>
+            <button class="ps-exit-btn" onclick="psSignOut()">Sign Out</button>
+          </div>
+        </div>
+        <div class="ps-home-body">
+          <div class="ps-home-content" id="psHomeContent">
+            <!-- Tiles -->
+            <div class="ps-home-tiles" id="psTilesGrid"></div>
+            <!-- Quick Links -->
+            <div class="ps-quicklinks">
+              <div class="ps-quicklinks-title">Quick Links</div>
+              <div class="ps-quicklinks-row" id="psQuickLinks"></div>
+            </div>
+          </div>
+          <!-- NavBar -->
+          <div class="ps-navbar" id="psNavBar">
+            <div class="ps-navbar-header">
+              <span class="ps-navbar-title">Navigator</span>
+              <button onclick="psToggleNav()" style="background:none;border:none;cursor:pointer;color:#888;font-size:16px">✕</button>
+            </div>
+            <input class="ps-navbar-search" type="text" placeholder="🔍 Search Menu..." oninput="psNavSearch(this.value)"/>
+            <div id="psNavItems"></div>
+          </div>
+        </div>
+        <div class="ps-home-footer">
+          <span>HCM Demo Environment</span>
+          <span id="psLoggedUser">Logged in as: HCMUSER</span>
+        </div>
+      </div>
+    </div>
+    <!-- Component View -->
+    <div id="psComponentScreen" class="ps-sim-screen">
+      <div class="ps-home-outer">
+        <div class="ps-home-topbar">
+          <div class="ps-home-brand">PS Learn <span class="ps-home-brand-sub">| PeopleSoft Practice Arena</span></div>
+          <div class="ps-home-topicons">
+            <button class="ps-home-topicon" onclick="psGoHome()">🏠</button>
+            <button class="ps-exit-btn" onclick="psSignOut()">Sign Out</button>
+          </div>
+        </div>
+        <div style="padding:24px;max-width:900px;margin:0 auto" id="psComponentContent"></div>
+      </div>
+    </div>
+  </div>
+
 </div>
+
+
 </body>
 </html>

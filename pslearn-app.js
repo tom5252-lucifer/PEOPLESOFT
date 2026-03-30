@@ -196,84 +196,811 @@ const INTERVIEW_QA = [
   {cat:"Real Project",level:"advanced",q:"Performance issue: a page with a 500-row grid takes 45 seconds to load. How do you diagnose and fix?",a:"Enable App Server SQL trace. Look for repeated identical SQL statements — SQLExec in RowInit is the classic cause. Fix: move the lookup to PostBuild using CreateSQL once to build an array/object keyed by EMPLID or DEPTID, then in RowInit just read from the array. Second check: is the grid's record a SQL Table or SQL View? Adding JOIN to a view to bring department names eliminates all RowInit lookups. Third: check indexes on the main record's key fields."},
 ];
 
+/* ═══════════════════════════════════════════════
+   PRO INTERVIEW ENGINE
+═══════════════════════════════════════════════ */
+let iqaState = {
+  level: 'all',
+  cat: 'all',
+  search: '',
+  reviewed: new Set(),
+  bookmarked: new Set(),
+};
+
 function showInterview() {
-  ['homepageView','appView','glossaryView','quizView','simulationView'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = 'none';
+  ['homepageView','appView','glossaryView','quizView','labView'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.style.display='none';
   });
   document.getElementById('interviewView').style.display = 'block';
-  renderInterviewQA('all');
-  window.scrollTo(0, 0);
+  buildIQACatSidebar();
+  renderIQA();
+  window.scrollTo(0,0);
 }
 
-let activeInterviewFilter = 'all';
+function buildIQACatSidebar() {
+  const cats = ['all', ...new Set(INTERVIEW_QA.map(q => q.cat))];
+  const sidebar = document.getElementById('iqaCatSidebar');
+  sidebar.innerHTML = cats.map(cat => {
+    const count = cat === 'all' ? INTERVIEW_QA.length : INTERVIEW_QA.filter(q => q.cat === cat).length;
+    return `<button class="iqa-cat-btn ${cat === iqaState.cat ? 'active' : ''}"
+      onclick="setIQACat('${cat}',this)">
+      <span>${cat === 'all' ? 'All Categories' : cat}</span>
+      <span class="iqa-cat-count">${count}</span>
+    </button>`;
+  }).join('');
+}
 
-function setInterviewFilter(level, btn) {
-  activeInterviewFilter = level;
-  document.querySelectorAll('.iqa-filter').forEach(b => b.classList.remove('active'));
+function setIQACat(cat, btn) {
+  iqaState.cat = cat;
+  document.querySelectorAll('.iqa-cat-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  renderInterviewQA(level);
+  renderIQA();
 }
 
-function renderInterviewQA(level) {
-  const container = document.getElementById('interviewContent');
-  const questions = level === 'all' ? INTERVIEW_QA : INTERVIEW_QA.filter(q => q.level === level);
-  
-  // Group by category
-  const grouped = {};
-  questions.forEach(q => {
-    if (!grouped[q.cat]) grouped[q.cat] = [];
-    grouped[q.cat].push(q);
-  });
+function setIQALevel(level, btn) {
+  iqaState.level = level;
+  document.querySelectorAll('.iqa-pro-filter').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderIQA();
+}
 
-  const levelColors = {beginner:'var(--green)',intermediate:'var(--amber)',advanced:'var(--red)'};
-  const levelLabels = {beginner:'Beginner',intermediate:'Intermediate',advanced:'Advanced'};
+function filterIQA() {
+  iqaState.search = document.getElementById('iqaSearchBar').value.toLowerCase();
+  renderIQA();
+}
 
-  container.innerHTML = Object.entries(grouped).map(([cat, qs]) => `
-    <div class="iqa-group" role="region" aria-label="${cat} questions">
-      <div class="iqa-group__header">${cat}</div>
-      ${qs.map((q, i) => `
-        <div class="iqa-item" role="article">
-          <button class="iqa-question" 
-            aria-expanded="false"
-            aria-controls="iqa-ans-${cat}-${i}"
-            onclick="toggleIQA(this)">
-            <span class="iqa-question__text">${q.q}</span>
-            <span class="iqa-level-badge" style="background:${levelColors[q.level]}20;color:${levelColors[q.level]};border:1px solid ${levelColors[q.level]}40">
-              ${levelLabels[q.level]}
-            </span>
-            <span class="iqa-chevron" aria-hidden="true">›</span>
-          </button>
-          <div class="iqa-answer" id="iqa-ans-${cat}-${i}" role="region" hidden>
-            <p>${q.a}</p>
+function renderIQA() {
+  let qs = INTERVIEW_QA;
+  if (iqaState.level !== 'all') qs = qs.filter(q => q.level === iqaState.level);
+  if (iqaState.cat !== 'all') qs = qs.filter(q => q.cat === iqaState.cat);
+  if (iqaState.search) qs = qs.filter(q =>
+    q.q.toLowerCase().includes(iqaState.search) ||
+    q.a.toLowerCase().includes(iqaState.search) ||
+    q.cat.toLowerCase().includes(iqaState.search)
+  );
+
+  const levelTag = {beginner:'🌱 Beginner',intermediate:'⚡ Intermediate',advanced:'🔥 Advanced',scenario:'🏢 Real Project'};
+  const levelClass = {beginner:'tag-level-b',intermediate:'tag-level-i',advanced:'tag-level-a',scenario:'tag-level-s'};
+  const numClass = {beginner:'num-beginner',intermediate:'num-intermediate',advanced:'num-advanced',scenario:'num-scenario'};
+
+  document.getElementById('iqaPanelTitle').textContent =
+    iqaState.cat === 'all' ? 'All Questions' : iqaState.cat;
+  document.getElementById('iqaPanelCount').textContent = `${qs.length} question${qs.length !== 1 ? 's' : ''}`;
+
+  document.getElementById('iqaContent').innerHTML = qs.length === 0
+    ? `<div style="padding:40px;text-align:center;color:var(--faint);font-size:14px">No questions match your filters.</div>`
+    : qs.map((q, i) => {
+      const globalIdx = INTERVIEW_QA.indexOf(q);
+      const isReviewed = iqaState.reviewed.has(globalIdx);
+      const isBookmarked = iqaState.bookmarked.has(globalIdx);
+      const highlightedQ = iqaState.search
+        ? q.q.replace(new RegExp(`(${iqaState.search})`, 'gi'), '<mark style="background:rgba(240,165,0,0.25);color:var(--gold)">$1</mark>')
+        : q.q;
+      return `
+      <div class="iqa-card ${isReviewed ? 'reviewed' : ''}" id="iqa-card-${globalIdx}">
+        <button class="iqa-card-header" onclick="toggleIQACard(${globalIdx})" aria-expanded="false" aria-controls="iqa-body-${globalIdx}">
+          <div class="iqa-card-num ${numClass[q.level]}">${globalIdx + 1}</div>
+          <div class="iqa-card-meta">
+            <div class="iqa-card-q">${highlightedQ}</div>
+            <div class="iqa-card-tags">
+              <span class="iqa-tag ${levelClass[q.level]}">${levelTag[q.level]}</span>
+              <span class="iqa-tag tag-cat">${q.cat}</span>
+              ${isBookmarked ? '<span class="iqa-tag" style="background:rgba(240,165,0,0.1);color:var(--gold)">🔖 Saved</span>' : ''}
+              ${isReviewed ? '<span class="iqa-tag" style="background:rgba(34,197,94,0.08);color:var(--green)">✓ Reviewed</span>' : ''}
+            </div>
+          </div>
+          <span class="iqa-card-chevron">›</span>
+        </button>
+        <div class="iqa-card-body" id="iqa-body-${globalIdx}">
+          <div class="iqa-answer-label">✅ Expert Answer</div>
+          <div class="iqa-answer-text">${formatIQAAnswer(q.a)}</div>
+          <div class="iqa-answer-actions">
+            <button class="iqa-copy-btn" onclick="copyIQAAnswer(${globalIdx},this)">📋 Copy Answer</button>
+            <button class="iqa-bookmark-btn ${isBookmarked ? 'bookmarked' : ''}" onclick="toggleIQABookmark(${globalIdx},this)">
+              ${isBookmarked ? '🔖 Saved' : '🔖 Save'}
+            </button>
+            <span class="iqa-progress-note">${isReviewed ? '✓ Reviewed' : ''}</span>
           </div>
         </div>
-      `).join('')}
-    </div>
-  `).join('');
+      </div>`;
+    }).join('');
+
+  updateIQAProgress();
 }
 
-function toggleIQA(btn) {
-  const answer = document.getElementById(btn.getAttribute('aria-controls'));
-  const isOpen = btn.getAttribute('aria-expanded') === 'true';
+function formatIQAAnswer(text) {
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/`([^`]+)`/g, '<code style="background:var(--s3);color:var(--cyan);padding:1px 6px;border-radius:4px;font-size:0.9em;font-family:var(--fm)">$1</code>');
+}
+
+function toggleIQACard(idx) {
+  const card = document.getElementById(`iqa-card-${idx}`);
+  const body = document.getElementById(`iqa-body-${idx}`);
+  const btn = card.querySelector('.iqa-card-header');
+  const isOpen = card.classList.contains('open');
+  card.classList.toggle('open', !isOpen);
   btn.setAttribute('aria-expanded', !isOpen);
-  if (isOpen) { answer.hidden = true; }
-  else { answer.hidden = false; }
-  btn.querySelector('.iqa-chevron').style.transform = isOpen ? '' : 'rotate(90deg)';
+  if (!isOpen) {
+    // Mark as reviewed
+    iqaState.reviewed.add(idx);
+    updateIQAProgress();
+  }
 }
 
+function copyIQAAnswer(idx, btn) {
+  const q = INTERVIEW_QA[idx];
+  navigator.clipboard.writeText(q.a).then(() => {
+    btn.classList.add('copied');
+    btn.textContent = '✅ Copied!';
+    setTimeout(() => { btn.classList.remove('copied'); btn.textContent = '📋 Copy Answer'; }, 2000);
+  });
+}
+
+function toggleIQABookmark(idx, btn) {
+  if (iqaState.bookmarked.has(idx)) {
+    iqaState.bookmarked.delete(idx);
+    btn.classList.remove('bookmarked');
+    btn.textContent = '🔖 Save';
+  } else {
+    iqaState.bookmarked.add(idx);
+    btn.classList.add('bookmarked');
+    btn.textContent = '🔖 Saved';
+  }
+}
+
+function updateIQAProgress() {
+  const total = INTERVIEW_QA.length;
+  const reviewed = iqaState.reviewed.size;
+  const pct = Math.round((reviewed / total) * 100);
+  const fill = document.getElementById('iqaProgressFill');
+  const label = document.getElementById('iqaProgressLabel');
+  const count = document.getElementById('iqaReviewedCount');
+  if (fill) fill.style.width = pct + '%';
+  if (label) label.textContent = `${reviewed} / ${total} reviewed`;
+  if (count) count.textContent = reviewed;
+}
 
 /* ═══════════════════════════════════════════════
-   SIMULATION VIEW (PLACEHOLDER)
+   LAB SIMULATOR ENGINE
 ═══════════════════════════════════════════════ */
-function showSimulation() {
+function showLab() {
   ['homepageView','appView','glossaryView','quizView','interviewView'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = 'none';
+    const el = document.getElementById(id); if(el) el.style.display='none';
   });
-  document.getElementById('simulationView').style.display = 'block';
-  window.scrollTo(0, 0);
+  document.getElementById('labView').style.display = 'block';
+  backToLab();
+  window.scrollTo(0,0);
 }
+
+function backToLab() {
+  document.getElementById('labHome').style.display = 'block';
+  ['labDebug','labEventFlow','labMatcher','labScenario','labAppDesigner','labPSSim'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.style.display='none';
+  });
+}
+
+function openLabMode(mode) {
+  document.getElementById('labHome').style.display = 'none';
+  const modeMap = {debug:'labDebug',eventflow:'labEventFlow',matcher:'labMatcher',
+    scenario:'labScenario',appdesigner:'labAppDesigner',pssim:'labPSSim'};
+  const el = document.getElementById(modeMap[mode]);
+  if(el) { el.style.display='block'; window.scrollTo(0,0); }
+  if(mode==='debug') initDebug();
+  if(mode==='eventflow') initEventFlow();
+  if(mode==='matcher') initMatcher();
+  if(mode==='scenario') initScenario();
+  if(mode==='appdesigner') initAppDesigner();
+  if(mode==='pssim') initPSSim();
+}
+
+/* ── MODE 1: DEBUG ── */
+const DEBUG_CHALLENGES = [
+  {
+    title:"Performance Issue in Job Data Component",
+    desc:"An HR coordinator reports the Job Data component takes 30+ seconds to load when an employee has many job rows. Identify the problematic line.",
+    code:[
+      {n:1,t:"/* PostBuild — Initialize component */"},
+      {n:2,t:"Function InitComponent()"},
+      {n:3,t:"   Local Rowset &rs;"},
+      {n:4,t:"   Local Record &rec;"},
+      {n:5,t:"   &rs = GetRowset(Scroll.JOB);"},
+      {n:6,t:"   For &i = 1 To &rs.ActiveRowCount"},
+      {n:7,t:"      &rec = &rs.GetRow(&i).GetRecord(Record.JOB);"},
+      {n:8,t:"      SQLExec(\"SELECT DESCR FROM PS_DEPT_TBL WHERE DEPTID=:1\", &rec.DEPTID.Value, &deptName);"},
+      {n:9,t:"      &rec.DEPTID_DESCR.Value = &deptName;"},
+      {n:10,t:"   End-For;"},
+      {n:11,t:"End-Function;"},
+    ],
+    bugLine:8,
+    hint:"Think about how many times this SQL runs...",
+    explanation:"Line 8 is the bug — SQLExec inside a For loop causes N+1 queries. If there are 50 job rows, this executes 50 separate SQL calls to PS_DEPT_TBL. Fix: use a single CreateSQL to pre-fetch all department names into an object before the loop, then look up from the object in RowInit."
+  },
+  {
+    title:"Scope Bug — Variable Not Available",
+    desc:"A developer set a flag in PostBuild but it's not accessible in SaveEdit. Find the scope error.",
+    code:[
+      {n:1,t:"/* PostBuild */"},
+      {n:2,t:"Local Boolean &isNewHire;"},
+      {n:3,t:"If JOB.ACTION.Value = \"HIR\" Then"},
+      {n:4,t:"   &isNewHire = True;"},
+      {n:5,t:"End-If;"},
+      {n:6,t:""},
+      {n:7,t:"/* SaveEdit — checks flag set in PostBuild */"},
+      {n:8,t:"If &isNewHire Then"},
+      {n:9,t:"   If JOB.DEPTID.Value = \"\" Then"},
+      {n:10,t:"      Error \"New hires must have a Department.\";"},
+      {n:11,t:"   End-If;"},
+      {n:12,t:"End-If;"},
+    ],
+    bugLine:2,
+    hint:"Local variables only exist within a single PeopleCode execution...",
+    explanation:"Line 2 is the bug — declaring &isNewHire as Local means it only exists during the PostBuild execution. By the time SaveEdit runs, it's a completely new execution — the Local variable is gone and &isNewHire is empty. Fix: declare it as Component Boolean &isNewHire so it persists across all events in the component transaction."
+  },
+  {
+    title:"Missing None() Check",
+    desc:"This code crashes when no department is found. Find the missing validation.",
+    code:[
+      {n:1,t:"/* FieldChange on DEPTID */"},
+      {n:2,t:"Local string &deptDescr;"},
+      {n:3,t:"SQLExec(\"SELECT DESCR FROM PS_DEPT_TBL WHERE DEPTID=:1 AND EFFDT=(SELECT MAX(EFFDT) FROM PS_DEPT_TBL WHERE DEPTID=:1 AND EFFDT<=%CurrentDateIn)\","},
+      {n:4,t:"   JOB.DEPTID.Value, JOB.DEPTID.Value, &deptDescr);"},
+      {n:5,t:"JOB.DEPTID_DESCR.Value = &deptDescr;"},
+      {n:6,t:"MessageBox(0, \"\", 0, 0, \"Department: \" | &deptDescr);"},
+    ],
+    bugLine:5,
+    hint:"What if the DEPTID doesn't exist in PS_DEPT_TBL?",
+    explanation:"Line 5 is the bug — if SQLExec finds no matching row, &deptDescr is empty string. The code assigns an empty value without checking. While this won't crash in all cases, the real issue is Line 6 which will show 'Department: ' with nothing. Best practice: after SQLExec, always check the result before using it. If the field is critical, use an Error or Warning when the lookup fails."
+  },
+  {
+    title:"Wrong Event for Field Default",
+    desc:"A developer wants to default DEPTID to 'CORP' when a component first opens. The code runs but the field keeps clearing. Find the wrong event choice.",
+    code:[
+      {n:1,t:"/* FieldChange on BUSINESS_UNIT */"},
+      {n:2,t:"/* Developer tries to default DEPTID when component loads */"},
+      {n:3,t:"If JOB.DEPTID.Value = \"\" Then"},
+      {n:4,t:"   JOB.DEPTID.Value = \"CORP\";"},
+      {n:5,t:"End-If;"},
+    ],
+    bugLine:1,
+    hint:"FieldChange fires when a user CHANGES a field. When does a default need to be set?",
+    explanation:"Line 1 is the bug — using FieldChange on BUSINESS_UNIT is wrong. FieldChange only fires when the user actively changes BUSINESS_UNIT. For setting a default when the component first loads, the correct event is FieldDefault (fires before the user sees the field) or PostBuild (fires once after all rows load). FieldDefault is the canonical place for defaulting field values."
+  },
+  {
+    title:"Effective Dating Query Bug",
+    desc:"This query returns multiple rows for the same employee causing duplicate results in a report. Find the SQL error.",
+    code:[
+      {n:1,t:"/* SQLExec to get employee department */"},
+      {n:2,t:"Local string &deptId;"},
+      {n:3,t:"SQLExec(\"SELECT DEPTID FROM PS_JOB WHERE EMPLID=:1\","},
+      {n:4,t:"   PERSONAL_DATA.EMPLID.Value, &deptId);"},
+      {n:5,t:"JOB.DEPTID.Value = &deptId;"},
+    ],
+    bugLine:3,
+    hint:"PS_JOB can have 20+ rows per employee. Which one is current?",
+    explanation:"Line 3 is the bug — the SQL has no effective dating WHERE clause. PS_JOB has one row per job change over an employee's entire career. Without MAX(EFFDT) <= today and MAX(EFFSEQ), SQLExec returns the first row found (could be the hire row from 10 years ago). Correct SQL: SELECT DEPTID FROM PS_JOB WHERE EMPLID=:1 AND EFFDT=(SELECT MAX(EFFDT) FROM PS_JOB WHERE EMPLID=:1 AND EFFDT<=%CurrentDateIn) AND EFFSEQ=(SELECT MAX(EFFSEQ) FROM PS_JOB WHERE EMPLID=:1 AND EFFDT=...)"
+  },
+  {
+    title:"SavePostChange Misuse",
+    desc:"A developer wants to cancel the save if a condition is not met, but Error() in SavePostChange does nothing. Find the wrong event.",
+    code:[
+      {n:1,t:"/* SavePostChange */"},
+      {n:2,t:"/* Developer tries to cancel save if salary too high */"},
+      {n:3,t:"If JOB.ANNUAL_RT.Value > 500000 Then"},
+      {n:4,t:"   Error \"Salary exceeds maximum grade. Save cancelled.\";"},
+      {n:5,t:"End-If;"},
+      {n:6,t:"/* Downstream integration call */"},
+      {n:7,t:"CallAppEngine(\"HR_NOTIF_AE\");"},
+    ],
+    bugLine:1,
+    hint:"Once data is committed to DB, can you still cancel?",
+    explanation:"Line 1 is the bug — the wrong event. SavePostChange fires AFTER the database commit is complete. At this point you cannot cancel the save — the data is already in the database. Error() in SavePostChange is silently ignored. Move the salary validation to SaveEdit, which fires BEFORE the DB commit and where Error() stops the save and highlights the issue. SavePostChange is only for downstream actions that need the data already saved."
+  },
+];
+
+let debugState = { idx:0, selected:null, score:0 };
+
+function initDebug() {
+  debugState = { idx:0, selected:null, score:0 };
+  renderDebugChallenge();
+}
+
+function renderDebugChallenge() {
+  const ch = DEBUG_CHALLENGES[debugState.idx];
+  debugState.selected = null;
+  document.getElementById('debugCounter').textContent = `Challenge ${debugState.idx+1} of ${DEBUG_CHALLENGES.length}`;
+  document.getElementById('debugScore').textContent = `Score: ${debugState.score}`;
+  document.getElementById('debugScenario').innerHTML = `<div class="matcher-scenario__label">Scenario</div><div class="matcher-scenario__text">${ch.desc}</div>`;
+  document.getElementById('debugCode').innerHTML = ch.code.map(line =>
+    `<div class="lab-code-line" id="dline-${line.n}" onclick="selectDebugLine(${line.n})">
+      <span class="lab-code-linenum">${line.n}</span>
+      <span class="lab-code-text">${escapeCodeHtml(line.t)}</span>
+    </div>`
+  ).join('');
+  document.getElementById('debugHint').textContent = '💡 ' + ch.hint;
+  document.getElementById('debugCheckBtn').disabled = true;
+  document.getElementById('debugNextBtn').style.display = 'none';
+  const res = document.getElementById('debugResult');
+  res.classList.remove('show','correct','wrong');
+  res.innerHTML = '';
+}
+
+function escapeCodeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function selectDebugLine(n) {
+  document.querySelectorAll('.lab-code-line').forEach(l => l.classList.remove('selected'));
+  document.getElementById(`dline-${n}`).classList.add('selected');
+  debugState.selected = n;
+  document.getElementById('debugCheckBtn').disabled = false;
+}
+
+function checkDebugAnswer() {
+  const ch = DEBUG_CHALLENGES[debugState.idx];
+  const correct = debugState.selected === ch.bugLine;
+  if(correct) debugState.score++;
+  document.getElementById('debugScore').textContent = `Score: ${debugState.score}`;
+  // Highlight
+  document.querySelectorAll('.lab-code-line').forEach(l => l.style.pointerEvents='none');
+  document.getElementById(`dline-${ch.bugLine}`).classList.add('correct-line');
+  if(!correct && debugState.selected) document.getElementById(`dline-${debugState.selected}`).classList.add('selected');
+  const res = document.getElementById('debugResult');
+  res.className = `lab-result-box show ${correct?'correct':'wrong'}`;
+  res.innerHTML = `<div class="lab-result-box__title">${correct?'✅ Correct!':'❌ Not quite'}</div>
+    <div class="lab-result-box__text"><strong>Bug on line ${ch.bugLine}:</strong> ${ch.explanation}</div>`;
+  document.getElementById('debugCheckBtn').style.display = 'none';
+  document.getElementById('debugNextBtn').style.display = debugState.idx < DEBUG_CHALLENGES.length-1 ? 'block' : 'none';
+  if(debugState.idx === DEBUG_CHALLENGES.length-1) {
+    document.getElementById('debugNextBtn').style.display = 'none';
+    res.innerHTML += `<br><strong style="color:var(--gold)">Lab Complete! Score: ${debugState.score}/${DEBUG_CHALLENGES.length}</strong>`;
+  }
+}
+
+function nextDebugChallenge() {
+  debugState.idx++;
+  renderDebugChallenge();
+}
+
+/* ── MODE 2: EVENT FLOW ── */
+const EF_CHALLENGES = [
+  {
+    name:"Component Load Sequence — What fires when a user opens a page?",
+    events:[
+      {name:"SearchInit",phase:"load",correct:0},
+      {name:"RowSelect",phase:"load",correct:1},
+      {name:"RowInit",phase:"load",correct:2},
+      {name:"FieldDefault",phase:"load",correct:3},
+      {name:"FieldFormula",phase:"load",correct:4},
+      {name:"PostBuild",phase:"load",correct:5},
+      {name:"Activate",phase:"load",correct:6},
+    ]
+  },
+  {
+    name:"Save Sequence — What fires when a user clicks Save?",
+    events:[
+      {name:"SaveEdit",phase:"save",correct:0},
+      {name:"SavePreChange",phase:"save",correct:1},
+      {name:"WorkFlow",phase:"save",correct:2},
+      {name:"SavePostChange",phase:"save",correct:3},
+    ]
+  },
+  {
+    name:"Field Interaction — What fires when a user changes a field value?",
+    events:[
+      {name:"FieldEdit",phase:"interact",correct:0},
+      {name:"FieldChange",phase:"interact",correct:1},
+    ]
+  },
+];
+let efState = { idx:0, items:[] };
+
+function initEventFlow() { efState.idx=0; loadEFChallenge(); }
+
+function loadEFChallenge() {
+  const ch = EF_CHALLENGES[efState.idx];
+  document.getElementById('efChallengeName').textContent = ch.name;
+  efState.items = [...ch.events].sort(() => Math.random()-0.5);
+  renderEFList();
+  const res = document.getElementById('efResult');
+  res.classList.remove('show','correct','wrong');
+  res.innerHTML = '';
+  document.getElementById('efNextBtn').style.display = 'none';
+}
+
+function renderEFList() {
+  const phaseColors = {load:'phase-load',interact:'phase-interact',save:'phase-save'};
+  const phaseLabels = {load:'Load',interact:'User Action',save:'Save'};
+  document.getElementById('eventDragList').innerHTML = efState.items.map((ev,i) =>
+    `<div class="event-drag-item" draggable="true" data-idx="${i}"
+      ondragstart="efDragStart(event,${i})"
+      ondragover="efDragOver(event,${i})"
+      ondrop="efDrop(event,${i})">
+      <span class="event-drag-handle">⠿</span>
+      <span class="event-drag-num">${i+1}</span>
+      <span style="flex:1;font-family:var(--fm);font-weight:600">${ev.name}</span>
+      <span class="event-phase-badge ${phaseColors[ev.phase]}">${phaseLabels[ev.phase]}</span>
+    </div>`
+  ).join('');
+}
+
+let efDragging = null;
+function efDragStart(e,i){ efDragging=i; e.currentTarget.classList.add('dragging'); }
+function efDragOver(e,i){ e.preventDefault(); }
+function efDrop(e,i){
+  e.preventDefault();
+  if(efDragging===null||efDragging===i) return;
+  const items=[...efState.items];
+  const [moved]=items.splice(efDragging,1);
+  items.splice(i,0,moved);
+  efState.items=items;
+  efDragging=null;
+  renderEFList();
+}
+
+function checkEventOrder() {
+  const ch = EF_CHALLENGES[efState.idx];
+  const correct = efState.items.every((ev,i) => ev.correct === i);
+  const items = document.querySelectorAll('.event-drag-item');
+  efState.items.forEach((ev,i) => {
+    items[i].classList.add(ev.correct === i ? 'correct-pos' : 'wrong-pos');
+    items[i].setAttribute('draggable','false');
+    items[i].style.cursor='default';
+  });
+  const res = document.getElementById('efResult');
+  res.className = `lab-result-box show ${correct?'correct':'wrong'}`;
+  const correctOrder = [...ch.events].sort((a,b)=>a.correct-b.correct).map(e=>e.name).join(' → ');
+  res.innerHTML = `<div class="lab-result-box__title">${correct?'✅ Perfect Order!':'❌ Not quite right'}</div>
+    <div class="lab-result-box__text">Correct sequence: <strong>${correctOrder}</strong></div>`;
+  if(efState.idx < EF_CHALLENGES.length-1) document.getElementById('efNextBtn').style.display='block';
+}
+
+function resetEventOrder() { loadEFChallenge(); }
+function nextEFChallenge() { efState.idx++; loadEFChallenge(); }
+
+/* ── MODE 3: OBJECT MATCHER ── */
+const MATCHER_CHALLENGES = [
+  {q:"Store temporary flag values during a component session — never saved to DB",ans:"Derived/Work Record",opts:["SQL Table","SQL View","Derived/Work Record","Temp Table"],exp:"Derived/Work records exist only in memory during the component transaction. They create no database object and are perfect for temporary flags, calculations, and work fields."},
+  {q:"Run a salary recalculation for 500,000 employees overnight",ans:"Application Engine",opts:["Component Interface","Application Engine","SQR","PS Query"],exp:"Application Engine is PeopleSoft's batch framework for large-scale data processing. It runs outside the online session, has checkpoint/restart capability, and supports parallel processing via Temp Tables."},
+  {q:"Load employee hire data from an external system using PeopleSoft business rules",ans:"Component Interface",opts:["Data Mover","SQL Insert","Component Interface","Application Engine"],exp:"Component Interface fires the same PeopleCode events as the online component — ensuring all business rules, defaults, and validations run during the data load. Perfect for inbound integrations."},
+  {q:"Display department name next to EMPLID without a DB insert",ans:"SQL View",opts:["SQL Table","SQL View","Derived/Work Record","Dynamic View"],exp:"SQL View creates a read-only database view that joins records. Use it to display related data (like DESCR from PS_DEPT_TBL) alongside key fields without any DB write."},
+  {q:"Short code list for EMPL_STATUS: A=Active, T=Terminated, L=Leave",ans:"Translate Value (XLAT)",opts:["Prompt Table","Translate Value (XLAT)","Dynamic View","Record Field"],exp:"Translate Values (XLAT) are stored in PSXLATITEM — PeopleSoft's universal lookup table for short stable codes of max 4 characters. Perfect for EMPL_STATUS, ACTION, FULL_PART_TIME."},
+  {q:"Send real-time employee data to an external payroll system via REST",ans:"Integration Broker",opts:["Application Engine","Data Mover","Integration Broker","Component Interface"],exp:"Integration Broker handles real-time synchronous and asynchronous messaging. Use Service Operations with REST routing to send/receive data from external systems."},
+  {q:"Reusable EFFDT + EFFSEQ fields used across 200 records",ans:"SubRecord",opts:["SQL Table","SubRecord","Dynamic View","Derived/Work Record"],exp:"SubRecords are reusable field groups. EFFDT_SBR contains EFFDT and EFFSEQ and is included in hundreds of effective-dated records — defining the fields once and reusing everywhere."},
+  {q:"Migrate reference data between environments with a simple script",ans:"Data Mover (DMS)",opts:["Application Engine","Data Mover (DMS)","Component Interface","SQL Script"],exp:"Data Mover (DMS) uses simple EXPORT/IMPORT scripts to move data between PeopleSoft databases. Ideal for migrating setup/reference data during implementations and upgrades."},
+  {q:"Allow parallel batch processing without data collision between instances",ans:"Temp Table",opts:["SQL Table","SQL View","Temp Table","Derived/Work Record"],exp:"Temp Tables are created multiple times in the DB (MYTEMP_AET, MYTEMP_AET1...). Each parallel AE instance uses its own copy — preventing data collision between concurrent batch processes."},
+  {q:"Upgrade-safe customization — attach custom PeopleCode to a delivered component without modifying it",ans:"Event Mapping",opts:["SubRecord","Event Mapping","Application Package","Component Interface"],exp:"Event Mapping (PT 8.55+) lets you attach custom App Class PeopleCode to delivered component events without touching the delivered object. During upgrades, Oracle replaces the delivered component but your mapping remains intact."},
+];
+let matcherState = { idx:0, score:0, answered:false };
+function initMatcher() { matcherState={idx:0,score:0,answered:false}; renderMatcher(); }
+function renderMatcher() {
+  const ch = MATCHER_CHALLENGES[matcherState.idx];
+  matcherState.answered = false;
+  document.getElementById('matcherCounter').textContent = `Scenario ${matcherState.idx+1} of ${MATCHER_CHALLENGES.length}`;
+  document.getElementById('matcherScore').textContent = `Score: ${matcherState.score}/${matcherState.idx}`;
+  document.getElementById('matcherScenario').textContent = ch.q;
+  document.getElementById('matcherOptions').innerHTML = ch.opts.map(opt =>
+    `<button class="matcher-opt" onclick="checkMatcher('${opt.replace(/'/g,"\\'")}',this)">${opt}</button>`
+  ).join('');
+  const res = document.getElementById('matcherResult');
+  res.classList.remove('show','correct','wrong'); res.innerHTML='';
+  document.getElementById('matcherNextBtn').style.display='none';
+}
+function checkMatcher(chosen, btn) {
+  if(matcherState.answered) return;
+  matcherState.answered = true;
+  const ch = MATCHER_CHALLENGES[matcherState.idx];
+  const correct = chosen === ch.ans;
+  if(correct) matcherState.score++;
+  document.querySelectorAll('.matcher-opt').forEach(b => {
+    b.disabled=true;
+    if(b.textContent===ch.ans) b.classList.add('correct');
+    else if(b===btn) b.classList.add('wrong');
+    else b.classList.add('reveal');
+  });
+  const res = document.getElementById('matcherResult');
+  res.className=`lab-result-box show ${correct?'correct':'wrong'}`;
+  res.innerHTML=`<div class="lab-result-box__title">${correct?'✅ Correct!':'❌ Wrong'}</div>
+    <div class="lab-result-box__text"><strong>Answer: ${ch.ans}</strong><br>${ch.exp}</div>`;
+  document.getElementById('matcherScore').textContent=`Score: ${matcherState.score}/${matcherState.idx+1}`;
+  if(matcherState.idx < MATCHER_CHALLENGES.length-1) document.getElementById('matcherNextBtn').style.display='block';
+  else res.innerHTML+=`<br><strong style="color:var(--gold)">Complete! Final Score: ${matcherState.score}/${MATCHER_CHALLENGES.length}</strong>`;
+}
+function nextMatcher() { matcherState.idx++; renderMatcher(); }
+
+/* ── MODE 4: SCENARIO SOLVER ── */
+const SCENARIO_CHALLENGES = [
+  {q:"An HR coordinator reports the Job Data page loads in 45 seconds. SQL trace shows 300 identical SELECT statements against PS_DEPT_TBL. Root cause?",ans:"SQLExec inside RowInit fires once per row",opts:["Database index is missing on PS_DEPT_TBL","SQLExec inside RowInit fires once per row","App Server has too few PSAPPSRV processes","WebLogic timeout is too short"],exp:"Classic N+1 problem. RowInit fires for every row in the grid. SQLExec inside RowInit = one DB call per row. 300 rows = 300 calls. Fix: pre-fetch all department names in PostBuild once using CreateSQL, then read from the result in RowInit."},
+  {q:"A user can navigate to a custom component and see all fields, but clicking Save does nothing. No error message appears.",ans:"Permission List grants Display Only instead of Update/Display",opts:["The component has no PeopleCode","Permission List grants Display Only instead of Update/Display","The database is in read-only mode","The App Server is overloaded"],exp:"Display Only access mode in the Permission List means the user can view but not edit or save. The Save button is either hidden or disabled. Fix: change the component access mode to Update/Display in the user's Permission List."},
+  {q:"A custom component using PS_JOB as the Search Record shows all employees to all HR users — even those outside their authorized departments.",ans:"PS_JOB bypasses row-level security — need a security view",opts:["The Permission List is too broad","PS_JOB bypasses row-level security — need a security view","Row-level security is not configured in the system","The component has too many pages"],exp:"Using PS_JOB directly as the Search Record bypasses row-level security entirely. Replace it with a security view (e.g., PS_JOB_SRCH_VW) that joins PS_JOB with the department security tables. The view automatically filters results based on the user's security profile."},
+  {q:"A developer migrated a new component from DEV to QA successfully. QA users say the component doesn't appear in any menu.",ans:"Portal CREF was not migrated — only App Designer objects were",opts:["The component PeopleCode has a bug","Portal CREF was not migrated — only App Designer objects were","The database tables were not built in QA","The Permission List was not updated"],exp:"App Designer objects (records, pages, components) and Portal Registry entries (CREFs) are separate objects. The CREF is what makes the component appear in navigation. It must be explicitly included in the project and migrated separately from the App Designer objects."},
+  {q:"A payroll batch process shows Error status in Process Monitor. The log shows: 'No rows selected for processing'. The manager says it worked fine last month.",ans:"Run Control parameters are incorrect — likely wrong pay period dates",opts:["The App Server is down","Run Control parameters are incorrect — likely wrong pay period dates","PS_JOB has a data corruption issue","The process was submitted with wrong user ID"],exp:"'No rows selected' almost always means the selection criteria found nothing. The most common cause is incorrect Run Control parameters — especially date ranges. Check that the Pay Period End Date, Company, and Pay Group on the Run Control match the period being processed."},
+  {q:"An employee's promotion from last month is not showing in a departmental headcount report. The data looks correct in Job Data.",ans:"Report query is missing effective dating — showing current row not historical",opts:["The employee's data was accidentally deleted","Report query is missing effective dating — showing current row not historical","The batch process hasn't run yet","The report has a security issue"],exp:"The report is likely selecting only the current row (today's EFFDT). If the promotion was entered as future-dated but the report should show last month's state, the effective dating WHERE clause must reference the report period date, not just today."},
+  {q:"After a PeopleSoft upgrade, a customized delivered component no longer works. The customization code is gone.",ans:"Oracle overwrote the delivered component during the upgrade — customization was not upgrade-safe",opts:["The database restore failed","Oracle overwrote the delivered component during the upgrade — customization was not upgrade-safe","The developer deleted it by mistake","The Permission List was reset"],exp:"This is the classic upgrade risk. Customizations made directly to Oracle-delivered objects are overwritten when Oracle delivers a new version of that object. The fix going forward: use Event Mapping (PT 8.55+) or clone delivered objects with a custom prefix before modifying."},
+  {q:"A PS Query joining PS_PERSONAL_DATA and PS_JOB returns 15x the expected number of rows.",ans:"Missing effective dating criteria on PS_JOB creates a cross join",opts:["Wrong join key between the two records","Missing effective dating criteria on PS_JOB creates a cross join","PS_PERSONAL_DATA has duplicate rows","The query is running against the wrong database"],exp:"PS_PERSONAL_DATA has 1 row per employee. PS_JOB has 10-30+ rows per employee (one per job change). Joining without effective dating criteria creates a near-Cartesian product: 1 row × 20 rows = 20 result rows per employee. Always add MAX(EFFDT) <= today criteria when joining with any effective-dated table."},
+];
+let scenState = { idx:0, score:0, answered:false };
+function initScenario() { scenState={idx:0,score:0,answered:false}; renderScenario(); }
+function renderScenario() {
+  const ch = SCENARIO_CHALLENGES[scenState.idx];
+  scenState.answered=false;
+  document.getElementById('scenarioCounter').textContent=`Scenario ${scenState.idx+1} of ${SCENARIO_CHALLENGES.length}`;
+  document.getElementById('scenarioScore').textContent=`Score: ${scenState.score}/${scenState.idx}`;
+  document.getElementById('scenarioText').textContent=ch.q;
+  document.getElementById('scenarioOptions').innerHTML=ch.opts.map(opt=>
+    `<button class="matcher-opt" onclick="checkScenario('${opt.replace(/'/g,"\\'")}',this)">${opt}</button>`
+  ).join('');
+  const res=document.getElementById('scenarioResult');
+  res.classList.remove('show','correct','wrong'); res.innerHTML='';
+  document.getElementById('scenarioNextBtn').style.display='none';
+}
+function checkScenario(chosen,btn) {
+  if(scenState.answered) return;
+  scenState.answered=true;
+  const ch=SCENARIO_CHALLENGES[scenState.idx];
+  const correct=chosen===ch.ans;
+  if(correct) scenState.score++;
+  document.querySelectorAll('#scenarioOptions .matcher-opt').forEach(b=>{
+    b.disabled=true;
+    if(b.textContent===ch.ans) b.classList.add('correct');
+    else if(b===btn) b.classList.add('wrong');
+    else b.classList.add('reveal');
+  });
+  const res=document.getElementById('scenarioResult');
+  res.className=`lab-result-box show ${correct?'correct':'wrong'}`;
+  res.innerHTML=`<div class="lab-result-box__title">${correct?'✅ Correct Diagnosis!':'❌ Not quite'}</div>
+    <div class="lab-result-box__text"><strong>${ch.ans}</strong><br>${ch.exp}</div>`;
+  document.getElementById('scenarioScore').textContent=`Score: ${scenState.score}/${scenState.idx+1}`;
+  if(scenState.idx<SCENARIO_CHALLENGES.length-1) document.getElementById('scenarioNextBtn').style.display='block';
+  else res.innerHTML+=`<br><strong style="color:var(--gold)">Complete! Final Score: ${scenState.score}/${SCENARIO_CHALLENGES.length}</strong>`;
+}
+function nextScenario() { scenState.idx++; renderScenario(); }
+
+/* ── MODE 5: APP DESIGNER SIMULATOR ── */
+const ADS_TASKS = [
+  {id:'add_emplid',label:'Add EMPLID field (CHAR, 11, Key)'},
+  {id:'add_effdt', label:'Add EFFDT field (DATE, Key)'},
+  {id:'add_deptid',label:'Add DEPTID field (CHAR, 10)'},
+  {id:'add_setid', label:'Add SETID field (CHAR, 5)'},
+  {id:'build',     label:'Click Build to create the table'},
+];
+let adsState = { fields:[], tasksCompleted:new Set() };
+
+function initAppDesigner() {
+  adsState = { fields:[], tasksCompleted:new Set() };
+  document.getElementById('adsOutput').textContent = 'Ready.';
+  renderADSFields();
+  renderADSTasks();
+  const res = document.getElementById('adsResult');
+  res.classList.remove('show','correct','wrong'); res.innerHTML='';
+}
+
+function renderADSTasks() {
+  document.getElementById('adsTaskList').innerHTML = ADS_TASKS.map(t=>
+    `<div class="ads-task ${adsState.tasksCompleted.has(t.id)?'done':''}" id="ads-task-${t.id}">
+      <div class="ads-task-check">${adsState.tasksCompleted.has(t.id)?'✓':''}</div>
+      ${t.label}
+    </div>`
+  ).join('');
+}
+
+function renderADSFields() {
+  document.getElementById('adsFieldBody').innerHTML = adsState.fields.length === 0
+    ? `<tr><td colspan="6" style="text-align:center;color:#888;padding:16px">No fields defined. Add fields from the properties panel →</td></tr>`
+    : adsState.fields.map((f,i)=>
+        `<tr ${i===adsState.fields.length-1?'class="selected"':''}>
+          <td>${i+1}</td><td><strong>${f.name}</strong></td><td>${f.type}</td>
+          <td>${f.len||''}</td>
+          <td>${f.key?'<span style="color:#1f5a9a;font-size:16px">☑</span>':''}</td>
+          <td></td>
+        </tr>`
+      ).join('');
+}
+
+function adsAddField() {
+  const sel = document.getElementById('adsAddFieldSelect');
+  const val = sel.value;
+  if(!val) return;
+  const [name,type,len] = val.split('|');
+  const isKey = (name==='EMPLID'||name==='EFFDT');
+  // Check duplicate
+  if(adsState.fields.find(f=>f.name===name)) {
+    document.getElementById('adsOutput').textContent = `Field ${name} already exists.`; return;
+  }
+  adsState.fields.push({name,type,len,key:isKey});
+  renderADSFields();
+  document.getElementById('adsOutput').textContent = `Field ${name} added successfully.`;
+  // Mark task
+  const taskMap = {EMPLID:'add_emplid',EFFDT:'add_effdt',DEPTID:'add_deptid',SETID:'add_setid'};
+  if(taskMap[name]) { adsState.tasksCompleted.add(taskMap[name]); renderADSTasks(); }
+  sel.value='';
+}
+
+function adsBuild() {
+  const requiredFields = ['EMPLID','EFFDT','DEPTID','SETID'];
+  const presentFields = adsState.fields.map(f=>f.name);
+  const missing = requiredFields.filter(f=>!presentFields.includes(f));
+  const out = document.getElementById('adsOutput');
+  if(missing.length > 0) {
+    out.textContent = `Build failed: Missing required fields: ${missing.join(', ')}. Add all fields before building.`; return;
+  }
+  const lines = [
+    'Starting Build...',
+    'Generating CREATE TABLE DDL...',
+    '',
+    'CREATE TABLE PS_EMP_DEPT_DATA (',
+    '   EMPLID      CHAR(11)  NOT NULL,',
+    '   EFFDT       DATE      NOT NULL,',
+    '   DEPTID      CHAR(10)  NOT NULL,',
+    '   SETID       CHAR(5)   NOT NULL',
+    ')',
+    '',
+    'Building Indexes...',
+    'CREATE UNIQUE INDEX PS_EMP_DEPT_DATA ON PS_EMP_DEPT_DATA (EMPLID, EFFDT)',
+    '',
+    'SQL build succeeded.',
+    '1 record processed: 0 errors, 0 warnings',
+    'SQL written to C:\\TEMP\\PPSBUILD.SQL',
+  ];
+  out.textContent = lines.join('\n');
+  adsState.tasksCompleted.add('build');
+  renderADSTasks();
+  // Check if all tasks done
+  if(adsState.tasksCompleted.size === ADS_TASKS.length) {
+    const res = document.getElementById('adsResult');
+    res.className = 'lab-result-box show correct';
+    res.innerHTML = `<div class="lab-result-box__title">✅ Record Built Successfully!</div>
+      <div class="lab-result-box__text">You created the <strong>EMP_DEPT_DATA</strong> SQL Table record with all required fields and built the physical database table <strong>PS_EMP_DEPT_DATA</strong>. This is exactly how developers create new records in PeopleSoft Application Designer.</div>`;
+  }
+}
+
+/* ── MODE 6: PS SIMULATOR ── */
+const PS_TILES = [
+  {icon:'📊',title:'Timesheet Compliance',subtitle:'Updated every Monday',type:'chart'},
+  {icon:'⏰',title:'Timesheet',subtitle:'Enter & approve time',type:'tile'},
+  {icon:'📁',title:'Quick Projects',subtitle:'Contract & billing',type:'tile'},
+  {icon:'👤',title:'My Profile',subtitle:'Personal information',type:'tile'},
+  {icon:'✅',title:'Approvals',subtitle:'Pending items',type:'tile'},
+  {icon:'📈',title:'Reporting Tasks',subtitle:'Run & schedule reports',type:'tile'},
+];
+const PS_NAV_ITEMS = [
+  {label:'Recently Visited', icon:'🕒', subs:['Job Data','Personal Details','Benefits']},
+  {label:'Favorites', icon:'⭐', subs:['Employee Search','Pay Rate Change']},
+  {label:'Navigator', icon:'🧭', subs:[]},
+  {label:'Employee Self Service', icon:'👤', subs:['Personal Details','Pay','Benefits Summary']},
+  {label:'HR Administrator', icon:'🏢', subs:['Job Data','Position Management','Department Table']},
+  {label:'Benefits Administration', icon:'🛡️', subs:['Enrollment','Benefit Summary','Dependents']},
+  {label:'Payroll', icon:'💰', subs:['Run Payroll','Pay Calendar','Earnings Codes']},
+  {label:'Workforce Administration', icon:'📋', subs:['Personal Info','Job Information','Employment Data']},
+  {label:'Classic Home', icon:'🏠', subs:[]},
+];
+const PS_COMPONENTS = {
+  'Job Data': {title:'Job Data',subtitle:'Workforce Administration > Job Information > Job Data',fields:[{label:'Employee ID',val:'KR00123'},{label:'Name',val:'Koushik Ram M'},{label:'Effective Date',val:'03/30/2026'},{label:'Action',val:'HIR — Hire'},{label:'Department',val:'IT0001 — Information Technology'},{label:'Job Code',val:'IT001 — Software Developer'},{label:'Location',val:'HYD — Hyderabad'}]},
+  'Personal Details': {title:'Personal Details',subtitle:'Employee Self Service > Personal Information > Personal Details',fields:[{label:'Employee ID',val:'KR00123'},{label:'Name',val:'Koushik Ram M'},{label:'Date of Birth',val:'01/01/1999'},{label:'National ID',val:'XXXXX1234'},{label:'Email',val:'koushik@company.com'},{label:'Phone',val:'+91 9876543210'}]},
+  'Pay Rate Change': {title:'Pay Rate Change',subtitle:'HR Administrator > Compensation > Pay Rate Change',fields:[{label:'Employee ID',val:'KR00123'},{label:'Effective Date',val:'04/01/2026'},{label:'Action',val:'PAY — Pay Rate Change'},{label:'Current Salary',val:'₹ 8,00,000'},{label:'New Salary',val:'₹ 9,50,000'},{label:'Pay Group',val:'IND — India Monthly'}]},
+  'Department Table': {title:'Department Table',subtitle:'Set Up HCM > Foundation Tables > Organization > Departments',fields:[{label:'SetID',val:'SHARE'},{label:'Department ID',val:'IT0001'},{label:'Effective Date',val:'01/01/2020'},{label:'Description',val:'Information Technology'},{label:'Manager',val:'TechLead001'},{label:'Location',val:'HYD'}]},
+};
+
+let psSimUser = '';
+function initPSSim() {
+  showPSScreen('psLoginScreen');
+  document.getElementById('psUserId').value='';
+  document.getElementById('psPassword').value='';
+  document.getElementById('psLoginError').classList.remove('show');
+}
+function showPSScreen(id) {
+  ['psLoginScreen','psHomeScreen','psComponentScreen'].forEach(s=>{
+    const el=document.getElementById(s); if(el) el.classList.remove('active');
+  });
+  const el=document.getElementById(id); if(el) el.classList.add('active');
+}
+function psSignIn() {
+  const uid=document.getElementById('psUserId').value.trim();
+  const pwd=document.getElementById('psPassword').value;
+  document.getElementById('psLoginError').classList.remove('show');
+  if(!uid||!pwd) { document.getElementById('psLoginError').textContent='Please enter both User ID and Password.'; document.getElementById('psLoginError').classList.add('show'); return; }
+  psSimUser = uid;
+  document.getElementById('psLoggedUser').textContent = `Logged in as: ${uid.toUpperCase()}`;
+  buildPSHome();
+  showPSScreen('psHomeScreen');
+}
+function psSignOut() { showPSScreen('psLoginScreen'); }
+function psGoHome() { showPSScreen('psHomeScreen'); buildPSHome(); }
+
+function buildPSHome() {
+  // Tiles
+  document.getElementById('psTilesGrid').innerHTML = PS_TILES.map((t,i)=>
+    t.type==='chart'
+    ? `<div class="ps-tile chart-tile" onclick="psOpenComponent('${t.title}')">
+        <div class="ps-tile__chart-title">${t.title}</div>
+        <div style="display:flex;align-items:flex-end;gap:4px;height:60px;margin-bottom:6px">
+          ${[40,65,50,80,55,90,75].map(h=>`<div style="width:12px;background:#1e4d8c;height:${h}%;border-radius:2px 2px 0 0;opacity:0.7"></div>`).join('')}
+        </div>
+        <div style="font-size:10px;color:#888">${t.subtitle}</div>
+      </div>`
+    : `<div class="ps-tile" onclick="psOpenComponent('${t.title}')">
+        <div class="ps-tile__icon">${t.icon}</div>
+        <div class="ps-tile__title">${t.title}</div>
+        <div class="ps-tile__subtitle">${t.subtitle}</div>
+      </div>`
+  ).join('');
+  // Quick links
+  const qlinks = [
+    {icon:'📋',label:'View PeopleSoft'},
+    {icon:'✅',label:'Asset Allowances'},
+    {icon:'🔍',label:'Run a Query'},
+    {icon:'📄',label:'Your Docs'},
+  ];
+  document.getElementById('psQuickLinks').innerHTML = qlinks.map(q=>
+    `<div class="ps-quicklink" onclick="alert('${q.label} — Component would open here')"><span>${q.icon}</span>${q.label}</div>`
+  ).join('');
+  // NavBar
+  buildPSNav('');
+  document.getElementById('psNavBar').style.display='flex';
+}
+
+function psToggleNav() {
+  const nav=document.getElementById('psNavBar');
+  nav.style.display=nav.style.display==='none'?'flex':'none';
+}
+
+function buildPSNav(filter) {
+  document.getElementById('psNavItems').innerHTML = PS_NAV_ITEMS
+    .filter(item=>!filter||item.label.toLowerCase().includes(filter)||item.subs.some(s=>s.toLowerCase().includes(filter)))
+    .map((item,i)=>`
+      <div class="ps-navbar-section">
+        <div class="ps-navbar-item" onclick="psToggleNavItem(${i})">
+          <span class="ps-navbar-item-icon">${item.icon}</span>
+          ${item.label}
+          ${item.subs.length?'<span style="margin-left:auto;color:#aaa;font-size:12px">›</span>':''}
+        </div>
+        ${item.subs.length?`<div class="ps-navbar-sub" id="psnav-sub-${i}">
+          ${item.subs.map(s=>`<div class="ps-navbar-sub-item" onclick="psOpenComponent('${s}')"><span class="ps-sub-icon">📄</span>${s}</div>`).join('')}
+        </div>`:''}
+      </div>`
+    ).join('');
+}
+
+function psNavSearch(val) { buildPSNav(val.toLowerCase()); }
+
+function psToggleNavItem(i) {
+  const sub=document.getElementById(`psnav-sub-${i}`);
+  if(sub) sub.classList.toggle('open');
+}
+
+function psOpenComponent(name) {
+  const comp = PS_COMPONENTS[name];
+  const content = document.getElementById('psComponentContent');
+  showPSScreen('psComponentScreen');
+  if(!comp) {
+    content.innerHTML=`<div style="padding:20px"><p style="font-family:'Segoe UI';color:#888;font-size:14px">← <button onclick="psGoHome()" style="background:none;border:none;color:#1e4d8c;cursor:pointer;font-size:13px;font-family:'Segoe UI'">Back to Home</button></p><div style="background:#fff;border:1px solid #ddd;border-radius:6px;padding:24px;text-align:center;color:#888;font-family:'Segoe UI'">🚧 This component is not available in the simulator yet.<br><br><button onclick="psGoHome()" style="background:#1e4d8c;color:#fff;border:none;padding:8px 20px;border-radius:4px;cursor:pointer;font-family:'Segoe UI'">← Back to Homepage</button></div></div>`;
+    return;
+  }
+  content.innerHTML=`
+    <p style="font-family:'Segoe UI';font-size:12px;color:#888;margin-bottom:4px">
+      <button onclick="psGoHome()" style="background:none;border:none;color:#1e4d8c;cursor:pointer;font-size:12px;font-family:'Segoe UI'">🏠 Home</button>
+      › ${comp.subtitle}
+    </p>
+    <div style="background:#fff;border:1px solid #ddd;border-radius:6px;overflow:hidden">
+      <div style="background:linear-gradient(180deg,#1e4d8c,#163f75);padding:12px 16px;display:flex;align-items:center;justify-content:space-between">
+        <div style="color:#fff;font-family:'Segoe UI';font-size:14px;font-weight:600">${comp.title}</div>
+        <div style="display:flex;gap:8px">
+          <button style="background:rgba(255,255,255,0.2);color:#fff;border:none;padding:5px 14px;font-size:12px;cursor:pointer;border-radius:3px;font-family:'Segoe UI'">💾 Save</button>
+          <button onclick="psGoHome()" style="background:rgba(255,255,255,0.1);color:#fff;border:none;padding:5px 14px;font-size:12px;cursor:pointer;border-radius:3px;font-family:'Segoe UI'">✕ Cancel</button>
+        </div>
+      </div>
+      <div style="padding:20px">
+        <table style="width:100%;border-collapse:collapse;font-family:'Segoe UI';font-size:13px">
+          ${comp.fields.map(f=>`
+            <tr>
+              <td style="padding:8px 16px 8px 0;color:#555;font-weight:600;width:180px;vertical-align:top">${f.label}</td>
+              <td style="padding:8px 0"><input type="text" value="${f.val}" style="border:1px solid #ccc;padding:6px 10px;border-radius:3px;font-size:13px;font-family:'Segoe UI';color:#222;min-width:200px"/></td>
+            </tr>`).join('')}
+        </table>
+      </div>
+    </div>`;
+}
+
 
 
 
@@ -782,7 +1509,7 @@ document.addEventListener('keydown', e => {
    VIEW MANAGEMENT
 ═══════════════════════════════════════════════ */
 function showHome() {
-  ['appView','glossaryView','quizView','interviewView','simulationView'].forEach(id => {
+  ['appView','glossaryView','quizView','interviewView','labView'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = 'none';
   });
@@ -795,8 +1522,9 @@ function showHome() {
 function showApp() {
   document.getElementById('homepageView').style.display = 'none';
   document.getElementById('appView').style.display = 'block';
-  document.getElementById('glossaryView').style.display = 'none';
-  document.getElementById('quizView').style.display = 'none';
+  ['glossaryView','quizView','interviewView','labView'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.style.display='none';
+  });
 }
 
 function openTopic(index) {
