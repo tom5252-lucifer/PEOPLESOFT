@@ -2021,7 +2021,3 @@ const statsObs = new IntersectionObserver(entries => {
 }, { threshold: 0.5 });
 const statsBar = document.querySelector('.stats-bar');
 if (statsBar) statsObs.observe(statsBar);
-
-window.addEventListener('DOMContentLoaded', () => {
-  showHome();
-});

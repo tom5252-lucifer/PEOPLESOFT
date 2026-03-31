@@ -1,330 +1,1089 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PSLearn — Master PeopleSoft from Zero to Expert</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PSLearn — Master PeopleSoft from Zero to Expert</title>
 
-  <!-- SEO -->
-  <meta name="description" content="PSLearn is a free, structured PeopleSoft learning platform covering PeopleCode, Application Engine, Fluid UI, Integration Broker, and more." />
-  <meta name="keywords" content="PeopleSoft, PeopleCode, PeopleTools, HCM, FSCM, Application Engine, PS Query, Integration Broker" />
-  <meta name="author" content="Koushik Ram M" />
-  <meta name="robots" content="index, follow" />
+<!-- ── SEO META TAGS ── -->
+<meta name="description" content="PSLearn is a free, structured PeopleSoft learning platform covering PeopleCode, Application Engine, Fluid UI, Integration Broker, and more. Built for beginners to enterprise experts."/>
+<meta name="keywords" content="PeopleSoft, PeopleCode, PeopleTools, HCM, FSCM, Application Engine, Fluid UI, Integration Broker, PS Query, PeopleSoft Tutorial, PeopleSoft Learning"/>
+<meta name="author" content="Koushik Ram M"/>
+<meta name="robots" content="index, follow"/>
+<link rel="canonical" href="https://pslearn.vercel.app/"/>
 
-  <!-- Open Graph -->
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="PSLearn — Master PeopleSoft from Zero to Expert" />
-  <meta property="og:description" content="Free structured learning platform for PeopleSoft. Learn from basics to real-world development." />
+<!-- ── OPEN GRAPH (LinkedIn, WhatsApp, Facebook) ── -->
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://pslearn.vercel.app/"/>
+<meta property="og:title" content="PSLearn — Master PeopleSoft from Zero to Expert"/>
+<meta property="og:description" content="Free structured learning platform for PeopleSoft. 20+ beginner topics, mini quizzes, real-world scenarios, and interview prep — all in one place."/>
+<meta property="og:image" content="https://pslearn.vercel.app/og-preview.png"/>
+<meta property="og:site_name" content="PSLearn"/>
 
-  <!-- Theme -->
-  <meta name="theme-color" content="#080c18" />
+<!-- ── TWITTER CARD ── -->
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="PSLearn — Master PeopleSoft from Zero to Expert"/>
+<meta name="twitter:description" content="Free structured PeopleSoft learning. PeopleCode, Architecture, Fluid UI, PS Query, Security and more."/>
 
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<!-- ── FAVICON (SVG inline as data URI) ── -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23080c18'/%3E%3Crect width='32' height='32' rx='8' fill='url(%23g)'/%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23f0a500'/%3E%3Cstop offset='1' stop-color='%23e06c00'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='8' fill='%23080c18'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Arial,sans-serif' font-weight='800' font-size='14' fill='%23f0a500'%3EPS%3C/text%3E%3C/svg%3E"/>
+<link rel="icon" type="image/png" sizes="32x32" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23080c18'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Arial,sans-serif' font-weight='800' font-size='14' fill='%23f0a500'%3EPS%3C/text%3E%3C/svg%3E"/>
+<meta name="theme-color" content="#080c18"/>
 
-  <!-- Styles -->
-  <link rel="stylesheet" href="styles.css" />
-</head>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="styles.css"/>
 <body>
-  <a href="#homepageView" class="skip-link">Skip to main content</a>
+<a href="#homepageView" class="skip-link">Skip to main content</a>
 
-  <!-- Resume Banner -->
-  <div id="resumeBanner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:300;background:linear-gradient(135deg,var(--indigo),var(--indigo-lo));padding:12px 20px;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;box-shadow:0 -4px 20px rgba(99,102,241,0.3)" role="alert" aria-live="polite">
-    <div style="display:flex;align-items:center;gap:10px">
-      <span style="font-size:18px">📍</span>
-      <div>
-        <div style="font-family:var(--fm);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,0.7)">Continue where you left off</div>
-        <div style="font-family:var(--fd);font-size:14px;font-weight:700;color:#fff" id="resumeTopicName">Topic Name</div>
-      </div>
-      <span style="font-family:var(--fm);font-size:11px;color:rgba(255,255,255,0.6);background:rgba(255,255,255,0.1);border-radius:999px;padding:2px 10px" id="resumeTopicNum">Topic X/20</span>
+<!-- RESUME BANNER -->
+<div id="resumeBanner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:300;background:linear-gradient(135deg,var(--indigo),var(--indigo-lo));padding:12px 20px;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;box-shadow:0 -4px 20px rgba(99,102,241,0.3)" role="alert" aria-live="polite">
+  <div style="display:flex;align-items:center;gap:10px">
+    <span style="font-size:18px">📍</span>
+    <div>
+      <div style="font-family:var(--fm);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,0.7)">Continue where you left off</div>
+      <div style="font-family:var(--fd);font-size:14px;font-weight:700;color:#fff" id="resumeTopicName">Topic Name</div>
     </div>
-    <div style="display:flex;gap:10px">
-      <button onclick="openTopic(lastSavedTopic)" style="background:#fff;color:var(--indigo-lo);border:none;border-radius:8px;padding:8px 18px;font-family:var(--fd);font-size:13px;font-weight:700;cursor:pointer">Resume →</button>
-      <button onclick="dismissResume()" style="background:rgba(255,255,255,0.15);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer" aria-label="Dismiss resume banner">✕</button>
+    <span style="font-family:var(--fm);font-size:11px;color:rgba(255,255,255,0.6);background:rgba(255,255,255,0.1);border-radius:999px;padding:2px 10px" id="resumeTopicNum">Topic X/20</span>
+  </div>
+  <div style="display:flex;gap:10px">
+    <button onclick="openTopic(lastSavedTopic)" style="background:#fff;color:var(--indigo-lo);border:none;border-radius:8px;padding:8px 18px;font-family:var(--fd);font-size:13px;font-weight:700;cursor:pointer">Resume →</button>
+    <button onclick="dismissResume()" style="background:rgba(255,255,255,0.15);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer" aria-label="Dismiss resume banner">✕</button>
+  </div>
+</div>
+
+<!-- BG -->
+<div class="bg-canvas" aria-hidden="true">
+  <div class="bg-canvas__dots"></div>
+  <div class="bg-canvas__orb bg-canvas__orb--1"></div>
+  <div class="bg-canvas__orb bg-canvas__orb--2"></div>
+  <div class="bg-canvas__orb bg-canvas__orb--3"></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav" id="mainNav">
+  <div class="container">
+    <div class="nav__inner">
+      <div class="nav__logo" onclick="showHome()">
+        <div class="nav__logo-mark">PS</div>
+        <span class="nav__logo-text">PS<span>Learn</span></span>
+      </div>
+      <div class="nav__links">
+        <button class="nav__link nav__link--active" onclick="showHome()">Home</button>
+        <button class="nav__link" onclick="openTopic(0)" aria-label="Go to Learn section">Learn</button>
+        <button class="nav__link" onclick="showGlossary()" aria-label="Open Glossary">Glossary</button>
+        <button class="nav__link" onclick="showQuiz()" aria-label="Open Quiz Engine">Quiz</button>
+        <button class="nav__link" onclick="showInterview()" aria-label="Open Interview Q&A">Interview Prep</button>
+        <button class="nav__link" onclick="showLab()" aria-label="Open Simulation Lab">Lab 🧪</button>
+        <button class="nav__link" onclick="showHome();setTimeout(()=>document.querySelector('.about-section').scrollIntoView({behavior:'smooth'}),100)" aria-label="About this platform">About</button>
+      </div>
+      <div class="nav__actions">
+        <span class="nav__badge">✦ Free Platform</span>
+        <button class="theme-btn" id="themeToggle" onclick="toggleTheme()">
+          <span id="themeKnob">🌙</span>
+          <span id="themeLabel">Night</span>
+        </button>
+        <button class="btn btn--gold btn--sm" onclick="openTopic(0)">Start Learning →</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════
+     HOMEPAGE VIEW
+═══════════════════════════════════════════════ -->
+<div id="homepageView" role="main">
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero__eyebrow">A Growing PeopleSoft Learning Platform</div>
+    <h1 class="hero__headline">
+      Learn PeopleSoft the Way
+      <em>Projects Actually Use It</em>
+    </h1>
+    <p class="hero__sub">From App Designer basics to real enterprise development — structured, practical, and built for freshers, support engineers, and developers moving into PeopleSoft.</p>
+    <div class="hero__actions">
+      <button class="btn btn--gold btn--lg" onclick="openTopic(0)">🚀 Start Beginner Path</button>
+      <button class="btn btn--ghost btn--lg" onclick="document.getElementById('curriculum').scrollIntoView({behavior:'smooth'})">Browse Curriculum →</button>
+    </div>
+    <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:40px;animation:fade-up .7s ease .4s both">
+      <span class="pill pill--green">🌱 Beginner — Live Now</span>
+      <span class="code-chip">PeopleCode</span><span class="code-chip">App Designer</span><span class="code-chip">PS Query</span>
+      <span class="code-chip">Effective Dating</span><span class="code-chip">Security</span>
+      <span class="pill pill--amber">⚡ Intermediate — Building</span>
+      <span class="pill pill--red">🔥 Advanced — Planned</span>
+    </div>
+    <div class="hero__scroll-hint">scroll to explore <span class="scroll-arrow">↓</span></div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="container">
+    <div class="stats-bar__grid">
+      <div class="stat-item"><span class="stat-item__number">20</span><span class="stat-item__label">Beginner Topics Live</span></div>
+      <div class="stat-item"><span class="stat-item__number">7</span><span class="stat-item__label">Learning Modules</span></div>
+      <div class="stat-item"><span class="stat-item__number">43</span><span class="stat-item__label">Glossary Terms</span></div>
+      <div class="stat-item"><span class="stat-item__number">100%</span><span class="stat-item__label">Free — No Login</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap" aria-hidden="true"><div class="marquee-track" id="marqueeTrack"></div></div>
+
+<!-- HOMEPAGE SEARCH -->
+<div class="homepage-search">
+  <div class="homepage-search__inner">
+    <div class="homepage-search__label">🔍 Find a Topic</div>
+    <div style="position:relative">
+      <span class="homepage-search__icon">🔍</span>
+      <input class="homepage-search__bar" id="homepageSearchBar" type="text"
+        placeholder="Search any topic — e.g. PeopleCode, Effective Dating, Security..."
+        oninput="homepageSearch(this.value)"
+        onkeydown="homepageSearchKey(event)"
+        autocomplete="off"/>
+      <div class="homepage-search__results" id="homepageSearchResults"></div>
+    </div>
+  </div>
+</div>
+
+<!-- WHAT IS PEOPLESOFT — slimmed down -->
+<section class="section intro-strip">
+  <div class="container">
+    <div class="intro-strip__grid">
+      <div class="reveal">
+        <div class="intro-strip__label">What is PeopleSoft?</div>
+        <h2 class="intro-strip__title">Oracle's Enterprise Platform<br><em>Built on Metadata</em></h2>
+        <p class="intro-strip__body">PeopleSoft is Oracle's ERP suite used by thousands of enterprises worldwide for HR, Finance, Supply Chain, and Education. What makes it unique is its <strong style="color:var(--gold)">metadata-driven architecture</strong> — every page, field, and workflow is defined as metadata in Application Designer, not hardcoded files.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin:16px 0">
+          <span class="about-source-chip">HCM — HR & Payroll</span>
+          <span class="about-source-chip">FSCM — Finance</span>
+          <span class="about-source-chip">Campus Solutions</span>
+          <span class="about-source-chip">PeopleTools IDE</span>
+        </div>
+        <button class="btn btn--gold btn--md" onclick="openTopic(0)" style="margin-top:8px">Start with the Basics →</button>
+      </div>
+      <div class="reveal" style="transition-delay:.1s">
+        <div class="intro-strip__facts">
+          <div class="intro-fact"><div class="intro-fact__icon">🌐</div><div class="intro-fact__text"><strong>Browser-Based via PIA</strong><span>Three-tier: Browser → WebLogic → Tuxedo App Server → Database. All business logic runs server-side.</span></div></div>
+          <div class="intro-fact"><div class="intro-fact__icon">🔧</div><div class="intro-fact__text"><strong>PeopleTools — The Dev Layer</strong><span>App Designer, PeopleCode, App Engine, Integration Broker, PS Query, BI Publisher — all built-in.</span></div></div>
+          <div class="intro-fact"><div class="intro-fact__icon">🗄️</div><div class="intro-fact__text"><strong>Multi-Database Support</strong><span>Oracle DB, SQL Server, IBM DB2 — Meta-SQL makes your code database-independent.</span></div></div>
+          <div class="intro-fact"><div class="intro-fact__icon">☁️</div><div class="intro-fact__text"><strong>On-Premise or Oracle Cloud</strong><span>Deploy on your servers or OCI — DPK and PUM make setup and patching straightforward.</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ARCHITECTURE — mini only, link to full lesson -->
+<section class="section" style="position:relative;z-index:1;padding:48px 0">
+  <div class="container">
+    <div class="section-header reveal" style="margin-bottom:28px">
+      <div class="section-header__tag">PeopleSoft Internet Architecture</div>
+      <h2 class="section-header__title">How a Page Request <em>Actually Works</em></h2>
+      <p class="section-header__sub">Every user action flows through three tiers. Understanding this is the foundation of all PeopleSoft development and debugging.</p>
+    </div>
+    <div class="arch-diagram reveal" style="transition-delay:.1s">
+      <div class="arch-node"><div class="arch-node__tag tag--browser">Client</div><div class="arch-node__icon">🌐</div><div class="arch-node__title">Browser</div><div class="arch-node__sub">HTTP/HTTPS</div></div>
+      <div class="arch-arrow"><div class="arch-arrow__line"></div><div class="arch-arrow__label">HTTP/S</div></div>
+      <div class="arch-node"><div class="arch-node__tag tag--web">Tier 1</div><div class="arch-node__icon">⚙️</div><div class="arch-node__title">WebLogic</div><div class="arch-node__sub">Presentation only</div></div>
+      <div class="arch-arrow"><div class="arch-arrow__line"></div><div class="arch-arrow__label">JOLT</div></div>
+      <div class="arch-node"><div class="arch-node__tag tag--app">Tier 2</div><div class="arch-node__icon">🧠</div><div class="arch-node__title">Tuxedo</div><div class="arch-node__sub">PeopleCode · Logic</div></div>
+      <div class="arch-arrow"><div class="arch-arrow__line"></div><div class="arch-arrow__label">SQL</div></div>
+      <div class="arch-node"><div class="arch-node__tag tag--db">Tier 3</div><div class="arch-node__icon">🗃️</div><div class="arch-node__title">Database</div><div class="arch-node__sub">Oracle/SQL Server/DB2</div></div>
+    </div>
+    <div style="text-align:center;margin-top:20px">
+      <button class="btn btn--ghost btn--sm" onclick="openTopic(4)">Explore Full Architecture Lesson →</button>
+    </div>
+  </div>
+</section>
+
+<!-- LEARNING PATHS -->
+<section class="section" style="position:relative;z-index:1;background:var(--s0);border-top:1px solid var(--border)">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-header__tag">Learning Paths</div>
+      <h2 class="section-header__title">Three Paths. <em>One Goal.</em></h2>
+      <p class="section-header__sub">Start with Foundations — Intermediate and Advanced paths are actively being built.</p>
+    </div>
+    <div class="path-grid">
+      <div class="path-card path-card--b reveal" onclick="openTopic(0)" style="cursor:pointer">
+        <div class="path-card__top-bar"></div><div class="path-card__glow"></div>
+        <span class="path-card__icon">🌱</span>
+        <div class="path-card__level">Beginner — 7 Modules · 20 Topics · Live Now</div>
+        <h3 class="path-card__title">PeopleSoft Foundations</h3>
+        <p class="path-card__desc">No prior experience needed. Learn architecture, PeopleTools, records, pages, PeopleCode basics, PS Query, security, and process scheduling.</p>
+        <div class="path-card__topics">
+          <span class="path-card__topic">Module 1 — History, Intro, PeopleTools, Glossary</span>
+          <span class="path-card__topic">Module 2 — Architecture & Cloud (PIA, OCI, PUM)</span>
+          <span class="path-card__topic">Module 3 — UI, Navigation, Pages, Components</span>
+          <span class="path-card__topic">Module 4 — App Designer, Records, Effective Dating</span>
+          <span class="path-card__topic">Module 5 — PeopleCode Basics & Component Buffer</span>
+          <span class="path-card__topic">Module 6 & 7 — PS Query, Security, Process Monitor</span>
+        </div>
+        <button class="btn btn--gold btn--sm" style="margin-top:8px">Start Beginner Path →</button>
+      </div>
+      <div class="path-card path-card--i reveal" style="transition-delay:.1s">
+        <div class="path-card__top-bar"></div><div class="path-card__glow"></div>
+        <span class="path-card__icon">⚡</span>
+        <div class="path-card__level">Intermediate — In Progress (~30% built)</div>
+        <h3 class="path-card__title">Core Development Skills</h3>
+        <p class="path-card__desc">Application Engine, Component Interface, Integration Broker, BI Publisher, advanced security, Process Scheduler, and Data Mover.</p>
+        <div class="path-card__topics">
+          <span class="path-card__topic">Application Engine — batch framework & Meta-SQL</span>
+          <span class="path-card__topic">Component Interface — programmatic APIs</span>
+          <span class="path-card__topic">Integration Broker — messaging & REST/SOAP</span>
+          <span class="path-card__topic">BI Publisher — formatted PDF/Excel reports</span>
+          <span class="path-card__topic">Advanced Security — row-level, trees, auditing</span>
+        </div>
+        <button class="btn btn--gold btn--sm" style="margin-top:8px" onclick="openTopic(0,true)">Start Intermediate Path →</button>
+      </div>
+      <div class="path-card path-card--a reveal" style="transition-delay:.2s">
+        <div class="path-card__top-bar"></div><div class="path-card__glow"></div>
+        <span class="path-card__icon">🔥</span>
+        <div class="path-card__level">Advanced — Planned</div>
+        <h3 class="path-card__title">Expert-Level Mastery</h3>
+        <p class="path-card__desc">Fluid UI development, Application Packages (OOP), REST/SOAP services, performance tuning, Event Mapping, and Elasticsearch.</p>
+        <div class="path-card__topics">
+          <span class="path-card__topic">Fluid UI — responsive HTML5, tiles & homepages</span>
+          <span class="path-card__topic">Application Packages — OOP in PeopleCode</span>
+          <span class="path-card__topic">REST & SOAP via Integration Broker</span>
+          <span class="path-card__topic">Event Mapping — upgrade-safe customization</span>
+          <span class="path-card__topic">Performance Tuning — trace, SQL, caching</span>
+        </div>
+        <span class="path-card__count" style="display:flex;align-items:center;gap:8px;margin-top:12px">
+          <span style="flex:1;height:4px;background:var(--s3);border-radius:99px;overflow:hidden"><span style="display:block;width:5%;height:100%;background:var(--red);border-radius:99px"></span></span>
+          <span>Planned — Coming Later</span>
+        </span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OUTCOMES SECTION -->
+<section class="section" style="position:relative;z-index:1">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-header__tag">Learning Outcomes</div>
+      <h2 class="section-header__title">After the Beginner Path,<br><em>You'll Be Able To...</em></h2>
+      <p class="section-header__sub">Concrete skills you'll have after completing all 20 beginner topics — not vague promises.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px" class="reveal" style="transition-delay:.1s">
+      <div class="outcome-card">
+        <div class="outcome-card__icon">🏗️</div>
+        <div class="outcome-card__title">Explain PeopleSoft Architecture</div>
+        <div class="outcome-card__desc">Describe the three-tier PIA architecture, what each tier does, and why business logic runs in Tuxedo — not the browser.</div>
+      </div>
+      <div class="outcome-card">
+        <div class="outcome-card__icon">🛠️</div>
+        <div class="outcome-card__title">Navigate Application Designer</div>
+        <div class="outcome-card__desc">Create records, define fields, design pages, build components, and register them in the Portal — the core developer workflow.</div>
+      </div>
+      <div class="outcome-card">
+        <div class="outcome-card__icon">⚡</div>
+        <div class="outcome-card__title">Write Basic PeopleCode</div>
+        <div class="outcome-card__desc">Use SQLExec, CreateSQL, field defaulting, SaveEdit validation, and PostBuild logic with confidence in real components.</div>
+      </div>
+      <div class="outcome-card">
+        <div class="outcome-card__icon">📅</div>
+        <div class="outcome-card__title">Understand Effective Dating</div>
+        <div class="outcome-card__desc">Query effective-dated tables correctly, understand why PS_JOB can have 30+ rows per employee, and avoid the most common SQL mistake.</div>
+      </div>
+      <div class="outcome-card">
+        <div class="outcome-card__icon">🔒</div>
+        <div class="outcome-card__title">Configure Basic Security</div>
+        <div class="outcome-card__desc">Set up User Profiles, assign Roles and Permission Lists, understand row-level security, and troubleshoot access issues.</div>
+      </div>
+      <div class="outcome-card">
+        <div class="outcome-card__icon">💼</div>
+        <div class="outcome-card__title">Answer Beginner Interview Questions</div>
+        <div class="outcome-card__desc">Confidently answer the 20 most common PeopleSoft beginner interview questions on architecture, records, PeopleCode, and security.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SAMPLE LESSON PREVIEW -->
+<section class="section" style="position:relative;z-index:1;background:var(--s0);border-top:1px solid var(--border);padding:56px 0">
+  <div class="container">
+    <div class="section-header reveal" style="margin-bottom:32px">
+      <div class="section-header__tag">Sample Lesson</div>
+      <h2 class="section-header__title">See What a Lesson <em>Actually Looks Like</em></h2>
+      <p class="section-header__sub">Every topic is structured the same way — pre-checklist, key takeaways, deep sections, real-world context, common mistakes, and a mini quiz.</p>
+    </div>
+    <div class="sample-lesson reveal" style="transition-delay:.1s">
+      <div class="sample-lesson__header">
+        <span class="sample-lesson__badge">🧱 Module 4: Application Designer & Data Model</span>
+        <h3 class="sample-lesson__title">Effective Dating (EFFDT & EFFSEQ)</h3>
+        <p class="sample-lesson__summary">Instead of overwriting data when something changes, PeopleSoft inserts a new row with a new Effective Date — preserving the complete history of every change forever.</p>
+      </div>
+      <div class="sample-lesson__body">
+        <div class="sample-lesson__col">
+          <div class="sample-lesson__section-label">⚡ Key Takeaways</div>
+          <ul class="sample-lesson__list">
+            <li>EFFDT = the date a row becomes valid</li>
+            <li>EFFSEQ handles multiple changes on the same date</li>
+            <li>PeopleSoft always shows MAX(EFFDT) ≤ today</li>
+            <li>Future-dated rows enter today but activate later</li>
+            <li>Historical rows are never deleted — ever</li>
+          </ul>
+          <div class="sample-lesson__section-label" style="margin-top:16px">🏢 Real-World Context</div>
+          <p style="font-size:13px;color:var(--soft);line-height:1.7">In a 100,000-employee system, PS_JOB alone can have 3M+ rows. Every salary change, promotion, and transfer is a new row — not an update. This is what makes retroactive payroll possible.</p>
+        </div>
+        <div class="sample-lesson__col">
+          <div class="sample-lesson__section-label">⚠️ Common Mistakes</div>
+          <div class="sample-lesson__mistake">
+            <span style="color:var(--red);font-weight:700;font-size:12px">MISTAKE</span>
+            <p style="font-size:13px;color:var(--soft);margin-top:4px">Querying PS_JOB without effective dating WHERE clause — returns ALL rows for an employee (30+ rows), causing duplicate records in reports.</p>
+          </div>
+          <div class="sample-lesson__section-label" style="margin-top:16px">🧠 Mini Quiz Preview</div>
+          <div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px 14px">
+            <p style="font-size:13px;color:var(--text);font-weight:600;margin-bottom:8px">What does PeopleSoft do when an employee gets promoted?</p>
+            <p style="font-size:12px;color:var(--green)">✅ Inserts a new row with the new Effective Date — the old row remains</p>
+          </div>
+        </div>
+      </div>
+      <div style="text-align:center;padding-top:20px;border-top:1px solid var(--border)">
+        <button class="btn btn--gold btn--md" onclick="openTopic(13)">Read Full Lesson on Effective Dating →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CURRICULUM -->
+<section id="curriculum" class="section--tight curriculum-section">
+  <div class="container">
+    <div class="section-header reveal" style="margin-bottom:28px">
+      <div class="section-header__tag">Full Curriculum</div>
+      <h2 class="section-header__title">Browse All <em>Topics</em></h2>
+    </div>
+    <div class="curriculum-tabs reveal">
+      <button class="curriculum-tab ab" onclick="switchTab(this,'b')">🌱 Beginner — Live</button>
+      <button class="curriculum-tab" onclick="switchTab(this,'i')">⚡ Intermediate — Building</button>
+      <button class="curriculum-tab" onclick="switchTab(this,'a')">🔥 Advanced — Planned</button>
+    </div>
+    <div class="curriculum-panel active" id="panel-b"><div class="topic-grid" id="topics-b"></div></div>
+    <div class="curriculum-panel" id="panel-i"><div class="topic-grid" id="topics-i"></div></div>
+    <div class="curriculum-panel" id="panel-a"><div class="topic-grid" id="topics-a"></div></div>
+  </div>
+</section>
+
+<!-- FEATURES — updated copy, no over-promising -->
+<section class="section features-section" style="background:var(--s0);border-top:1px solid var(--border)">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-header__tag">Platform Features</div>
+      <h2 class="section-header__title">Practical Learning — <em>No Fluff</em></h2>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card reveal"><div class="feature-card__icon-wrap fw-gold">📚</div><h3 class="feature-card__title">Deep Topic Explanations</h3><p class="feature-card__desc">Every topic covers the why, not just the what. Based on Oracle PeopleBooks and real enterprise project patterns — not documentation copy-paste.</p></div>
+      <div class="feature-card reveal" style="transition-delay:.08s"><div class="feature-card__icon-wrap fw-green">⚡</div><h3 class="feature-card__title">Real PeopleCode Examples</h3><p class="feature-card__desc">Actual runnable code — SQLExec, CreateSQL, Rowsets, field defaults, SaveEdit validation. Every example is production-pattern, not toy code.</p></div>
+      <div class="feature-card reveal" style="transition-delay:.16s"><div class="feature-card__icon-wrap fw-indigo">🧠</div><h3 class="feature-card__title">Mini Quiz Per Topic</h3><p class="feature-card__desc">2–3 questions at the end of every topic with instant feedback and full explanations. Reinforces what you just read while it's fresh.</p></div>
+      <div class="feature-card reveal" style="transition-delay:.08s"><div class="feature-card__icon-wrap fw-red">⚠️</div><h3 class="feature-card__title">Common Mistakes Section</h3><p class="feature-card__desc">Every topic lists the 2–3 mistakes beginners make most often — SQLExec in RowInit, missing effective dating WHERE clauses, forgetting Portal registration.</p></div>
+      <div class="feature-card reveal" style="transition-delay:.16s"><div class="feature-card__icon-wrap fw-amber">🗺️</div><h3 class="feature-card__title">Structured Sequence</h3><p class="feature-card__desc">Topics are ordered intentionally. Architecture before development. Records before Pages. Component Processor before PeopleCode events. No guesswork.</p></div>
+      <div class="feature-card reveal" style="transition-delay:.24s"><div class="feature-card__icon-wrap fw-cyan">🔗</div><h3 class="feature-card__title">Direct PeopleBooks Links</h3><p class="feature-card__desc">Every topic section links to the relevant Oracle PeopleBooks page. You can verify, go deeper, or bookmark the official source at any time.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA — honest, strong -->
+<section class="section cta-section">
+  <div class="cta-bg" aria-hidden="true"></div>
+  <div class="container cta-inner">
+    <div class="cta-tag reveal">Start Today — No Account Needed</div>
+    <h2 class="cta-title reveal">Learn PeopleSoft the Way<br><em>Projects Actually Use It</em></h2>
+    <p class="cta-sub reveal">Structured, practical, enterprise-focused. Start the Beginner Path and build real foundational knowledge — for free.</p>
+    <div class="cta-actions reveal">
+      <button class="btn btn--gold btn--lg" onclick="openTopic(0)">🚀 Start Beginner Path</button>
+      <button class="btn btn--ghost btn--lg" onclick="showGlossary()">Browse Glossary 📖</button>
+    </div>
+    <p class="cta-note reveal">No login · No payment · Learn at your own pace</p>
+  </div>
+</section>
+
+<!-- ABOUT SECTION — stronger credibility -->
+<section class="section about-section">
+  <div class="container">
+    <div class="about-grid">
+      <div class="reveal">
+        <div class="about-platform__label">About This Platform</div>
+        <h2 class="about-platform__title">Why PSLearn <span style="color:var(--gold)">Exists</span></h2>
+        <p class="about-platform__body">Good PeopleSoft learning content online is genuinely scarce. Most resources are fragmented forum posts, outdated PDFs, or expensive training courses. PSLearn was built to fix that — a structured, free, practical learning path from zero to job-ready.</p>
+        <p class="about-platform__body">Every topic is written from real enterprise experience — not documentation rewrites. The examples, mistakes, and real-world scenarios come from actual production implementations.</p>
+        <div class="about-platform__label" style="margin-top:20px">📚 Sources & References</div>
+        <div class="about-sources">
+          <span class="about-source-chip">Oracle PeopleBooks</span>
+          <span class="about-source-chip">PeopleSoft Community</span>
+          <span class="about-source-chip">Enterprise Project Experience</span>
+          <span class="about-source-chip">PeopleTools Documentation</span>
+        </div>
+      </div>
+      <div class="reveal" style="transition-delay:.12s">
+        <div class="builder-card">
+          <div class="builder-card__label">👤 Built By</div>
+          <div class="builder-card__avatar">KR</div>
+          <div class="builder-card__name">Koushik Ram M</div>
+          <div class="builder-card__role">PeopleSoft Technical Consultant</div>
+          <div class="builder-card__bio">Hands-on experience in HCM, FSCM, and HRMS implementations — production support, enhancements, and full project cycles. Worked with PeopleCode, Application Engine, SQR, SQL, PS Query, Integration Broker, security configurations, and validations across enterprise environments.</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px">
+            <span class="about-source-chip" style="font-size:10px">PeopleCode</span>
+            <span class="about-source-chip" style="font-size:10px">App Engine</span>
+            <span class="about-source-chip" style="font-size:10px">SQR</span>
+            <span class="about-source-chip" style="font-size:10px">Integration Broker</span>
+            <span class="about-source-chip" style="font-size:10px">HCM</span>
+            <span class="about-source-chip" style="font-size:10px">FSCM</span>
+            <span class="about-source-chip" style="font-size:10px">PS Query</span>
+            <span class="about-source-chip" style="font-size:10px">Security</span>
+          </div>
+          <a href="https://www.linkedin.com/in/koushik-ram-m-3b6599210" target="_blank" rel="noopener" class="builder-card__linkedin">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            Connect on LinkedIn ↗
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer__inner">
+      <div class="footer__brand">
+        <div class="nav__logo-mark" style="width:28px;height:28px;font-size:12px">PS</div>
+        <span style="font-family:var(--fd);font-weight:700;font-size:14px">PSLearn</span>
+      </div>
+      <p class="footer__copy">© 2025 PSLearn · Built by Koushik Ram M</p>
+      <div class="footer__links">
+        <button onclick="openTopic(0)" class="footer__link" style="background:none;border:none;cursor:pointer">Learn</button>
+        <button onclick="showGlossary()" class="footer__link" style="background:none;border:none;cursor:pointer">Glossary</button>
+        <a href="https://www.linkedin.com/in/koushik-ram-m-3b6599210" target="_blank" class="footer__link">LinkedIn</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</div><!-- end homepageView -->
+
+<!-- ═══════════════════════════════════════════════
+     APP VIEW — LEARNING PLATFORM
+═══════════════════════════════════════════════ -->
+<div id="appView">
+  <!-- MOBILE DRAWER OVERLAY -->
+  <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+
+  <!-- FLOATING TOPICS BUTTON (mobile) -->
+  <button class="fab-topics" onclick="openDrawer()">☰ Topics</button>
+
+  <div class="app-layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="mobileSidebar">
+      <div class="sidebar__header">
+        <input class="sidebar__search" type="text" placeholder="Search topics..." oninput="filterTopics(this.value)" id="sidebarSearch"/>
+      </div>
+      <div class="sidebar__body" id="sidebarBody"></div>
+      <div class="sidebar__progress">
+        <div class="sidebar__progress-label">
+          <span>Progress</span>
+          <span id="progressText">0 / 20</span>
+        </div>
+        <div class="sidebar__progress-bar">
+          <div class="sidebar__progress-fill" id="progressFill" style="width:0%"></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- TOPIC CONTENT -->
+    <div style="flex:1;display:flex;flex-direction:column;overflow:hidden">
+      <!-- MOBILE TOP BAR -->
+      <div class="mobile-topbar" id="mobileTopbar">
+        <button class="mobile-topbar__menu" onclick="openDrawer()">☰</button>
+        <div class="mobile-topbar__info">
+          <div class="mobile-topbar__label">Current Topic</div>
+          <div class="mobile-topbar__title" id="mobileTopicTitle">PeopleSoft History & Evolution</div>
+        </div>
+        <span class="mobile-topbar__count" id="mobileTopicCount">01/20</span>
+      </div>
+      <!-- DESKTOP BACK BAR -->
+      <div class="desktop-back-bar">
+        <button onclick="showHome()" class="back-home-btn">← Home</button>
+        <span class="back-divider">·</span>
+        <span id="desktopTopicBreadcrumb" style="font-size:13px;color:var(--soft)">Topic 01 / 20</span>
+      </div>
+      <div class="topic-content" id="topicContent"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     GLOSSARY VIEW
+═══════════════════════════════════════════════ -->
+<div id="glossaryView">
+  <div class="glossary-layout">
+    <div class="glossary-header">
+      <button onclick="showHome()" style="background:none;border:none;color:var(--soft);font-size:13px;cursor:pointer;padding:0 0 16px;font-family:var(--fb);display:flex;align-items:center;gap:6px">← Back to Home</button>
+      <h1 style="font-family:var(--fd);font-size:clamp(26px,4vw,40px);font-weight:800;letter-spacing:-1.5px;color:var(--text);margin-bottom:8px">PeopleSoft <span style="color:var(--gold)">Glossary</span></h1>
+      <p style="font-size:15px;color:var(--soft);margin-bottom:24px;line-height:1.6">Every PeopleSoft term you'll encounter — searchable, categorized, and explained in plain English.</p>
+      <input class="glossary-search-bar" id="glossarySearch" type="text" placeholder="🔍  Search any term — e.g. EMPLID, Tuxedo, EFFDT..." oninput="filterGlossary(this.value)"/>
+      <div class="glossary-filter-bar" id="glossaryFilters">
+        <button class="glossary-filter active" onclick="setGlossaryFilter('all',this)">All</button>
+        <button class="glossary-filter" onclick="setGlossaryFilter('technical',this)">Technical</button>
+        <button class="glossary-filter" onclick="setGlossaryFilter('hcm',this)">HCM</button>
+        <button class="glossary-filter" onclick="setGlossaryFilter('fscm',this)">FSCM</button>
+        <button class="glossary-filter" onclick="setGlossaryFilter('architecture',this)">Architecture</button>
+        <button class="glossary-filter" onclick="setGlossaryFilter('development',this)">Development</button>
+      </div>
+    </div>
+    <div id="glossaryContent"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     QUIZ VIEW
+═══════════════════════════════════════════════ -->
+<div id="quizView">
+
+  <!-- QUIZ HOME -->
+  <div id="quizHome">
+    <div class="quiz-home">
+      <button class="quiz-home__back" onclick="showHome()">← Back to Home</button>
+      <div class="quiz-home__header">
+        <div class="quiz-home__tag">🧠 Test Your Knowledge</div>
+        <h1 class="quiz-home__title">PeopleSoft <span style="color:var(--gold)">Quiz Engine</span></h1>
+        <p class="quiz-home__sub">100 questions covering foundations, architecture, development, and real project scenarios. Choose your mode and start testing.</p>
+      </div>
+
+      <!-- MODE SELECTOR -->
+      <div class="quiz-modes">
+        <div class="quiz-mode-card" id="modeCardModule" onclick="selectQuizMode('module')">
+          <div class="quiz-mode-card__top">
+            <span class="quiz-mode-card__icon">📦</span>
+            <span class="quiz-mode-card__badge badge-green">30 Questions</span>
+          </div>
+          <div class="quiz-mode-card__title">Topic-by-Topic</div>
+          <div class="quiz-mode-card__desc">Pick a module and get 30 questions focused on that topic area. Great for targeted revision after studying a module.</div>
+          <div class="quiz-mode-card__meta">
+            <span class="q-meta-chip">⏱ 30 sec / Q</span>
+            <span class="q-meta-chip">7 modules</span>
+            <span class="q-meta-chip">Focused</span>
+          </div>
+        </div>
+        <div class="quiz-mode-card" id="modeCardFull" onclick="selectQuizMode('full')">
+          <div class="quiz-mode-card__top">
+            <span class="quiz-mode-card__icon">📋</span>
+            <span class="quiz-mode-card__badge badge-indigo">40 Questions</span>
+          </div>
+          <div class="quiz-mode-card__title">Full Exam Mode</div>
+          <div class="quiz-mode-card__desc">40 questions randomly drawn from all 100 — covering everything from history to real project scenarios. Full timed exam.</div>
+          <div class="quiz-mode-card__meta">
+            <span class="q-meta-chip">⏱ 30 sec / Q</span>
+            <span class="q-meta-chip">All topics</span>
+            <span class="q-meta-chip">Random mix</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODULE SELECTOR (shown for Topic mode) -->
+      <div class="quiz-module-section" id="quizModuleSection">
+        <div class="quiz-module-label">Select a Module</div>
+        <div class="quiz-module-grid" id="quizModuleGrid"></div>
+      </div>
+
+      <!-- START BAR -->
+      <div class="quiz-start-bar">
+        <div class="quiz-start-info" id="quizStartInfo">Select a quiz mode above to begin</div>
+        <button class="quiz-start-btn" id="quizStartBtn" disabled onclick="startQuiz()">Start Quiz →</button>
+      </div>
     </div>
   </div>
 
-  <!-- Background -->
-  <div class="bg-canvas" aria-hidden="true">
-    <div class="bg-canvas__dots"></div>
-    <div class="bg-canvas__orb bg-canvas__orb--1"></div>
-    <div class="bg-canvas__orb bg-canvas__orb--2"></div>
-    <div class="bg-canvas__orb bg-canvas__orb--3"></div>
-  </div>
-
-  <!-- NAV -->
-  <nav class="nav" id="mainNav">
-    <div class="container">
-      <div class="nav__inner">
-        <div class="nav__logo" onclick="showHome()">
-          <div class="nav__logo-mark">PS</div>
-          <span class="nav__logo-text">PS<span>Learn</span></span>
+  <!-- ACTIVE QUIZ -->
+  <div id="quizActive" style="display:none">
+    <div class="quiz-active">
+      <div class="quiz-top-bar">
+        <div class="quiz-top-left">
+          <span class="quiz-q-counter" id="quizQCounter">Question 1 of 30</span>
+          <span class="quiz-category-chip" id="quizCategoryChip">Architecture</span>
         </div>
-
-        <!-- Desktop Nav -->
-        <div class="nav__links">
-          <button class="nav__link nav__link--active" onclick="showHome()">Home</button>
-          <button class="nav__link" onclick="openTopic(0)">Learn</button>
-          <button class="nav__link" onclick="showGlossary()">Glossary</button>
-          <button class="nav__link" onclick="showQuiz()">Quiz</button>
-          <button class="nav__link" onclick="showInterview()">Interview Prep</button>
-          <button class="nav__link" onclick="showLab()">Lab 🧪</button>
-          <button class="nav__link" onclick="document.querySelector('.about-section').scrollIntoView({behavior:'smooth'})">About</button>
-        </div>
-
-        <div class="nav__actions">
-          <span class="nav__badge">✦ Free Platform</span>
-          <button class="theme-btn" id="themeToggle" onclick="toggleTheme()">
-            <span id="themeKnob">🌙</span>
-            <span id="themeLabel">Night</span>
-          </button>
-          <button class="btn btn--gold btn--sm" onclick="openTopic(0)">Start Learning →</button>
-        </div>
-
-        <!-- Mobile Menu Button -->
-        <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Open navigation menu">☰</button>
+        <div class="quiz-timer" id="quizTimerDisplay">30</div>
       </div>
-    </div>
-  </nav>
-
-  <!-- Mobile Menu -->
-  <div class="mobile-menu" id="mobileMenu">
-    <button class="mobile-menu__link" onclick="showHome(); closeMobileMenu()">Home</button>
-    <button class="mobile-menu__link" onclick="openTopic(0); closeMobileMenu()">Learn</button>
-    <button class="mobile-menu__link" onclick="showGlossary(); closeMobileMenu()">Glossary</button>
-    <button class="mobile-menu__link" onclick="showQuiz(); closeMobileMenu()">Quiz</button>
-    <button class="mobile-menu__link" onclick="showInterview(); closeMobileMenu()">Interview Prep</button>
-    <button class="mobile-menu__link" onclick="showLab(); closeMobileMenu()">Lab 🧪</button>
-    <button class="mobile-menu__link" onclick="document.querySelector('.about-section').scrollIntoView({behavior:'smooth'}); closeMobileMenu()">About</button>
-
-    <div class="mobile-menu__footer">
-      <button class="btn btn--gold btn--md" onclick="openTopic(0); closeMobileMenu()">Start Learning →</button>
+      <div class="quiz-progress-track">
+        <div class="quiz-progress-fill" id="quizProgressFill" style="width:0%"></div>
+      </div>
+      <div class="quiz-timer-track">
+        <div class="quiz-timer-fill timer-green" id="quizTimerFill" style="width:100%"></div>
+      </div>
+      <div class="quiz-question-card">
+        <div class="quiz-q-num" id="quizQNum">Q1</div>
+        <div class="quiz-scenario-badge" id="quizScenarioBadge" style="display:none">🏢 Real Project Scenario</div>
+        <div class="quiz-q-text" id="quizQText">Question text here</div>
+      </div>
+      <div class="quiz-options" id="quizOptions"></div>
+      <div class="quiz-explanation" id="quizExplanation"></div>
+      <div class="quiz-nav-bar">
+        <button class="quiz-skip-btn" id="quizSkipBtn" onclick="skipQuestion()">Skip →</button>
+        <button class="quiz-next-btn" id="quizNextBtn" onclick="nextQuestion()">Next Question →</button>
+      </div>
     </div>
   </div>
 
-  <!-- HOME VIEW -->
-<main id="homepageView" role="main" style="display:block;">
-
-    <!-- HERO -->
-    <section class="hero">
-      <div class="container">
-        <div class="hero__eyebrow">A Growing PeopleSoft Learning Platform</div>
-        <h1 class="hero__headline">
-          Master PeopleSoft from
-          <em>Basics to Real Projects</em>
-        </h1>
-        <p class="hero__sub">
-          Learn Application Designer, PeopleCode, PS Query, Effective Dating, Security, and enterprise PeopleSoft development through structured practical lessons.
-        </p>
-
-        <div class="hero__actions">
-          <button class="btn btn--gold btn--lg" onclick="openTopic(0)">🚀 Start Learning</button>
-          <button class="btn btn--ghost btn--lg" onclick="document.getElementById('curriculum').scrollIntoView({behavior:'smooth'})">Browse Curriculum →</button>
+  <!-- RESULTS -->
+  <div id="quizResults" style="display:none">
+    <div class="quiz-results">
+      <div class="quiz-score-card">
+        <div class="quiz-score-circle">
+          <canvas id="scoreCanvas" width="110" height="110" style="position:absolute;top:0;left:0"></canvas>
+          <span class="quiz-score-pct" id="resultPct">0%</span>
+          <span class="quiz-score-label">Score</span>
         </div>
-
-        <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:28px;">
-          <span class="pill pill--green">🌱 Beginner Topics Live</span>
-          <span class="code-chip">PeopleCode</span>
-          <span class="code-chip">App Designer</span>
-          <span class="code-chip">PS Query</span>
-          <span class="code-chip">Effective Dating</span>
-          <span class="code-chip">Security</span>
+        <div class="quiz-grade" id="resultGrade">Excellent!</div>
+        <div class="quiz-grade-sub" id="resultGradeSub">You've mastered the basics.</div>
+        <div class="quiz-stats-row">
+          <div class="quiz-stat"><div class="quiz-stat__num" id="resultCorrect" style="color:var(--green)">0</div><div class="quiz-stat__lbl">Correct</div></div>
+          <div class="quiz-stat"><div class="quiz-stat__num" id="resultWrong" style="color:var(--red)">0</div><div class="quiz-stat__lbl">Wrong</div></div>
+          <div class="quiz-stat"><div class="quiz-stat__num" id="resultSkipped" style="color:var(--faint)">0</div><div class="quiz-stat__lbl">Skipped</div></div>
+          <div class="quiz-stat"><div class="quiz-stat__num" id="resultTime" style="color:var(--cyan)">0s</div><div class="quiz-stat__lbl">Time</div></div>
         </div>
       </div>
-    </section>
-
-    <!-- WHAT IS PEOPLESOFT -->
-    <section class="section">
-      <div class="container">
-        <div class="section-heading reveal">
-          <div class="section-heading__eyebrow">Foundation</div>
-          <h2 class="section-heading__title">What is PeopleSoft?</h2>
-          <p class="section-heading__sub">
-            PeopleSoft is Oracle’s enterprise platform used to manage Human Resources, Finance, Supply Chain, Payroll, and more. PSLearn helps you understand it the practical way — not just theory.
-          </p>
-        </div>
-
-        <div class="feature-grid reveal">
-          <div class="feature-card">
-            <div class="feature-card__icon">👥</div>
-            <h3>HCM</h3>
-            <p>Human Resources, Payroll, Benefits, Absence, Time & Labor, and employee lifecycle processes.</p>
-          </div>
-
-          <div class="feature-card">
-            <div class="feature-card__icon">💼</div>
-            <h3>FSCM</h3>
-            <p>Finance, Procurement, Inventory, Expenses, General Ledger, and business operations.</p>
-          </div>
-
-          <div class="feature-card">
-            <div class="feature-card__icon">⚙️</div>
-            <h3>PeopleTools</h3>
-            <p>Application Designer, PeopleCode, App Engine, Query, CI, Integration Broker, and security.</p>
-          </div>
-        </div>
+      <div class="quiz-results-actions">
+        <button class="btn btn--gold btn--md" onclick="startQuiz()">🔄 Retake Quiz</button>
+        <button class="btn btn--ghost btn--md" id="reviewToggleBtn" onclick="toggleReview()">📋 Review Answers</button>
+        <button class="btn btn--ghost btn--md" onclick="showQuiz()">← Back to Modes</button>
       </div>
-    </section>
-
-    <!-- LEARNING PATHS -->
-    <section class="section section--tight">
-      <div class="container">
-        <div class="section-heading reveal">
-          <div class="section-heading__eyebrow">Paths</div>
-          <h2 class="section-heading__title">Learning Paths</h2>
-          <p class="section-heading__sub">
-            Follow a structured route depending on what role or skill path you want to build.
-          </p>
-        </div>
-
-        <div class="feature-grid reveal">
-          <div class="feature-card">
-            <div class="feature-card__icon">💻</div>
-            <h3>Developer Path</h3>
-            <p>Learn App Designer, PeopleCode, Application Engine, Component Interface, and debugging.</p>
-          </div>
-
-          <div class="feature-card">
-            <div class="feature-card__icon">📋</div>
-            <h3>Functional Path</h3>
-            <p>Understand modules, business process flow, approvals, setup, and transaction behavior.</p>
-          </div>
-
-          <div class="feature-card">
-            <div class="feature-card__icon">📊</div>
-            <h3>Reporting Path</h3>
-            <p>Master PS Query, reporting logic, BI Publisher basics, and SQL-backed troubleshooting.</p>
-          </div>
-        </div>
+      <div class="quiz-review-section" id="quizReviewSection">
+        <div class="quiz-review-title">Your Answers — Detailed Review</div>
+        <div id="quizReviewContent"></div>
       </div>
-    </section>
-
-    <!-- CURRICULUM -->
-    <section class="section" id="curriculum">
-      <div class="container">
-        <div class="section-heading reveal">
-          <div class="section-heading__eyebrow">Explore</div>
-          <h2 class="section-heading__title">Curriculum Browser</h2>
-          <p class="section-heading__sub">
-            Browse the core PeopleSoft topics that form your foundation.
-          </p>
-        </div>
-
-        <div class="feature-grid reveal">
-          <div class="feature-card"><div class="feature-card__icon">🧱</div><h3>Application Designer</h3><p>Records, fields, pages, components, menus, and metadata structure.</p></div>
-          <div class="feature-card"><div class="feature-card__icon">💡</div><h3>PeopleCode</h3><p>Events, validation, dynamic UI, SQL access, and component logic.</p></div>
-          <div class="feature-card"><div class="feature-card__icon">⚙️</div><h3>Application Engine</h3><p>Batch processing, restartability, temp tables, and scalable data jobs.</p></div>
-          <div class="feature-card"><div class="feature-card__icon">🔗</div><h3>Component Interface</h3><p>Programmatic access to components for integrations and automation.</p></div>
-          <div class="feature-card"><div class="feature-card__icon">📄</div><h3>SQR</h3><p>Legacy reporting, loops, procedures, formatting, and enterprise reports.</p></div>
-          <div class="feature-card"><div class="feature-card__icon">🔒</div><h3>Security</h3><p>Users, roles, permission lists, row-level access, and component security.</p></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ABOUT -->
-    <section class="section section--tight about-section">
-      <div class="container">
-        <div class="section-heading reveal">
-          <div class="section-heading__eyebrow">Why PSLearn?</div>
-          <h2 class="section-heading__title">Built for Practical PeopleSoft Learning</h2>
-          <p class="section-heading__sub">
-            PSLearn is designed to make PeopleSoft learning structured, practical, and easier to navigate — especially for beginners, support engineers, and developers moving into enterprise projects.
-          </p>
-        </div>
-
-        <div class="feature-grid reveal">
-          <div class="feature-card">
-            <div class="feature-card__icon">🎯</div>
-            <h3>Structured</h3>
-            <p>Follow a proper progression instead of scattered notes and random references.</p>
-          </div>
-          <div class="feature-card">
-            <div class="feature-card__icon">🛠️</div>
-            <h3>Practical</h3>
-            <p>Built around real project understanding, not just interview definitions.</p>
-          </div>
-          <div class="feature-card">
-            <div class="feature-card__icon">🚀</div>
-            <h3>Growing</h3>
-            <p>PSLearn is designed to expand into quizzes, labs, glossary, and deeper advanced topics.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- FOOTER -->
-    <footer class="section section--tight" style="padding-top:40px;padding-bottom:60px;">
-      <div class="container" style="text-align:center;">
-        <div class="nav__logo" style="justify-content:center;margin-bottom:16px;" onclick="showHome()">
-          <div class="nav__logo-mark">PS</div>
-          <span class="nav__logo-text">PS<span>Learn</span></span>
-        </div>
-        <p style="color:var(--soft);max-width:640px;margin:0 auto 20px;">
-          Structured learning for PeopleSoft professionals — from basics to real-world development.
-        </p>
-        <div style="display:flex;justify-content:center;gap:14px;flex-wrap:wrap;color:var(--soft);font-size:14px;">
-          <button class="nav__link" onclick="showHome()">Home</button>
-          <button class="nav__link" onclick="openTopic(0)">Learn</button>
-          <button class="nav__link" onclick="showGlossary()">Glossary</button>
-          <button class="nav__link" onclick="showQuiz()">Quiz</button>
-          <button class="nav__link" onclick="showInterview()">Interview</button>
-          <button class="nav__link" onclick="showLab()">Lab</button>
-        </div>
-      </div>
-    </footer>
-  </main>
-
-  <!-- APP VIEW -->
-  <div id="appView" style="display:none;">
-    <div class="container" style="padding-top:120px;padding-bottom:80px;">
-      <h2 style="font-family:var(--fd);font-size:32px;margin-bottom:16px;">Learning App</h2>
-      <p style="color:var(--soft);margin-bottom:24px;">This section is powered by your existing topic rendering logic.</p>
-
-      <!-- Keep these IDs because your JS likely depends on them -->
-      <div id="desktopTopicBreadcrumb" style="margin-bottom:16px;color:var(--soft);"></div>
-      <div id="mobileTopicTitle" style="font-weight:700;margin-bottom:8px;"></div>
-      <div id="mobileTopicCount" style="color:var(--soft);margin-bottom:24px;"></div>
-
-      <div id="sidebarBody"></div>
     </div>
   </div>
 
-  <!-- GLOSSARY VIEW -->
-  <div id="glossaryView" style="display:none;">
-    <div class="container" style="padding-top:120px;padding-bottom:80px;">
-      <h2 style="font-family:var(--fd);font-size:32px;margin-bottom:16px;">Glossary</h2>
-      <p style="color:var(--soft);">Glossary view loads from your existing JS.</p>
+</div>
+
+
+<script src="pslearn-data.js"></script>
+<script src="pslearn-app.js"></script>
+
+<!-- INTERVIEW Q&A VIEW — PRO -->
+<div id="interviewView" style="display:none;position:relative;z-index:1;min-height:100vh;padding-top:60px;background:var(--base)" role="main" aria-label="Interview Preparation">
+
+  <!-- PRO HEADER -->
+  <div class="iqa-pro-header">
+    <div class="iqa-pro-header-inner">
+      <button onclick="showHome()" style="background:none;border:none;color:var(--soft);font-size:13px;cursor:pointer;padding:0 0 16px;font-family:var(--fb);display:flex;align-items:center;gap:6px">← Back to Home</button>
+      <div class="iqa-pro-tag">💼 Interview Preparation Hub</div>
+      <h1 class="iqa-pro-title">PeopleSoft <span>Interview Q&amp;A</span></h1>
+      <p class="iqa-pro-sub">200 expert questions across Beginner, Intermediate, and Advanced levels. 50 random questions shown each session — click <strong>Refresh</strong> for a new set.</p>
+      <div class="iqa-pro-stats">
+        <div class="iqa-pro-stat"><strong>200</strong> Total Questions</div>
+        <div class="iqa-pro-stat"><strong id="iqaTotalCount">50</strong> Shown Now</div>
+        <div class="iqa-pro-stat"><strong>8</strong> Categories</div>
+        <div class="iqa-pro-stat" id="iqaReviewedStat"><strong id="iqaReviewedCount">0</strong> Reviewed</div>
+      </div>
+      <div class="iqa-pro-progress">
+        <div class="iqa-pro-progress-label">
+          <span>Your Progress</span>
+          <span id="iqaProgressLabel">0 / 40 reviewed</span>
+        </div>
+        <div class="iqa-pro-progress-bar"><div class="iqa-pro-progress-fill" id="iqaProgressFill" style="width:0%"></div></div>
+      </div>
     </div>
   </div>
 
-  <!-- QUIZ VIEW -->
-  <div id="quizView" style="display:none;">
-    <div class="container" style="padding-top:120px;padding-bottom:80px;">
-      <h2 style="font-family:var(--fd);font-size:32px;margin-bottom:16px;">Quiz</h2>
-      <p style="color:var(--soft);">Quiz engine loads from your existing JS.</p>
+  <!-- BODY -->
+  <div class="iqa-pro-layout">
+    <!-- Search + filters -->
+    <div class="iqa-search-wrap">
+      <span class="iqa-search-icon">🔍</span>
+      <input class="iqa-search" id="iqaSearchBar" type="text" placeholder="Search any question — e.g. SaveEdit, Component Buffer, Integration Broker..." oninput="filterIQA()" autocomplete="off"/>
+    </div>
+    <div class="iqa-pro-filters" role="group" aria-label="Filter by level" style="margin-bottom:8px">
+      <button class="iqa-pro-filter active" onclick="setIQALevel('all',this)">All</button>
+      <button class="iqa-pro-filter f-beginner" onclick="setIQALevel('beginner',this)">🌱 Beginner</button>
+      <button class="iqa-pro-filter f-intermediate" onclick="setIQALevel('intermediate',this)">⚡ Intermediate</button>
+      <button class="iqa-pro-filter f-advanced" onclick="setIQALevel('advanced',this)">🔥 Advanced</button>
+      <button class="iqa-pro-filter f-scenario" onclick="setIQALevel('scenario',this)">🏢 Real Project</button>
+      <button class="iqa-pro-filter" onclick="refreshIQA()" style="margin-left:auto;background:rgba(240,165,0,0.1);border-color:rgba(240,165,0,0.3);color:var(--gold)">🔀 Refresh 50</button>
+    </div>
+
+    <div class="iqa-body">
+      <!-- Category sidebar -->
+      <aside class="iqa-sidebar">
+        <div class="iqa-sidebar-title">Categories</div>
+        <div id="iqaCatSidebar"></div>
+      </aside>
+      <!-- Questions panel -->
+      <div class="iqa-questions-panel">
+        <div class="iqa-section-header">
+          <div class="iqa-section-title" id="iqaPanelTitle">All Questions</div>
+          <div class="iqa-section-count" id="iqaPanelCount"></div>
+        </div>
+        <div id="iqaContent" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- LAB SIMULATOR — 6 MODES -->
+<div id="labView" style="display:none;position:relative;z-index:1;min-height:100vh;padding-top:60px;background:var(--base)" role="main" aria-label="Practice Lab">
+
+  <!-- LAB HOME -->
+  <div id="labHome">
+    <div class="lab-home">
+      <button onclick="showHome()" style="background:none;border:none;color:var(--soft);font-size:13px;cursor:pointer;padding:0 0 20px;font-family:var(--fb);display:flex;align-items:center;gap:6px">← Back to Home</button>
+      <div class="lab-header">
+        <div class="lab-header__tag">🧪 Practice Simulation Lab</div>
+        <h1 class="lab-header__title">Learn by <span>Doing</span></h1>
+        <p class="lab-header__sub">Interactive PeopleSoft simulators — from debugging PeopleCode to navigating a real Fluid homepage. No system access needed.</p>
+      </div>
+      <div class="lab-modes-grid">
+        <!-- Mode 1: Debug -->
+        <div class="lab-mode-card" onclick="openLabMode('debug')">
+          <div class="lab-mode-card__top-bar" style="background:linear-gradient(90deg,var(--red),var(--amber))"></div>
+          <div class="lab-mode-card__icon">🔍</div>
+          <div class="lab-mode-card__title">Debug the PeopleCode</div>
+          <div class="lab-mode-card__desc">Spot the bug in real PeopleCode snippets. Click the wrong line and explain what's wrong.</div>
+          <span class="lab-mode-card__badge badge-live">● Live</span>
+        </div>
+        <!-- Mode 2: Event Flow -->
+        <div class="lab-mode-card" onclick="openLabMode('eventflow')">
+          <div class="lab-mode-card__top-bar" style="background:linear-gradient(90deg,var(--amber),var(--green))"></div>
+          <div class="lab-mode-card__icon">⚡</div>
+          <div class="lab-mode-card__title">Event Flow Trainer</div>
+          <div class="lab-mode-card__desc">Drag PeopleCode events into the correct sequence. Master the full component lifecycle.</div>
+          <span class="lab-mode-card__badge badge-live">● Live</span>
+        </div>
+        <!-- Mode 3: Object Matcher -->
+        <div class="lab-mode-card" onclick="openLabMode('matcher')">
+          <div class="lab-mode-card__top-bar" style="background:linear-gradient(90deg,var(--indigo),var(--cyan))"></div>
+          <div class="lab-mode-card__icon">🗂️</div>
+          <div class="lab-mode-card__title">Object Matcher</div>
+          <div class="lab-mode-card__desc">Given a scenario, pick the correct PeopleSoft object type — record, component, AE, CI, and more.</div>
+          <span class="lab-mode-card__badge badge-live">● Live</span>
+        </div>
+        <!-- Mode 4: Scenario Solver -->
+        <div class="lab-mode-card" onclick="openLabMode('scenario')">
+          <div class="lab-mode-card__top-bar" style="background:linear-gradient(90deg,var(--gold),var(--amber))"></div>
+          <div class="lab-mode-card__icon">📋</div>
+          <div class="lab-mode-card__title">Scenario Solver</div>
+          <div class="lab-mode-card__desc">Real enterprise problem. Diagnose the root cause from 4 options — just like production support.</div>
+          <span class="lab-mode-card__badge badge-live">● Live</span>
+        </div>
+        <!-- Mode 5: App Designer -->
+        <div class="lab-mode-card" onclick="openLabMode('appdesigner')">
+          <div class="lab-mode-card__top-bar" style="background:linear-gradient(90deg,#1f5a9a,#4a90d9)"></div>
+          <div class="lab-mode-card__icon">🖥️</div>
+          <div class="lab-mode-card__title">App Designer Simulator</div>
+          <div class="lab-mode-card__desc">Interactive mock Application Designer IDE. Create records, add fields, set keys, and build tables.</div>
+          <span class="lab-mode-card__badge badge-live">● Live</span>
+        </div>
+        <!-- Mode 6: PS Login + Home -->
+        <div class="lab-mode-card" onclick="openLabMode('pssim')">
+          <div class="lab-mode-card__top-bar" style="background:linear-gradient(90deg,#1e4d8c,#d4a017)"></div>
+          <div class="lab-mode-card__icon">🔐</div>
+          <div class="lab-mode-card__title">PeopleSoft Navigator</div>
+          <div class="lab-mode-card__desc">Sign into a mock PeopleSoft HCM environment. Navigate the Fluid homepage, tiles, and NavBar.</div>
+          <span class="lab-mode-card__badge badge-live">● Live</span>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- INTERVIEW VIEW -->
-  <div id="interviewView" style="display:none;">
-    <div class="container" style="padding-top:120px;padding-bottom:80px;">
-      <h2 style="font-family:var(--fd);font-size:32px;margin-bottom:16px;">Interview Prep</h2>
-      <p style="color:var(--soft);">Interview prep content loads from your existing JS.</p>
+  <!-- MODE 1: DEBUG -->
+  <div id="labDebug" style="display:none">
+    <div class="lab-debug">
+      <button class="lab-debug__back" onclick="backToLab()">← Back to Lab</button>
+      <div class="lab-debug__header">
+        <div class="lab-debug__tag">🔍 Debug Mode</div>
+        <h2 class="lab-debug__title">Find the Bug</h2>
+        <p class="lab-debug__sub">Click the line of code that contains the bug. Then check your answer.</p>
+      </div>
+      <div class="lab-debug__meta">
+        <span class="lab-debug__counter" id="debugCounter">Challenge 1 of 6</span>
+        <div style="display:flex;gap:8px">
+          <span id="debugScore" style="font-family:var(--fm);font-size:12px;color:var(--green)">Score: 0</span>
+        </div>
+      </div>
+      <div class="lab-debug__scenario" id="debugScenario"></div>
+      <div class="lab-code-block" id="debugCode"></div>
+      <p class="lab-debug__hint" id="debugHint"></p>
+      <div class="lab-debug__actions">
+        <button class="btn btn--gold btn--sm" id="debugCheckBtn" onclick="checkDebugAnswer()" disabled>Check Answer →</button>
+        <button class="btn btn--ghost btn--sm" onclick="nextDebugChallenge()" id="debugNextBtn" style="display:none">Next Challenge →</button>
+      </div>
+      <div class="lab-result-box" id="debugResult"></div>
     </div>
   </div>
 
-  <!-- LAB VIEW -->
-  <div id="labView" style="display:none;">
-    <div class="container" style="padding-top:120px;padding-bottom:80px;">
-      <h2 style="font-family:var(--fd);font-size:32px;margin-bottom:16px;">Simulation Lab</h2>
-      <p style="color:var(--soft);">Lab content loads from your existing JS.</p>
+  <!-- MODE 2: EVENT FLOW -->
+  <div id="labEventFlow" style="display:none">
+    <div class="lab-event-flow">
+      <button class="lab-debug__back" onclick="backToLab()">← Back to Lab</button>
+      <div class="lab-debug__header">
+        <div class="lab-debug__tag" style="color:var(--amber)">⚡ Event Flow Trainer</div>
+        <h2 class="lab-debug__title">Order the Events</h2>
+        <p class="lab-debug__sub">Drag the PeopleCode events into the correct execution order.</p>
+      </div>
+      <div id="efChallengeName" style="font-family:var(--fm);font-size:13px;color:var(--gold);margin-bottom:14px;background:rgba(240,165,0,0.08);border:1px solid rgba(240,165,0,0.2);border-radius:8px;padding:10px 16px"></div>
+      <div class="event-drag-list" id="eventDragList"></div>
+      <div class="lab-debug__actions">
+        <button class="btn btn--gold btn--sm" onclick="checkEventOrder()">Check Order →</button>
+        <button class="btn btn--ghost btn--sm" onclick="resetEventOrder()">🔀 Shuffle</button>
+        <button class="btn btn--ghost btn--sm" id="efNextBtn" style="display:none" onclick="nextEFChallenge()">Next →</button>
+      </div>
+      <div class="lab-result-box" id="efResult"></div>
     </div>
   </div>
 
-  <!-- Scripts -->
-  <script src="pslearn-data.js"></script>
-  <script src="pslearn-app.js"></script>
+  <!-- MODE 3: OBJECT MATCHER -->
+  <div id="labMatcher" style="display:none">
+    <div class="lab-matcher">
+      <button class="lab-debug__back" onclick="backToLab()">← Back to Lab</button>
+      <div class="lab-debug__header">
+        <div class="lab-debug__tag" style="color:var(--cyan)">🗂️ Object Matcher</div>
+        <h2 class="lab-debug__title">Pick the Right Object</h2>
+        <p class="lab-debug__sub">Read the scenario and select the correct PeopleSoft object type.</p>
+      </div>
+      <div class="lab-debug__meta">
+        <span class="lab-debug__counter" id="matcherCounter">Scenario 1 of 10</span>
+        <span id="matcherScore" style="font-family:var(--fm);font-size:12px;color:var(--green)">Score: 0/0</span>
+      </div>
+      <div class="matcher-scenario"><div class="matcher-scenario__label">Scenario</div><div class="matcher-scenario__text" id="matcherScenario"></div></div>
+      <div class="matcher-options" id="matcherOptions"></div>
+      <div class="lab-result-box" id="matcherResult"></div>
+      <button class="btn btn--ghost btn--sm" id="matcherNextBtn" style="display:none;margin-top:12px" onclick="nextMatcher()">Next Scenario →</button>
+    </div>
+  </div>
+
+  <!-- MODE 4: SCENARIO SOLVER -->
+  <div id="labScenario" style="display:none">
+    <div class="lab-matcher">
+      <button class="lab-debug__back" onclick="backToLab()">← Back to Lab</button>
+      <div class="lab-debug__header">
+        <div class="lab-debug__tag" style="color:var(--gold)">📋 Scenario Solver</div>
+        <h2 class="lab-debug__title">Diagnose the Problem</h2>
+        <p class="lab-debug__sub">Real enterprise issue. Pick the correct root cause diagnosis.</p>
+      </div>
+      <div class="lab-debug__meta">
+        <span class="lab-debug__counter" id="scenarioCounter">Scenario 1 of 8</span>
+        <span id="scenarioScore" style="font-family:var(--fm);font-size:12px;color:var(--green)">Score: 0/0</span>
+      </div>
+      <div class="matcher-scenario" id="scenarioBox"><div class="matcher-scenario__label">🏢 Enterprise Scenario</div><div class="matcher-scenario__text" id="scenarioText"></div></div>
+      <div class="matcher-options" id="scenarioOptions"></div>
+      <div class="lab-result-box" id="scenarioResult"></div>
+      <button class="btn btn--ghost btn--sm" id="scenarioNextBtn" style="display:none;margin-top:12px" onclick="nextScenario()">Next Scenario →</button>
+    </div>
+  </div>
+
+  <!-- MODE 5: APP DESIGNER SIMULATOR -->
+  <div id="labAppDesigner" style="display:none">
+    <div class="lab-appdesigner">
+      <button class="lab-debug__back" onclick="backToLab()">← Back to Lab</button>
+      <div class="lab-debug__header">
+        <div class="lab-debug__tag" style="color:#4a90d9">🖥️ App Designer Simulator</div>
+        <h2 class="lab-debug__title">Build a Record</h2>
+      </div>
+      <div class="ads-instruction" id="adsInstruction">
+        <strong>Task:</strong> Create a new SQL Table record called <strong>EMP_DEPT_DATA</strong> with 4 fields — EMPLID (key), EFFDT (key), DEPTID, and SETID. Then click Build to create the table.
+      </div>
+      <div class="ads-task-list" id="adsTaskList"></div>
+      <!-- Mock App Designer window -->
+      <div class="appdesigner-window">
+        <div class="appdesigner-titlebar">
+          <div class="appdesigner-titlebar-text">
+            <span>🖥</span> PeopleSoft Application Designer — [EMP_DEPT_DATA (Record)]
+          </div>
+          <div style="display:flex;gap:4px">
+            <div style="width:14px;height:14px;border-radius:2px;background:rgba(255,255,255,0.3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff">—</div>
+            <div style="width:14px;height:14px;border-radius:2px;background:rgba(255,255,255,0.3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff">□</div>
+            <div style="width:14px;height:14px;border-radius:2px;background:#c0392b;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff">✕</div>
+          </div>
+        </div>
+        <div class="appdesigner-menubar">
+          <div class="appdesigner-menuitem">File</div>
+          <div class="appdesigner-menuitem">Edit</div>
+          <div class="appdesigner-menuitem">View</div>
+          <div class="appdesigner-menuitem">Insert</div>
+          <div class="appdesigner-menuitem" onclick="adsBuild()" style="font-weight:600">Build</div>
+          <div class="appdesigner-menuitem">Debug</div>
+          <div class="appdesigner-menuitem">Tools</div>
+          <div class="appdesigner-menuitem">Help</div>
+        </div>
+        <div class="appdesigner-body">
+          <!-- Tree -->
+          <div class="appdesigner-tree">
+            <div class="appdesigner-tree-header">Project Workspace</div>
+            <div class="appdesigner-tree-item selected">📁 PSLearn_Project</div>
+            <div class="appdesigner-tree-item" style="padding-left:28px">📋 Records</div>
+            <div class="appdesigner-tree-item selected" style="padding-left:40px;background:#316ac5;color:#fff">📄 EMP_DEPT_DATA</div>
+            <div class="appdesigner-tree-item" style="padding-left:28px">📝 Fields</div>
+            <div class="appdesigner-tree-item" style="padding-left:28px">🖼 Pages</div>
+          </div>
+          <!-- Workspace -->
+          <div class="appdesigner-workspace">
+            <div class="appdesigner-record-window">
+              <div class="appdesigner-record-titlebar">
+                <div class="appdesigner-record-title">EMP_DEPT_DATA (Record)</div>
+                <div style="display:flex;gap:4px">
+                  <div style="width:12px;height:12px;border-radius:2px;background:rgba(255,255,255,0.3)"></div>
+                  <div style="width:12px;height:12px;border-radius:2px;background:#c0392b"></div>
+                </div>
+              </div>
+              <div class="appdesigner-record-tabs">
+                <div class="appdesigner-record-tab active">Record Fields</div>
+                <div class="appdesigner-record-tab">Record Type</div>
+                <div class="appdesigner-record-tab">Use</div>
+                <div class="appdesigner-record-tab">PeopleCode</div>
+              </div>
+              <table class="appdesigner-record-table" id="adsFieldTable">
+                <thead><tr><th>#</th><th>Field Name</th><th>Type</th><th>Len</th><th>Key</th><th>Value</th></tr></thead>
+                <tbody id="adsFieldBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <!-- Properties -->
+          <div class="appdesigner-props" id="adsProps">
+            <div class="appdesigner-prop-row">
+              <div class="appdesigner-prop-label">Record Name</div>
+              <div class="appdesigner-prop-value">EMP_DEPT_DATA</div>
+            </div>
+            <div class="appdesigner-prop-row">
+              <div class="appdesigner-prop-label">Record Type</div>
+              <select class="appdesigner-prop-select" id="adsRecordType">
+                <option selected>SQL Table</option>
+                <option>SQL View</option>
+                <option>Dynamic View</option>
+                <option>Derived/Work</option>
+                <option>SubRecord</option>
+                <option>Temp Table</option>
+              </select>
+            </div>
+            <div class="appdesigner-prop-row">
+              <div class="appdesigner-prop-label">Table Name</div>
+              <div class="appdesigner-prop-value">PS_EMP_DEPT_DATA</div>
+            </div>
+            <div style="margin-top:14px">
+              <div class="appdesigner-prop-label">Add Field</div>
+              <select id="adsAddFieldSelect" class="appdesigner-prop-select" style="margin-bottom:6px">
+                <option value="">-- Select Field --</option>
+                <option value="EMPLID|CHAR|11">EMPLID (CHAR 11)</option>
+                <option value="EFFDT|DATE|">EFFDT (DATE)</option>
+                <option value="DEPTID|CHAR|10">DEPTID (CHAR 10)</option>
+                <option value="SETID|CHAR|5">SETID (CHAR 5)</option>
+                <option value="JOB_CODE|CHAR|6">JOB_CODE (CHAR 6)</option>
+              </select>
+              <button onclick="adsAddField()" style="width:100%;background:#1f5a9a;color:#fff;border:none;padding:5px;font-size:11px;cursor:pointer;border-radius:2px">+ Add Field</button>
+            </div>
+          </div>
+        </div>
+        <!-- Output -->
+        <div>
+          <div class="appdesigner-output-header">
+            <span class="appdesigner-output-tab active">Build</span>
+            <span class="appdesigner-output-tab">Upgrade</span>
+            <span class="appdesigner-output-tab">Results</span>
+            <span class="appdesigner-output-tab">Validate</span>
+          </div>
+          <div class="appdesigner-output" id="adsOutput">Ready.</div>
+        </div>
+      </div>
+      <div class="lab-result-box" id="adsResult" style="margin-top:16px"></div>
+    </div>
+  </div>
+
+  <!-- MODE 6: PS LOGIN + HOME SIMULATOR -->
+  <div id="labPSSim" style="display:none" class="lab-ps-sim">
+    <!-- Login Screen -->
+    <div id="psLoginScreen" class="ps-sim-screen active">
+      <div class="ps-login-outer">
+        <div class="ps-login-card">
+          <div class="ps-login-header">
+            <div class="ps-login-brand">PS Learn <span>| PeopleSoft Practice Arena</span></div>
+          </div>
+          <div class="ps-login-title">PS Learn</div>
+          <div class="ps-login-subtitle">HCM Demo Environment</div>
+          <div class="ps-login-error" id="psLoginError">Invalid User ID or Password. Please try again.</div>
+          <div class="ps-login-field">
+            <label class="ps-login-label" for="psUserId">User ID</label>
+            <input class="ps-login-input" id="psUserId" type="text" placeholder="Enter your User ID" autocomplete="off"/>
+          </div>
+          <div class="ps-login-field">
+            <label class="ps-login-label" for="psPassword">Password</label>
+            <input class="ps-login-input" id="psPassword" type="password" placeholder="Enter your password" onkeydown="if(event.key==='Enter')psSignIn()"/>
+          </div>
+          <button class="ps-login-btn" onclick="psSignIn()">Sign In</button>
+          <div class="ps-login-env">HCM Demo Environment</div>
+          <div class="ps-login-footer">
+            <span>HCM Demo Environment</span>
+            <span>PSLearn Practice Simulator — Educational Use Only</span>
+          </div>
+        </div>
+      </div>
+      <button onclick="backToLab()" style="position:fixed;top:70px;left:16px;z-index:500;background:rgba(0,0,0,0.5);color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:12px;cursor:pointer">← Back to Lab</button>
+    </div>
+    <!-- Home Screen -->
+    <div id="psHomeScreen" class="ps-sim-screen">
+      <div class="ps-home-outer">
+        <div class="ps-home-topbar">
+          <div class="ps-home-brand">
+            PS Learn <span class="ps-home-brand-sub">| PeopleSoft Practice Arena</span>
+          </div>
+          <div class="ps-home-topicons">
+            <button class="ps-home-topicon" title="Home" onclick="psGoHome()">🏠</button>
+            <button class="ps-home-topicon" title="Search">🔍</button>
+            <button class="ps-home-topicon" title="Notifications" style="position:relative">
+              🔔<span class="ps-home-notif-badge">1</span>
+            </button>
+            <button class="ps-home-topicon" title="NavBar" onclick="psToggleNav()">⚙️</button>
+            <button class="ps-exit-btn" onclick="psSignOut()">Sign Out</button>
+          </div>
+        </div>
+        <div class="ps-home-body">
+          <div class="ps-home-content" id="psHomeContent">
+            <!-- Tiles -->
+            <div class="ps-home-tiles" id="psTilesGrid"></div>
+            <!-- Quick Links -->
+            <div class="ps-quicklinks">
+              <div class="ps-quicklinks-title">Quick Links</div>
+              <div class="ps-quicklinks-row" id="psQuickLinks"></div>
+            </div>
+          </div>
+          <!-- NavBar -->
+          <div class="ps-navbar" id="psNavBar">
+            <div class="ps-navbar-header">
+              <span class="ps-navbar-title">Navigator</span>
+              <button onclick="psToggleNav()" style="background:none;border:none;cursor:pointer;color:#888;font-size:16px">✕</button>
+            </div>
+            <input class="ps-navbar-search" type="text" placeholder="🔍 Search Menu..." oninput="psNavSearch(this.value)"/>
+            <div id="psNavItems"></div>
+          </div>
+        </div>
+        <div class="ps-home-footer">
+          <span>PSLearn Practice Simulator — Educational Use Only</span>
+          <span id="psLoggedUser">Logged in as: HCMUSER</span>
+        </div>
+      </div>
+    </div>
+    <!-- Component View -->
+    <div id="psComponentScreen" class="ps-sim-screen">
+      <div class="ps-home-outer">
+        <div class="ps-home-topbar">
+          <div class="ps-home-brand">PS Learn <span class="ps-home-brand-sub">| PeopleSoft Practice Arena</span></div>
+          <div class="ps-home-topicons">
+            <button class="ps-home-topicon" onclick="psGoHome()">🏠</button>
+            <button class="ps-exit-btn" onclick="psSignOut()">Sign Out</button>
+          </div>
+        </div>
+        <div style="padding:24px;max-width:900px;margin:0 auto" id="psComponentContent"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
 </body>
 </html>
