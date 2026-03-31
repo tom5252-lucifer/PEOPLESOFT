@@ -1,1010 +1,607 @@
 /* PSLearn — Application Logic */
 /* pslearn.vercel.app | Built by Koushik Ram M */
 
+/* ═══════════════════════════════════════════════
+   VIEW MANAGER — prevents scroll bleed
+═══════════════════════════════════════════════ */
+const ALL_VIEWS = ['homepageView','appView','glossaryView','quizView','interviewView','labView'];
+function switchView(showId) {
+  ALL_VIEWS.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.display = id === showId ? 'block' : 'none';
+  });
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
+}
 
 /* ═══════════════════════════════════════════════
-   LOCALSTORAGE PROGRESS PERSISTENCE
+   LOCALSTORAGE PROGRESS
 ═══════════════════════════════════════════════ */
-const STORAGE_KEY = 'pslearn_v1';
+const STORAGE_KEY = 'pslearn_v2';
+let lastSavedTopic = -1, lastSavedIsIntermediate = false, currentIsIntermediate = false;
 
 function saveProgress() {
-  const data = {
-    visited: Array.from(visited),
-    lastTopic: currentTopicIndex,
-    quizScores: quizScores,
-    savedAt: Date.now()
-  };
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) {}
-}
-
-function loadProgress() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return;
-    const data = JSON.parse(raw);
-    if (data.visited) data.visited.forEach(i => visited.add(i));
-    if (typeof data.lastTopic === 'number') lastSavedTopic = data.lastTopic;
-    if (data.quizScores) quizScores = data.quizScores;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      visited: Array.from(visited), lastTopic: currentTopicIndex,
+      lastIsIntermediate: currentIsIntermediate, savedAt: Date.now()
+    }));
   } catch(e) {}
 }
-
-let quizScores = {};
-let lastSavedTopic = -1;
-
-// Auto-save every topic open
-const _origOpenTopic = openTopic;
-
-
-/* ═══════════════════════════════════════════════
-   RESUME WHERE YOU LEFT OFF
-═══════════════════════════════════════════════ */
+function loadProgress() {
+  try {
+    const data = JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
+    if (data.visited) data.visited.forEach(i => visited.add(i));
+    if (typeof data.lastTopic === 'number') lastSavedTopic = data.lastTopic;
+    if (data.lastIsIntermediate) lastSavedIsIntermediate = !!data.lastIsIntermediate;
+  } catch(e) {}
+}
 function showResumeBanner() {
   if (lastSavedTopic < 0) return;
-  const topic = TOPICS[lastSavedTopic];
-  if (!topic) return;
-  const banner = document.getElementById('resumeBanner');
-  if (!banner) return;
-  document.getElementById('resumeTopicName').textContent = topic.title;
-  document.getElementById('resumeTopicNum').textContent = `Topic ${lastSavedTopic + 1} of ${TOPICS.length}`;
+  const topicList = lastSavedIsIntermediate ? (typeof INTERMEDIATE_TOPICS!=='undefined'?INTERMEDIATE_TOPICS:[]) : TOPICS;
+  if (!topicList[lastSavedTopic]) return;
+  const banner = document.getElementById('resumeBanner'); if(!banner) return;
+  const t = topicList[lastSavedTopic];
+  const nameEl = document.getElementById('resumeTopicName');
+  const numEl = document.getElementById('resumeTopicNum');
+  if(nameEl) nameEl.textContent = t.title;
+  if(numEl) numEl.textContent = `Topic ${lastSavedTopic+1} of ${topicList.length}`;
   banner.style.display = 'flex';
 }
-
 function dismissResume() {
-  const banner = document.getElementById('resumeBanner');
-  if (banner) banner.style.display = 'none';
+  const b = document.getElementById('resumeBanner'); if(b) b.style.display='none';
   lastSavedTopic = -1;
 }
 
-
 /* ═══════════════════════════════════════════════
-   FUZZY SEARCH — LEVENSHTEIN DISTANCE
+   FUZZY SEARCH + SYNONYMS
 ═══════════════════════════════════════════════ */
-function levenshtein(a, b) {
-  if (!a.length) return b.length;
-  if (!b.length) return a.length;
-  const dp = Array.from({length: a.length + 1}, (_, i) =>
-    Array.from({length: b.length + 1}, (_, j) => i === 0 ? j : j === 0 ? i : 0)
-  );
-  for (let i = 1; i <= a.length; i++) {
-    for (let j = 1; j <= b.length; j++) {
-      dp[i][j] = a[i-1] === b[j-1]
-        ? dp[i-1][j-1]
-        : 1 + Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
-    }
-  }
-  return dp[a.length][b.length];
-}
-
+const SYNONYMS = {
+  'ae':'application engine','app engine':'application engine','ci':'component interface',
+  'ib':'integration broker','effdt':'effective dating','xlat':'translate values',
+  'pia':'architecture','tuxedo':'architecture','rowset':'component buffer',
+  'sqlexec':'peoplecode','postbuild':'peoplecode','saveedit':'peoplecode',
+  'rowselect':'peoplecode','rowinit':'peoplecode','fielddefault':'peoplecode',
+  'fieldchange':'peoplecode','roles':'security','run control':'process monitor',
+  'deptid':'records','sql table':'records','subrecord':'records',
+  'fluid':'fluid ui','activity guide':'fluid ui',
+};
+function expandQuery(q){return SYNONYMS[q.toLowerCase()]||q;}
 function fuzzyMatch(text, query) {
-  text = text.toLowerCase();
-  query = query.toLowerCase();
-  // Exact match — highest score
-  if (text.includes(query)) return true;
-  // Word-by-word fuzzy for queries 4+ chars
-  if (query.length < 4) return false;
+  text=text.toLowerCase(); query=query.toLowerCase();
+  if(text.includes(query)) return true;
+  if(query.length<4) return false;
   const words = text.split(/\s+/);
-  return words.some(word => {
-    if (Math.abs(word.length - query.length) > 3) return false;
-    return levenshtein(word.slice(0, query.length + 2), query) <= Math.floor(query.length / 4);
+  return words.some(w => {
+    if(Math.abs(w.length-query.length)>3) return false;
+    let a=w.slice(0,query.length+2), b=query;
+    if(!a||!b) return false;
+    const dp=Array.from({length:a.length+1},(_,i)=>Array.from({length:b.length+1},(_,j)=>i===0?j:j===0?i:0));
+    for(let i=1;i<=a.length;i++) for(let j=1;j<=b.length;j++)
+      dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);
+    return dp[a.length][b.length]<=Math.floor(query.length/4);
   });
 }
 
-// Aliases / synonyms map
-const SYNONYMS = {
-  'ae': 'application engine',
-  'app engine': 'application engine',
-  'ci': 'component interface',
-  'ib': 'integration broker',
-  'ps query': 'ps query fundamentals',
-  'psquery': 'ps query fundamentals',
-  'effdt': 'effective dating',
-  'effective date': 'effective dating',
-  'buf': 'component buffer',
-  'buffer': 'component buffer',
-  'xlat': 'translate values',
-  'translate': 'translate values',
-  'pia': 'architecture',
-  'tuxedo': 'architecture',
-  'weblogic': 'architecture',
-  'jolt': 'architecture',
-  'rowset': 'component buffer',
-  'sqlexec': 'peoplecode',
-  'fieldedit': 'peoplecode',
-  'fielddefault': 'peoplecode',
-  'fieldchange': 'peoplecode',
-  'postbuild': 'peoplecode',
-  'saveedit': 'peoplecode',
-  'rowselect': 'peoplecode',
-  'rowinit': 'peoplecode',
-  'emplid': 'glossary',
-  'empl_rcd': 'glossary',
-  'setid': 'data model',
-  'business unit': 'data model',
-  'permission list': 'security',
-  'roles': 'security',
-  'row level security': 'security',
-  'process scheduler': 'process monitor',
-  'run control': 'process monitor',
-  'report manager': 'process monitor',
-  'deptid': 'records',
-  'sql table': 'records',
-  'derived work': 'records',
-  'subrecord': 'records',
-  'prompt table': 'translate values',
-};
-
-function expandQuery(q) {
-  const lq = q.toLowerCase();
-  return SYNONYMS[lq] || q;
-}
-
+/* ═══════════════════════════════════════════════
+   VIEW FUNCTIONS
+═══════════════════════════════════════════════ */
+function showHome() { switchView('homepageView'); closeDrawer(); showResumeBanner(); }
+function showApp()  { switchView('appView'); }
+function showGlossary() { switchView('glossaryView'); renderGlossary('','all'); }
+function showLab() { switchView('labView'); document.getElementById('labView').style.display='block'; backToLab(); }
+function showInterview() { switchView('interviewView'); document.getElementById('interviewView').style.display='block'; buildIQACatSidebar(); renderIQA(); window.scrollTo(0,0); }
 
 /* ═══════════════════════════════════════════════
-   INTERVIEW Q&A ENGINE
+   TOPIC NAVIGATION
 ═══════════════════════════════════════════════ */
-const INTERVIEW_QA = [
-  // BEGINNER
+function openTopic(index, isIntermediate) {
+  currentTopicIndex = index;
+  currentIsIntermediate = !!isIntermediate;
+  const topicList = isIntermediate ? INTERMEDIATE_TOPICS : TOPICS;
+  visited.add((isIntermediate?'i_':'b_')+index);
+  lastSavedTopic = index; lastSavedIsIntermediate = !!isIntermediate;
+  saveProgress(); showApp(); buildSidebar(isIntermediate); renderTopic(index, isIntermediate); updateProgress();
+  const t = topicList[index];
+  const te=document.getElementById('mobileTopicTitle'), ce=document.getElementById('mobileTopicCount');
+  if(te) te.textContent=t.title;
+  if(ce) ce.textContent=`${String(index+1).padStart(2,'0')}/${topicList.length}`;
+  const bc=document.getElementById('desktopTopicBreadcrumb');
+  if(bc) bc.textContent=`${isIntermediate?'Intermediate':'Beginner'} Topic ${index+1}/${topicList.length} — ${t.title}`;
+  closeDrawer();
+  setTimeout(()=>{ const h=document.querySelector('.section-block__header'); if(h) h.click(); },50);
+}
+
+function buildSidebar(isIntermediate=false, filter='') {
+  const body=document.getElementById('sidebarBody'); body.innerHTML='';
+  const topicList = isIntermediate ? INTERMEDIATE_TOPICS : TOPICS;
+  const pl=document.createElement('div');
+  pl.style.cssText='font-family:var(--fm);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--faint);padding:8px 16px 4px;border-bottom:1px solid var(--border);margin-bottom:4px';
+  pl.textContent = isIntermediate?'⚡ Intermediate Path':'🌱 Beginner Path';
+  body.appendChild(pl);
+  const sb=document.createElement('button');
+  sb.style.cssText='width:100%;padding:8px 16px;background:none;border:none;border-bottom:1px solid var(--border);font-family:var(--fm);font-size:11px;color:var(--indigo-hi);cursor:pointer;text-align:left;margin-bottom:8px';
+  sb.textContent=isIntermediate?'← Switch to Beginner':'→ Switch to Intermediate';
+  sb.onclick=()=>openTopic(0,!isIntermediate); body.appendChild(sb);
+  const IC=['#8b5cf6','#8b5cf6','#8b5cf6','#22d3ee','#22d3ee','#ef4444','#f59e0b','#ef4444','#ef4444','#f0a500'];
+  const II=['⚙️','⚙️','⚙️','🔗','🔗','🔒','📊','🔒','⚙️','📱'];
+  const IN=['Module 8: Batch Dev','Module 8: Batch Dev','Module 8: Batch Dev','Module 9: Integration','Module 9: Integration','Module 10: Security','Module 10: Reporting','Module 10: Security','Module 10: Performance','Module 11: Modern PS'];
+  let lastG='';
+  topicList.forEach((topic,idx)=>{
+    if(filter&&!topic.title.toLowerCase().includes(filter.toLowerCase())) return;
+    const gLabel=isIntermediate?(IN[idx]||'Intermediate'):(MODULES[topic.module]?.name||'');
+    const icon=isIntermediate?(II[idx]||'📚'):(MODULES[topic.module]?.icon||'📚');
+    const color=isIntermediate?(IC[idx]||'var(--soft)'):(MODULES[topic.module]?.color||'var(--soft)');
+    if(gLabel!==lastG){
+      const h=document.createElement('div'); h.className='sidebar__module-header';
+      h.innerHTML=`<span>${icon}</span><span style="color:${color}">${gLabel}</span>`;
+      body.appendChild(h); lastG=gLabel;
+    }
+    const isA=idx===currentTopicIndex&&isIntermediate===currentIsIntermediate;
+    const vk=(isIntermediate?'i_':'b_')+idx;
+    const btn=document.createElement('button');
+    btn.className='sidebar__topic'+(isA?' active':'');
+    btn.innerHTML=`<span class="sidebar__topic-num">${topic.num}</span><span style="flex:1;text-align:left">${topic.title}</span>${visited.has(vk)&&!isA?'<span style="color:var(--green);font-size:11px">✓</span>':''}`;
+    btn.onclick=()=>openTopic(idx,isIntermediate); body.appendChild(btn);
+  });
+}
+function filterTopics(val){ buildSidebar(currentIsIntermediate, val); }
+
+
+const INTERVIEW_QA_ALL = [
+  // ── BEGINNER (30) ──
   {cat:"Beginner",level:"beginner",q:"What is PeopleSoft?",a:"PeopleSoft is Oracle's enterprise application suite for HR, Finance, Supply Chain, and Education. It is metadata-driven — every page, field, and workflow is defined as metadata in Application Designer, not hardcoded. The runtime engine reads this metadata to generate HTML pages and execute business logic."},
-  {cat:"Beginner",level:"beginner",q:"What is PIA (Pure Internet Architecture)?",a:"PIA is PeopleSoft's three-tier web architecture introduced in PeopleSoft 8 (2000). Browser communicates with WebLogic (web tier), which communicates with Tuxedo Application Server (app tier) via JOLT, which communicates with the database (data tier). All PeopleCode and business logic runs in the Tuxedo App Server — zero logic in the browser."},
-  {cat:"Beginner",level:"beginner",q:"What is Application Designer?",a:"Application Designer is PeopleSoft's Windows-based IDE. Developers use it to create and modify Records, Fields, Pages, Components, Menus, and PeopleCode. All objects created are stored as metadata in the database — not as physical files. It connects to the database in 2-tier mode (direct) or 3-tier mode (via App Server)."},
-  {cat:"Beginner",level:"beginner",q:"What is the difference between a Record and a Table in PeopleSoft?",a:"In PeopleSoft, a Record is the metadata definition of a table or view created in Application Designer. When you Build a SQL Table record, PeopleSoft creates the physical database table prefixed with PS_ (e.g., Record JOB → Table PS_JOB). The Record is the definition; the Table is the physical database object."},
-  {cat:"Beginner",level:"beginner",q:"What are the 7 Record Types in PeopleSoft?",a:"SQL Table (creates PS_ table), SQL View (read-only DB view), Dynamic View (runtime SQL, no DB object), Derived/Work (memory only, no DB), SubRecord (reusable field group), Query View (created by PS Query), Temp Table (for AE parallel processing)."},
-  {cat:"Beginner",level:"beginner",q:"What is Effective Dating in PeopleSoft?",a:"Instead of updating existing rows, PeopleSoft inserts new rows with a new EFFDT (Effective Date). The 'current' row is retrieved using MAX(EFFDT) ≤ today. EFFSEQ handles multiple changes on the same date. Historical rows are never deleted — enabling retroactive payroll and full audit history."},
-  {cat:"Beginner",level:"beginner",q:"What is PeopleCode?",a:"PeopleCode is PeopleSoft's proprietary event-driven scripting language. It runs server-side in the Tuxedo App Server — never in the browser. PeopleCode is always attached to a specific event (PostBuild, SaveEdit, FieldChange) on a specific object (record field, component). It handles validation, defaulting, dynamic UI, and SQL operations."},
-  {cat:"Beginner",level:"beginner",q:"What is the Component Buffer?",a:"The Component Buffer is an in-memory data structure in the Tuxedo App Server that holds all data for the current component transaction. When a user opens a page, data loads from DB into the buffer. PeopleCode reads/writes to the buffer. Only when the user saves does the Component Processor commit the buffer to the database."},
-  {cat:"Beginner",level:"beginner",q:"What is PostBuild event used for?",a:"PostBuild fires once after the entire component is fully loaded — after all RowInit and FieldDefault events have run for all rows. It is the ideal location for show/hide logic, setting field defaults based on component-level conditions, and any initialization that needs the fully loaded state."},
-  {cat:"Beginner",level:"beginner",q:"What is SaveEdit event used for?",a:"SaveEdit is the standard event for final business rule validation before the database commit. Using Error() in SaveEdit stops the save and highlights the field. Using Warning() allows the save but shows a caution. It fires during the save sequence after all field-level edits have passed."},
+  {cat:"Beginner",level:"beginner",q:"What is PIA (Pure Internet Architecture)?",a:"PIA is PeopleSoft's three-tier web architecture introduced in PS8 (2000). Browser → WebLogic (web tier) → Tuxedo App Server (app tier) via JOLT → Database. All PeopleCode and business logic runs in Tuxedo — zero logic in the browser."},
+  {cat:"Beginner",level:"beginner",q:"What is Application Designer?",a:"PeopleSoft's Windows-based IDE for creating Records, Fields, Pages, Components, Menus, and PeopleCode. All objects stored as metadata in the database — not files. Connects 2-tier (direct DB) or 3-tier (via App Server)."},
+  {cat:"Beginner",level:"beginner",q:"What is the difference between a Record and a Table?",a:"A Record is the metadata definition in Application Designer. When you Build a SQL Table record, PeopleSoft creates the physical DB table prefixed PS_ (Record JOB → Table PS_JOB). Record = definition, Table = physical DB object."},
+  {cat:"Beginner",level:"beginner",q:"What are the 7 Record Types in PeopleSoft?",a:"SQL Table (creates PS_ table), SQL View (read-only DB view), Dynamic View (runtime SQL, no DB object), Derived/Work (memory only), SubRecord (reusable field group), Query View (created by PS Query), Temp Table (AE parallel processing)."},
+  {cat:"Beginner",level:"beginner",q:"What is Effective Dating?",a:"Instead of updating rows, PeopleSoft inserts new rows with EFFDT. Current row = MAX(EFFDT) ≤ today. EFFSEQ handles same-date changes. Historical rows never deleted — enables retroactive payroll and full audit history."},
+  {cat:"Beginner",level:"beginner",q:"What is PeopleCode?",a:"PeopleSoft's proprietary event-driven scripting language. Runs server-side in Tuxedo — never in the browser. Attached to a specific event (PostBuild, SaveEdit, FieldChange) on a specific object. Handles validation, defaulting, dynamic UI, SQL."},
+  {cat:"Beginner",level:"beginner",q:"What is the Component Buffer?",a:"In-memory data structure in the Tuxedo App Server holding all data for the current transaction. Data loads from DB into buffer on open. PeopleCode reads/writes to buffer. DB update happens only on Save."},
+  {cat:"Beginner",level:"beginner",q:"What is PostBuild used for?",a:"Fires once after the component fully loads — after all RowInit and FieldDefault events run. Best place for show/hide logic, component-level defaulting, and initialization needing the fully loaded state."},
+  {cat:"Beginner",level:"beginner",q:"What is SaveEdit used for?",a:"Final business rule validation before DB commit. Error() stops the save, Warning() allows but shows caution. Fires after all field-level edits pass in the save sequence."},
+  {cat:"Beginner",level:"beginner",q:"What is FieldChange event?",a:"Fires when a user changes a field value and tabs out. Used for dynamic updates — auto-populating related fields, showing/hiding controls based on the new value. Runs server-side in Tuxedo."},
+  {cat:"Beginner",level:"beginner",q:"What does %OperatorId return?",a:"The current user's login ID (Operator ID). %EmployeeId returns the linked EMPLID. %Date returns today's date. %CurrentDateIn returns today in the correct SQL format for the database platform."},
+  {cat:"Beginner",level:"beginner",q:"What is a Prompt Table?",a:"A record used to validate a field's value via a lookup. When a user types a value, PeopleSoft checks it exists in the Prompt Table. Example: DEPTID validated against PS_DEPT_TBL. Prompts show a search dialog to the user."},
+  {cat:"Beginner",level:"beginner",q:"What is RowInit used for?",a:"Fires for every row loaded into the component buffer. Used to set default display properties per row — show/hide fields, set DisplayOnly. Avoid SQLExec in RowInit — it fires N times for N rows causing N database calls."},
+  {cat:"Beginner",level:"beginner",q:"What is the difference between FieldEdit and FieldChange?",a:"FieldEdit fires first — before the new value is accepted. Use Error() here to reject the value. FieldChange fires after — value is already accepted. Use it for cascading updates based on the new value."},
+  {cat:"Beginner",level:"beginner",q:"What is a Component in PeopleSoft?",a:"A group of pages sharing the same buffer that save together as one atomic transaction. The fundamental unit of a PeopleSoft transaction — Records, Pages, PeopleCode all work together inside a Component."},
+  {cat:"Beginner",level:"beginner",q:"What is the Search Record in a Component?",a:"Drives the search dialog before a component opens — defines which fields appear as search criteria and which appear as result columns. Typically the primary record or a security view of it."},
+  {cat:"Beginner",level:"beginner",q:"What is a Content Reference (CREF)?",a:"A Portal Registry entry pointing to a Component — defines its label, folder location, and security. Without a CREF, users cannot navigate to the component through the NavBar or tiles."},
+  {cat:"Beginner",level:"beginner",q:"What does Build → Create Table do in Application Designer?",a:"Generates and executes CREATE TABLE DDL SQL to create the physical PS_RECORDNAME table in the database. Saving the record in App Designer only creates the metadata — Build creates the actual DB object."},
+  {cat:"Beginner",level:"beginner",q:"What is PS_JOB?",a:"PeopleSoft HCM's central job history table. Contains one row per job change per employee (hire, transfer, promotion, pay change). Each row has EMPLID, EMPL_RCD, EFFDT, EFFSEQ, ACTION. Current row = MAX(EFFDT) ≤ today."},
+  {cat:"Beginner",level:"beginner",q:"What is a SubRecord?",a:"A reusable field group embedded into other records — included fields become part of the parent table. EFFDT_SBR (EFFDT + EFFSEQ) is the most common example, included in hundreds of effective-dated records."},
+  {cat:"Beginner",level:"beginner",q:"What are PeopleTools?",a:"PeopleSoft's complete development and administration toolset — Application Designer, PeopleCode, Application Engine, Integration Broker, PS Query, BI Publisher, Data Mover, Security, Process Scheduler. The platform on top of which PeopleSoft applications are built."},
+  {cat:"Beginner",level:"beginner",q:"What is the difference between 2-tier and 3-tier App Designer?",a:"2-tier: App Designer connects directly to DB — bypasses App Server. Faster for simple tasks. 3-tier: connects via App Server — required for some advanced features. Most production environments use 3-tier."},
+  {cat:"Beginner",level:"beginner",q:"What is the PS_ prefix on database tables?",a:"All PeopleSoft application tables are prefixed PS_ to distinguish them from PeopleTools metadata tables (PSRECDEFN, PSDBFIELD) and from database system tables. Record JOB → table PS_JOB."},
+  {cat:"Beginner",level:"beginner",q:"What is EMPL_RCD in PS_JOB?",a:"Employee Record Number — allows one employee to hold multiple simultaneous jobs (concurrent employment). Primary job = EMPL_RCD 0. A part-time second job = EMPL_RCD 1. Keys: EMPLID + EMPL_RCD + EFFDT + EFFSEQ."},
+  {cat:"Beginner",level:"beginner",q:"What is a Derived/Work record?",a:"A record type that exists only in the component buffer — no database table created. Used for temporary values, calculated fields, push button PeopleCode, and work variables during a component session."},
+  {cat:"Beginner",level:"beginner",q:"What does None() do in PeopleCode?",a:"Returns True if a field value is empty/null. Always use None() after SQLExec to check if a row was found before using the output variable. If SQLExec finds no row, output variables are set to empty — None() detects this."},
+  {cat:"Beginner",level:"beginner",q:"What is a Grid in PeopleSoft pages?",a:"The modern control for displaying multiple child record rows on a page. Replaced Scroll Areas. Supports sorting, filtering, pagination. All new PeopleSoft development uses Grids for multi-row data display."},
+  {cat:"Beginner",level:"beginner",q:"What is the difference between Add and Update/Display access in security?",a:"Add mode: user can create new records. Update/Display: user can view and edit existing records. Display Only: read-only, cannot save. These access modes are configured in Permission Lists per component."},
+  {cat:"Beginner",level:"beginner",q:"What is Process Monitor?",a:"PeopleSoft's batch job tracking page. Shows status (Queued, Initiated, Processing, Success, Error) of all submitted processes. Provides access to log files, trace files, and report output for diagnosis."},
+  {cat:"Beginner",level:"beginner",q:"What is a Run Control?",a:"A record that stores batch process parameters before submission. Keyed by OPRID + RUN_CNTL_ID. User enters parameters (date range, pay group, etc.) on the Run Control page, saves, then submits the process which reads parameters at runtime."},
 
-  // INTERMEDIATE
-  {cat:"PeopleCode",level:"intermediate",q:"Explain the complete PeopleCode event flow from component open to save.",a:"Load sequence: SearchInit → SearchSave → RowSelect → RowInit (per row) → FieldDefault → FieldFormula → PostBuild. User interaction: Activate (per tab) → FieldEdit → FieldChange. Save sequence: SaveEdit → SavePreChange → WorkFlow → SavePostChange. Understanding this sequence is critical — code in the wrong event causes subtle bugs."},
-  {cat:"PeopleCode",level:"intermediate",q:"What is the difference between SQLExec and CreateSQL?",a:"SQLExec retrieves a single row — if multiple rows match, only the first is returned. CreateSQL returns a SQL object used with While &sql.Fetch() to iterate multiple rows. Always call &sql.Close() after. SQLExec in RowInit is the most common performance anti-pattern — N rows × 1 SQL = N database calls."},
-  {cat:"PeopleCode",level:"intermediate",q:"What are the three PeopleCode variable scopes?",a:"Local: exists only for the current program execution — safest, use by default. Component: persists for the entire component transaction (open to save/cancel) — accessible from any event in that component. Global: persists for the entire user session — use very sparingly, can cause cross-component bugs."},
-  {cat:"PeopleCode",level:"intermediate",q:"How do you iterate through Level 1 rows in the Component Buffer?",a:"Use GetRowset(Scroll.RECORDNAME) to get the Level 1 rowset. Loop with For &i = 1 To &rs.ActiveRowCount. Use GetRow(&i) to get each Row, then GetRecord(Record.NAME) to get the Record, then access Field.Value. Always use ActiveRowCount — not RowCount — to exclude deleted rows."},
-  {cat:"PeopleCode",level:"intermediate",q:"What is Meta-SQL and why is it used?",a:"Meta-SQL are PeopleSoft-specific SQL functions that make code database-independent. %CurrentDateIn resolves to the correct date syntax for Oracle/SQL Server/DB2. %Table(RECORDNAME) resolves to PS_RECORDNAME. %Bind(FIELD) inserts a bind variable. Using Meta-SQL ensures your PeopleCode runs correctly regardless of the underlying database platform."},
-  {cat:"PeopleCode",level:"intermediate",q:"When would you use Component scope vs Local scope?",a:"Use Local for all variables unless you specifically need to share a value across events. Use Component scope when you need to set a value in one event (e.g., set &isNewHire = True in PostBuild) and read it in another event later (e.g., check &isNewHire in SaveEdit). Avoid Global scope unless the data is truly session-wide."},
+  // ── PEOPLECODE (30) ──
+  {cat:"PeopleCode",level:"intermediate",q:"Explain the complete PeopleCode event flow from open to save.",a:"Load: SearchInit → SearchSave → RowSelect → RowInit (per row) → FieldDefault → FieldFormula → PostBuild → Activate. User actions: FieldEdit → FieldChange. Save: SaveEdit → SavePreChange → WorkFlow → SavePostChange. Getting the right event is critical — code in the wrong event causes subtle bugs."},
+  {cat:"PeopleCode",level:"intermediate",q:"What is the difference between SQLExec and CreateSQL?",a:"SQLExec retrieves one row — first match only. CreateSQL returns a SQL object, iterate with While &sql.Fetch(). Always call &sql.Close() after. SQLExec in RowInit = classic N+1 performance problem. Use CreateSQL for multiple rows."},
+  {cat:"PeopleCode",level:"intermediate",q:"What are the three variable scopes?",a:"Local: current program only — use by default. Component: persists entire component session (open to save) — accessible from any event in that component. Global: entire user session — use sparingly, causes cross-component bugs."},
+  {cat:"PeopleCode",level:"intermediate",q:"How do you iterate Level 1 buffer rows?",a:"GetRowset(Scroll.RECORDNAME) returns Level 1 rowset. Loop: For &i = 1 To &rs.ActiveRowCount. GetRow(&i).GetRecord(Record.NAME).FIELDNAME.Value. Always ActiveRowCount — not RowCount — to skip deleted rows."},
+  {cat:"PeopleCode",level:"intermediate",q:"What is Meta-SQL?",a:"Database-independent SQL functions: %CurrentDateIn (today's date in correct format), %Table(RECORD) resolves to PS_RECORD, %Bind(FIELD) inserts bind variable. Makes PeopleCode portable across Oracle, SQL Server, DB2."},
+  {cat:"PeopleCode",level:"intermediate",q:"When should you use Component scope?",a:"When a value set in one event needs to be read in another event later in the same transaction. Example: set &isNewHire = True in PostBuild, check it in SaveEdit. Never use Local for cross-event sharing — it won't survive to the next event."},
+  {cat:"PeopleCode",level:"intermediate",q:"What does SavePreChange fire after?",a:"Fires just BEFORE the DB commit — buffer is final but nothing written to DB yet. Last chance to manipulate buffer or create related records before commit. After this fires, SavePostChange fires after the actual DB commit."},
+  {cat:"PeopleCode",level:"intermediate",q:"What does SavePostChange fire after?",a:"Fires AFTER DB commit is complete. Cannot cancel the save. Use for downstream updates, sending notifications, triggering integrations that require the data to already exist in the database."},
+  {cat:"PeopleCode",level:"intermediate",q:"How do you make a field read-only in PeopleCode?",a:"RECORD.FIELD.DisplayOnly = True — shows the value but prevents editing. Enabled = False — grays out the field. Visible = False — hides completely. Use DisplayOnly when you want visible but not editable."},
+  {cat:"PeopleCode",level:"intermediate",q:"What is RowSelect used for?",a:"Fires for each row as it is fetched from DB into the buffer. Use DiscardRow() to filter rows or StopFetching() to stop. Rarely needed — filtering in SQL Views is always more efficient than RowSelect PeopleCode."},
+  {cat:"PeopleCode",level:"intermediate",q:"What does GetRecord() return?",a:"Returns the Record object from the current Row in the buffer. From Record, access Field objects: &rec = &row.GetRecord(Record.JOB); &rec.DEPTID.Value. This is the standard pattern for working with buffer data in loops."},
+  {cat:"PeopleCode",level:"intermediate",q:"What is the risk of forgetting &sql.Close()?",a:"Leaves an open DB cursor. In RowInit across many rows, this exhausts database cursor limits and causes DB connection errors. Always: &sql = CreateSQL(...); While &sql.Fetch(); ... End-While; &sql.Close();"},
+  {cat:"PeopleCode",level:"intermediate",q:"What is Error() vs Warning() in PeopleCode?",a:"Error() stops processing, highlights the field in red, user must correct before continuing. Warning() shows a message but allows the user to continue. Use Error() for mandatory business rules, Warning() for advisory checks."},
+  {cat:"PeopleCode",level:"intermediate",q:"What is RowInsert event?",a:"Fires when a user adds a new row to a grid. Note: RowInit always fires after RowInsert — don't duplicate initialization code in both or it runs twice for new rows."},
+  {cat:"PeopleCode",level:"intermediate",q:"How do you call an Application Engine from PeopleCode?",a:"CallAppEngine(AE_PROGRAM_NAME, &runcntlrec) — synchronous call, waits for completion. For asynchronous, schedule via Process Request. CallAppEngine is typically used in SavePostChange to trigger downstream processing."},
+  {cat:"PeopleCode",level:"intermediate",q:"What is an Application Package?",a:"PeopleSoft's object-oriented framework for PeopleCode. Packages contain Application Classes with properties and methods. Enables code reuse, encapsulation, and polymorphism. Used for Event Mapping handlers and reusable business logic libraries."},
+  {cat:"PeopleCode",level:"intermediate",q:"What is the Component Processor?",a:"The PeopleSoft runtime engine in Tuxedo that manages the complete component lifecycle — loading data into buffer, firing PeopleCode events in sequence, generating SQL, executing DB operations. All page interaction goes through it."},
+  {cat:"PeopleCode",level:"intermediate",q:"What is the difference between GetRowset() and GetRowset(Scroll.NAME)?",a:"GetRowset() with no args returns Level 0 — the primary record (always 1 row). GetRowset(Scroll.RECORDNAME) returns Level 1 rowset for that scroll. Must specify scroll name to navigate to child data grids."},
+  {cat:"PeopleCode",level:"intermediate",q:"What does ActiveRowCount vs RowCount mean?",a:"RowCount includes rows marked for deletion. ActiveRowCount excludes them. Always use ActiveRowCount in loops to avoid processing rows about to be deleted on save."},
+  {cat:"PeopleCode",level:"intermediate",q:"What is FieldDefault event?",a:"Fires before a field is displayed to the user for the first time. Use it to set field defaults based on other data. Fires before PostBuild, so defaults set here are available when PostBuild runs."},
+  {cat:"PeopleCode",level:"intermediate",q:"What is SearchInit used for?",a:"Fires before the search dialog is displayed. Used to restrict or pre-populate search criteria — for example, defaulting the Business Unit so users only see their own BU's data in search results."},
+  {cat:"PeopleCode",level:"intermediate",q:"What is WorkFlow event?",a:"Fires during the save sequence between SavePreChange and SavePostChange. Used to trigger workflow routing — sending approvals, notifications, or escalations based on data changes during a save."},
+  {cat:"PeopleCode",level:"intermediate",q:"What is GetLevel0() in PeopleCode?",a:"Returns the Level 0 Rowset — the top-level component buffer (always 1 row). Equivalent to GetRowset(). From Level 0 you can navigate down to Level 1 child scrolls using GetRow(1).GetRowset(Scroll.CHILDRECORD)."},
+  {cat:"PeopleCode",level:"intermediate",q:"How do you hide a page tab in PeopleCode?",a:"Use SetPageTabOrder to hide tabs, or reference the page directly: GetPage(Page.PAGENAME).Visible = False. Page visibility is typically controlled in PostBuild based on user role or component mode (Add vs Update)."},
+  {cat:"PeopleCode",level:"intermediate",q:"What is %Mode system variable?",a:"%Mode returns the component mode: A (Add), U (Update/Display), L (Update/Display All), E (Correction), D (Data Entry). Useful for conditionally enabling fields or defaulting values differently in Add vs Update mode."},
+  {cat:"PeopleCode",level:"intermediate",q:"What is the difference between %Date and %DateIn?",a:"%Date returns today's date as a PeopleCode Date value. %CurrentDateIn returns today's date formatted correctly for SQL WHERE clauses for the current database platform (Oracle TO_DATE vs SQL Server GETDATE format)."},
+  {cat:"PeopleCode",level:"intermediate",q:"What does Rededit vs SaveEdit control?",a:"FieldEdit controls individual field value acceptance — rejects a value before it enters the buffer. SaveEdit validates the complete component state before committing — checks cross-field rules and business logic across all pages."},
+  {cat:"PeopleCode",level:"intermediate",q:"What is DoModal() in PeopleCode?",a:"Opens a secondary component as a modal popup dialog — user must complete or cancel it before returning to the parent component. Used for confirmations, entry dialogs, and sub-transactions within a main transaction."},
+  {cat:"PeopleCode",level:"intermediate",q:"What is TransferPage() used for?",a:"Transfers the user to a different page within the same component. Used for wizard-style navigation or conditional page flow. Different from navigating between tabs — this programmatically controls page flow."},
+  {cat:"PeopleCode",level:"intermediate",q:"What is the Activate event?",a:"Fires each time a page tab becomes visible — when user clicks a tab or when the page first displays. Used for tab-specific initialization, refreshing data on the tab, or hiding/showing fields specific to that tab."},
 
-  // RECORDS & DATA
-  {cat:"Records & Data",level:"intermediate",q:"What is the difference between a SQL View and a Dynamic View?",a:"SQL View creates a permanent database view object — visible in the DB schema. Dynamic View stores SQL in PeopleTools metadata but creates no database object — the SQL resolves at runtime. Dynamic Views allow runtime-specific filtering (like current user's SetID) that cannot be in a static view. Both are read-only."},
-  {cat:"Records & Data",level:"intermediate",q:"Why should you never add fields directly to a delivered PeopleSoft record?",a:"Oracle-delivered objects are overwritten during upgrades. If you add a field to PS_JOB, the next upgrade replaces PS_JOB and your field is gone. Best practice: create an extension record (e.g., ZZ_JOB_EXT) with the same key fields and add your custom fields there. For PT 8.55+, Event Mapping allows upgrade-safe customization entirely."},
-  {cat:"Records & Data",level:"intermediate",q:"How do you implement row-level security in a custom component showing employee data?",a:"Replace the base SQL Table (PS_JOB) with a security view as the Search Record. The security view joins the base table with a department security table — filtering results based on the current user's security profile. Without this, any user with page access sees all data regardless of their row-level security settings."},
-  {cat:"Records & Data",level:"intermediate",q:"What is SetID and how does it work with TableSet sharing?",a:"SetID is a code assigned to setup tables that controls which reference data applies to each Business Unit. Multiple Business Units can share the same SetID (e.g., SHARE for departments). TableSet Controls (PS_SET_CNTRL_TBL) link each Business Unit to SetIDs per record group. This allows sharing common data while maintaining separate configurations per region."},
+  // ── RECORDS & FIELDS (25) ──
+  {cat:"Records & Fields",level:"intermediate",q:"What is the difference between SQL View and Dynamic View?",a:"SQL View creates a permanent DB view object. Dynamic View stores SQL in metadata — no DB object created, SQL resolves at runtime. Dynamic Views allow runtime-specific filtering (current user's SetID) impossible in static views. Both read-only."},
+  {cat:"Records & Fields",level:"intermediate",q:"Why not add fields directly to delivered records?",a:"Oracle overwrites delivered objects during upgrades. Add a field to PS_JOB → next upgrade removes it. Best practice: create extension record ZZ_JOB_EXT with same keys. For PT 8.55+, Event Mapping is upgrade-safe entirely."},
+  {cat:"Records & Fields",level:"intermediate",q:"What is row-level security implementation?",a:"Replace PS_JOB (base table) with a security view as the Search Record. The view joins PS_JOB with department security tables — auto-filters based on user's security profile. Without this, all users see all data."},
+  {cat:"Records & Fields",level:"intermediate",q:"What is SetID and TableSet sharing?",a:"SetID is a code assigned to setup tables controlling which reference data applies to each Business Unit. Multiple BUs can share SetID SHARE. PS_SET_CNTRL_TBL links each BU to SetIDs per record group — enabling shared setup with separate configurations."},
+  {cat:"Records & Fields",level:"intermediate",q:"What is an Alternate Search Key (A)?",a:"Creates a DB index on that field enabling efficient searching without making it a primary key. Example: LAST_NAME as A on PS_NAMES enables fast employee name searches. Without it, full table scans occur."},
+  {cat:"Records & Fields",level:"intermediate",q:"What is a List Box Item (L)?",a:"Field appears as a column in the search results list — helps users identify which row to select. Example: showing Employee Name, Job Title alongside Employee ID in search results."},
+  {cat:"Records & Fields",level:"intermediate",q:"What is a Temp Table record type?",a:"Creates multiple DB instances (MYTEMP_AET, MYTEMP_AET1...) allowing parallel AE processes to work simultaneously without data collision. Number of instances configured on the AE Program properties."},
+  {cat:"Records & Fields",level:"intermediate",q:"Why are PeopleSoft fields defined globally?",a:"One global field definition (e.g., EMPLID) used across hundreds of records. Change the label once — updates everywhere automatically. Ensures consistency of field properties, validation, and display across the entire application."},
+  {cat:"Records & Fields",level:"intermediate",q:"What is a Query View?",a:"Created and managed by PS Query. Allows query results to become the source for another query — enabling complex nested query scenarios. Not manually created in Application Designer."},
+  {cat:"Records & Fields",level:"intermediate",q:"What does Alternate Search Key (A) create in the database?",a:"A non-unique database index on that field. This index is what makes searching by that field fast. Without the A designation, PeopleSoft won't create an index and searches will perform full table scans."},
+  {cat:"Records & Fields",level:"intermediate",q:"What is EFFDT_SBR?",a:"A SubRecord containing EFFDT (Effective Date) and EFFSEQ (Effective Sequence). Included in hundreds of PeopleSoft records to implement the standard effective dating pattern consistently without redefining the same two fields everywhere."},
+  {cat:"Records & Fields",level:"intermediate",q:"What is the difference between Key (K) and Search Key (S)?",a:"K (Key) makes the field part of the record's primary key — used to uniquely identify rows. S (Search Key) displays the field in the search dialog as an input field. A field can be both K and S — like EMPLID."},
+  {cat:"Records & Fields",level:"intermediate",q:"What is a record's Use tab in Application Designer?",a:"Defines which Set Control field, Effective Date field, and Language field the record uses. Also specifies audit options (when to log changes), record audit options, and query security group for PS Query access."},
+  {cat:"Records & Fields",level:"intermediate",q:"What is Meta-SQL %Table()?",a:"%Table(RECORDNAME) resolves to PS_RECORDNAME at runtime, correctly for the target database. Prevents hardcoding PS_ prefix in SQL — ensures portability. Example: %Table(JOB) → PS_JOB."},
+  {cat:"Records & Fields",level:"intermediate",q:"How do you add a field to all records using it after a global field change?",a:"If you change a field's length or type, you must run Alter Table (Build → Alter) on all records using that field to update the physical DB columns. Changing the field definition alone does not alter the DB schema."},
+  {cat:"Records & Fields",level:"intermediate",q:"What is a Translate Value (XLAT)?",a:"Short code list (max 4 chars) stored in PSXLATITEM — PeopleSoft's universal lookup for stable values. Examples: EMPL_STATUS (A=Active, T=Terminated), ACTION (HIR, PRO, TER). Managed in App Designer, not in custom tables."},
+  {cat:"Records & Fields",level:"intermediate",q:"What happens when you mark a Translate Value as Inactive?",a:"It disappears from dropdown lists for new entries but historical records referencing it remain valid. Never delete a XLAT value used in live data — it would break existing records. Mark Inactive with an effective date instead."},
+  {cat:"Records & Fields",level:"intermediate",q:"What is a Long Character field type?",a:"Stores text up to 32,760 characters (vs CHAR max of 32,767 but practically 254 in some contexts). Used for notes, descriptions, comments, and free-text fields. Stored as CLOB/LONG in the database."},
+  {cat:"Records & Fields",level:"intermediate",q:"What does the Record Type tab show in Application Designer?",a:"Displays the record type (SQL Table, SQL View, etc.), the SQL view text (for views), and edit/audit options. For SQL Views, this is where you write the actual SELECT statement that defines the view."},
+  {cat:"Records & Fields",level:"intermediate",q:"What is an Image field type?",a:"Stores binary image data in the database. Used for employee photos, document attachments. PeopleSoft provides built-in image handling pages for upload/display. Stored as BLOB in the underlying database."},
+  {cat:"Records & Fields",level:"intermediate",q:"What is the significance of BUSINESS_UNIT in PeopleSoft?",a:"A fundamental organizational key used across all PeopleSoft modules. Separates data by business entity. Used with SetID to control which setup tables apply to each BU. Almost every transactional record includes BUSINESS_UNIT as a key."},
+  {cat:"Records & Fields",level:"intermediate",q:"What is record field PeopleCode?",a:"PeopleCode attached directly to a record field — not to a page or component. Fires regardless of which component displays the field. Examples: FieldDefault, FieldFormula, FieldEdit, FieldChange, SearchInit, SearchSave attached to record.field."},
+  {cat:"Records & Fields",level:"intermediate",q:"What is a required field in PeopleSoft?",a:"A field marked as Required in the record definition or page definition. PeopleSoft enforces that the field has a value before save. Required at record level applies everywhere the field appears. Required at page level applies only on that page."},
+  {cat:"Records & Fields",level:"intermediate",q:"What is the difference between character and number field types?",a:"CHAR stores text with fixed or variable length. NUMBER stores numeric values with defined precision and scale. PeopleSoft uses CHAR for codes (EMPLID, DEPTID) even when values look numeric — ensures leading zeros are preserved."},
+  {cat:"Records & Fields",level:"intermediate",q:"What does Audit Record do in Application Designer?",a:"Configures the record to automatically log changes to an audit table. PeopleSoft creates PS_AUDIT_RECORDNAME entries with old/new values, timestamp, and user ID for every change. Essential for regulated industries and SOX compliance."},
 
-  // ARCHITECTURE
-  {cat:"Architecture",level:"intermediate",q:"What is the difference between PSAPPSRV and PSQRYSRV?",a:"PSAPPSRV is the core App Server process handling component buffer operations, PeopleCode execution, and SQL generation for page transactions. PSQRYSRV is a dedicated process for PS Query execution — separated to prevent heavy queries from blocking online component processing. Multiple instances of both run simultaneously for concurrent users."},
-  {cat:"Architecture",level:"intermediate",q:"What does the Distribution Agent (PSDSTSRV) do?",a:"PSDSTSRV moves completed batch process output files from the batch server to the Report Repository web server. Once moved, users can access their report output through Report Manager in the browser. Without PSDSTSRV running, batch reports complete but users cannot see the output."},
-  {cat:"Architecture",level:"intermediate",q:"What is a Run Control and why is it needed?",a:"A Run Control is a database record that stores parameters before a batch process runs. Batch processes cannot interactively prompt users, so they read parameters from the Run Control table (keyed by OPRID + RUN_CNTL_ID). Users enter parameters on the Run Control page, save them, then submit the process. The process reads the saved parameters at runtime."},
+  // ── EFFECTIVE DATING (20) ──
+  {cat:"Effective Dating",level:"beginner",q:"What happens to PS_JOB when an employee is promoted?",a:"A new row is inserted with the promotion date as EFFDT and ACTION=PRO. The old hire row remains permanently. No UPDATE — always INSERT. PS_JOB is append-only for job changes."},
+  {cat:"Effective Dating",level:"beginner",q:"What does EFFSEQ handle?",a:"Multiple changes on the same Effective Date. First change EFFSEQ=0, second EFFSEQ=1. The row with MAX(EFFSEQ) for a given EFFDT is the most current for that date."},
+  {cat:"Effective Dating",level:"beginner",q:"SQL to get current row from an effective-dated table?",a:"WHERE EFFDT = (SELECT MAX(EFFDT) FROM PS_JOB B WHERE B.EMPLID=A.EMPLID AND B.EFFDT <= %CurrentDateIn) AND EFFSEQ = (SELECT MAX(EFFSEQ) FROM PS_JOB C WHERE C.EMPLID=A.EMPLID AND C.EFFDT=A.EFFDT) — both subqueries needed."},
+  {cat:"Effective Dating",level:"beginner",q:"What is a future-dated row?",a:"A row with EFFDT > today. It exists in the DB now but won't be 'current' until its date arrives. Example: entering next month's salary increase today — payroll automatically uses the new rate when the date arrives."},
+  {cat:"Effective Dating",level:"beginner",q:"Why might PS_JOB have 30 rows for one employee?",a:"Each job change (ACTION) creates one new row: hire, transfers, promotions, pay changes, leaves, returns. An employee with 10+ years of changes easily has 30+ rows. All history preserved — nothing deleted."},
+  {cat:"Effective Dating",level:"beginner",q:"What is Correction Mode?",a:"Allows authorized users to directly modify historical effective-dated rows. Tightly security-controlled — retroactive corrections can trigger payroll recalculation. Regular users typically have Update/Display only, not Correction."},
+  {cat:"Effective Dating",level:"beginner",q:"Most common mistake querying PS_JOB?",a:"Missing effective dating WHERE clause — returns ALL rows (30+ per employee) causing duplicate results. Every query against effective-dated tables needs the MAX(EFFDT) ≤ today and MAX(EFFSEQ) subqueries."},
+  {cat:"Effective Dating",level:"intermediate",q:"What is retroactive payroll and why does effective dating enable it?",a:"When salary is backdated, payroll recalculates prior periods using historical PS_JOB rows. Because rows are never deleted, payroll can access the exact salary that was active during any past period — enabling accurate retroactive calculation."},
+  {cat:"Effective Dating",level:"intermediate",q:"What does ACTION_REASON store in PS_JOB?",a:"A sub-code providing more detail about the ACTION. For ACTION=TER (Termination), ACTION_REASON might be RES (Resignation), LAY (Layoff), or RET (Retirement). Together they tell the complete story of every job change."},
+  {cat:"Effective Dating",level:"intermediate",q:"What is the difference between effective dating and history rows?",a:"All rows are history — PeopleSoft doesn't distinguish current from history in storage. The 'current' row is determined by query criteria (MAX EFFDT ≤ today). Future rows also exist — they just haven't become current yet."},
+  {cat:"Effective Dating",level:"intermediate",q:"Why does PS_JOB use EMPL_RCD as a key field?",a:"Allows one employee (EMPLID) to hold multiple simultaneous job records — concurrent employment. Primary job = EMPL_RCD 0. A part-time second position = EMPL_RCD 1. Full key: EMPLID + EMPL_RCD + EFFDT + EFFSEQ."},
+  {cat:"Effective Dating",level:"intermediate",q:"What is the impact of not including EMPL_RCD in PS_JOB queries?",a:"If an employee has two concurrent jobs (EMPL_RCD 0 and 1), omitting EMPL_RCD from the WHERE clause returns double the rows — one set per EMPL_RCD. Always include EMPL_RCD = 0 unless specifically reporting concurrent jobs."},
+  {cat:"Effective Dating",level:"intermediate",q:"How do you query data at a specific point in time in the past?",a:"Replace %CurrentDateIn with the target date: WHERE EFFDT = (SELECT MAX(EFFDT) ... WHERE EFFDT <= TO_DATE('2023-01-01','YYYY-MM-DD')). This returns the row that was active on January 1, 2023 — even if a newer row exists today."},
+  {cat:"Effective Dating",level:"intermediate",q:"What setup tables use effective dating?",a:"Almost all — PS_DEPT_TBL (departments), PS_JOBCODE_TBL (job codes), PS_LOCATION_TBL (locations), PS_COMPANY_TBL (companies), PS_PAY_GRADE_TBL (salary grades). Effective dating in setup tables preserves configuration history alongside transaction history."},
+  {cat:"Effective Dating",level:"intermediate",q:"What is EFFDT in PeopleSoft date format vs database format?",a:"PeopleSoft stores dates in the database in the standard DB format (DATE type). When coding SQL in PeopleCode, always use %CurrentDateIn for today — never hardcode date literals. This ensures correct format across Oracle, SQL Server, and DB2."},
+  {cat:"Effective Dating",level:"advanced",q:"How do you handle effective dating in a PS Query joining two effective-dated tables?",a:"Both tables need their own effective dating criteria. Example joining PS_JOB and PS_DEPT_TBL: PS_JOB needs MAX(EFFDT) ≤ today, AND PS_DEPT_TBL needs its own MAX(EFFDT) ≤ today. Missing either one causes row multiplication."},
+  {cat:"Effective Dating",level:"advanced",q:"What is future-row conflict in PeopleSoft?",a:"When a correction to a past row conflicts with a future row that was entered based on the old data. Example: change July salary — August future row may have been entered assuming July's salary. PeopleSoft shows warnings but allows the correction."},
+  {cat:"Effective Dating",level:"advanced",q:"How does effective dating affect Application Engine SQL performance?",a:"AE batch SQL against large effective-dated tables (PS_JOB with millions of rows) must use proper MAX(EFFDT) subqueries AND ensure correct indexes exist on EMPLID, EFFDT. Without indexes, correlated subqueries cause full table scans across millions of rows."},
+  {cat:"Effective Dating",level:"advanced",q:"What is the difference between effective dating and row-level audit?",a:"Effective dating preserves intended historical state — 'this was the salary on this date'. Audit tables (PS_AUDIT_*) record who changed what and when — the change event. Both serve different purposes: effective dating for business history, audit for compliance logging."},
+  {cat:"Effective Dating",level:"advanced",q:"What is EFFDT on PS_DEPT_TBL and why does it matter in joins?",a:"PS_DEPT_TBL has its own EFFDT — a department can change its name, manager, or location over time. When joining PS_JOB to PS_DEPT_TBL for a historical report, you must match each job row's DEPTID to the department description active on the same date — not today's description."},
 
-  // SECURITY
-  {cat:"Security",level:"intermediate",q:"Explain PeopleSoft's security hierarchy.",a:"User Profiles are assigned Roles. Roles bundle Permission Lists. Permission Lists define actual access — which components (and in which modes: Add/Update/Display), which processes, which PS Query trees, which web services. Row-Level Security (Department Security Trees) controls which data rows a user can see within accessible components."},
-  {cat:"Security",level:"intermediate",q:"What is the difference between page-level security and row-level security?",a:"Page-level security (Permission Lists) controls whether a user can access a component at all and in which mode (Add, Update, Display Only). Row-level security controls which data rows are visible within components they have page access to — e.g., an HR admin can access Job Data but only see employees in their authorized departments."},
-  {cat:"Security",level:"intermediate",q:"What is a Permission List and what does it control?",a:"A Permission List is the core security object. It controls: component access (which pages, which modes), process group access (which batch processes can be submitted), PS Query access (which record groups can be queried), web service access (Integration Broker), sign-on times, and PeopleTools access (App Designer, Data Mover, etc.)."},
+  // ── ARCHITECTURE (20) ──
+  {cat:"Architecture",level:"beginner",q:"What are the three tiers of PIA?",a:"Tier 1 (Web): Oracle WebLogic — handles HTTP/HTTPS, pure presentation. Tier 2 (App): Oracle Tuxedo — all PeopleCode, Component Processor, business logic. Tier 3 (DB): Oracle/SQL Server/DB2 — data and metadata storage. All logic runs in Tier 2."},
+  {cat:"Architecture",level:"beginner",q:"What protocol does WebLogic use to talk to Tuxedo?",a:"JOLT (Java Object Linking and Transactions) — Oracle's proprietary protocol between WebLogic and Tuxedo. JOLT port is typically 9000. WebLogic forwards requests to Tuxedo via JOLT; Tuxedo sends back processed HTML."},
+  {cat:"Architecture",level:"beginner",q:"What is PSAPPSRV?",a:"The core Tuxedo process handling component buffer operations, PeopleCode execution, and SQL generation for online component transactions. Multiple PSAPPSRV instances run simultaneously for concurrent users."},
+  {cat:"Architecture",level:"intermediate",q:"What is PSQRYSRV?",a:"Dedicated Tuxedo process for PS Query execution — separated from PSAPPSRV to prevent heavy queries from blocking online component transactions. Users running large queries don't impact other users' page performance."},
+  {cat:"Architecture",level:"intermediate",q:"What is PSSAMSRV?",a:"Security/Authentication Manager Server — handles user authentication during PeopleSoft signon. Validates credentials against the PeopleSoft user profile database. Part of the Tuxedo App Server domain."},
+  {cat:"Architecture",level:"intermediate",q:"What is PSDSTSRV (Distribution Agent)?",a:"Moves completed batch process output files from the batch server to the Report Repository web server. Without PSDSTSRV running, batch processes complete but users cannot see output in Report Manager."},
+  {cat:"Architecture",level:"intermediate",q:"What is a PeopleSoft Domain?",a:"An instance of either the Tuxedo Application Server or Process Scheduler. Standard setup: one App Server domain, one Process Scheduler domain. High-availability: multiple domains per tier. Configured via PSADMIN."},
+  {cat:"Architecture",level:"intermediate",q:"What is the Report Repository?",a:"A web server directory where completed batch output (reports, log files) is stored and served to users through Report Manager. PSDSTSRV transfers files here. Users click 'View Log' in Process Monitor to access output."},
+  {cat:"Architecture",level:"intermediate",q:"What is PSADMIN?",a:"PeopleSoft's command-line administration utility for managing App Server and Process Scheduler domains — start/stop/configure/monitor. Run on the server hosting Tuxedo. Provides menus for domain configuration."},
+  {cat:"Architecture",level:"intermediate",q:"What is a DPK (Deployment Package)?",a:"Puppet-based automation scripts that install and configure a complete PeopleSoft environment. Standard from PT 8.55+. Replaced manual multi-day installs with automated setup in hours. VirtualBox-based for development environments."},
+  {cat:"Architecture",level:"intermediate",q:"What is PUM (PeopleSoft Update Manager)?",a:"Oracle's selective patching system. Organizations download a PeopleSoft Image VM, browse available fixes/features in a web UI, select exactly what to apply, generate a Change Package. Replaced annual bundle patching from ~2014."},
+  {cat:"Architecture",level:"intermediate",q:"What is the difference between online and batch processing in PeopleSoft?",a:"Online: user-driven, runs in the App Server (Tuxedo), real-time response required, limited to component transactions. Batch: scheduled/submitted, runs in Process Scheduler, handles large datasets, no user interaction during execution."},
+  {cat:"Architecture",level:"advanced",q:"What is the Tuxedo bulletin board?",a:"Tuxedo's shared memory segment where service requests are queued and dispatched to available server processes. Manages load balancing across multiple PSAPPSRV instances. If the bulletin board fills up, users get 'server busy' errors."},
+  {cat:"Architecture",level:"advanced",q:"What is connection pooling in PeopleSoft?",a:"The App Server maintains a pool of persistent database connections shared across PSAPPSRV processes. Individual user requests use a connection from the pool rather than creating new DB connections — dramatically improves performance and reduces DB load."},
+  {cat:"Architecture",level:"advanced",q:"What is the Process Scheduler architecture?",a:"Process Scheduler (PSPRCSRV) maintains a queue of submitted process requests in PS_PRCSPARMS. It spawns child processes (AE, SQR, etc.) to execute jobs. PSDSTSRV moves output to Report Repository. All tracked in PS_PRCSPARMS / PS_PMN_PRCSLIST."},
+  {cat:"Architecture",level:"advanced",q:"What is the difference between App Server cache and DB metadata?",a:"App Server caches PeopleTools metadata (record definitions, page definitions, PeopleCode) in server memory to avoid repeated DB metadata reads. Cache is populated on first access and refreshed when you run Build or cache clearing utilities."},
+  {cat:"Architecture",level:"advanced",q:"What is the significance of the JOLT port?",a:"The JOLT port (typically 9000) is the network port on the App Server that WebLogic connects to. Firewall rules must allow WebLogic to reach this port. Multiple App Server domains use different JOLT ports. PSADMIN shows current port configuration."},
+  {cat:"Architecture",level:"advanced",q:"What is a PeopleSoft Search Framework?",a:"Elasticsearch-based full-text search introduced in PT 8.52. Enables powerful keyword search across PeopleSoft components. Requires a separate Elasticsearch cluster. Fluid components use Search Framework for the main search bar. Classic components use PS Query-based search."},
+  {cat:"Architecture",level:"advanced",q:"What is Change Assistant?",a:"PeopleSoft's upgrade automation tool. Reads a Change Package (generated by PUM) and applies it step-by-step to the target environment. Automates compare, copy, build, and data conversion steps. Provides detailed progress tracking and error reporting."},
+  {cat:"Architecture",level:"advanced",q:"What are Tuxedo server processes and how many should you have?",a:"PSAPPSRV, PSQRYSRV, PSSAMSRV, PSDSTSRV, PSANALYTICSRV, PSSUBSRV, etc. Number of PSAPPSRV instances depends on concurrent user count and transaction volume. Standard sizing: 3-5 PSAPPSRV per 100 concurrent users. Configured in PSADMIN per domain."},
 
-  // ADVANCED
-  {cat:"Advanced",level:"advanced",q:"What is Application Engine and when would you use it?",a:"Application Engine (AE) is PeopleSoft's batch processing framework for large-scale data operations. Use it when processing needs to run outside the online component session — mass data updates, data migrations, interface file processing, payroll calculations. AE uses Steps, Sections, Actions (Do Select, Do When, SQL, PeopleCode). It has checkpoint/restart capability and supports parallel processing via Temp Tables."},
-  {cat:"Advanced",level:"advanced",q:"What is a Component Interface and when is it used?",a:"A Component Interface (CI) provides programmatic access to a PeopleSoft component from external programs — Application Engine, web services, batch load programs. It fires the same PeopleCode events as the online component. CIs are used for data migration (loading data using delivered business rules), integration (receiving data from external systems), and testing automation."},
-  {cat:"Advanced",level:"advanced",q:"What is Integration Broker?",a:"Integration Broker is PeopleSoft's enterprise messaging platform for real-time and asynchronous integrations. Key concepts: Service Operations (define what data is exchanged), Nodes (identify systems), Handlers (process incoming messages), Routing Rules (direct messages). Supports REST, SOAP, and internal PeopleSoft messaging. Used for HR-to-Finance integrations, third-party payroll, and cloud HR interfaces."},
-  {cat:"Advanced",level:"advanced",q:"What is Event Mapping in PeopleTools 8.55+?",a:"Event Mapping is an upgrade-safe customization technique. Instead of modifying delivered component events directly, you create a custom Application Class PeopleCode and map it to a delivered component event (e.g., PostBuild of HR_PERSONAL_DTLS). During upgrades, delivered objects are replaced but your mapping remains — eliminating the traditional 'modify and compare' upgrade pain. This is the recommended approach for all customizations in modern PeopleSoft."},
-  {cat:"Advanced",level:"advanced",q:"How does PeopleSoft's Fluid UI differ from Classic UI?",a:"Classic UI uses fixed-width HTML tables, desktop-only, grey interface — introduced with PIA in PeopleSoft 8. Fluid UI (PT 8.53+) uses responsive HTML5/CSS3 with Oracle JET — works on mobile, tablet, desktop. Fluid uses Homepages with Tiles, NavBar navigation, Activity Guides, and Related Actions. New Oracle functionality is built exclusively in Fluid. Classic pages cannot be automatically converted to Fluid — they require redevelopment."},
-  {cat:"Advanced",level:"advanced",q:"What is PUM (PeopleSoft Update Manager) and how does it work?",a:"PUM replaced bundle patching (~2014). Oracle releases PeopleSoft Images (VirtualBox VMs) with all cumulative fixes. Organizations connect their environment to the Image via PUM, browse available updates in a web UI, select exactly what they want (individual fixes or features), and generate a Change Package to apply. This selective adoption means organizations can take critical security fixes without taking untested UI changes."},
-  {cat:"Advanced",level:"advanced",q:"Explain the Temp Table pattern in Application Engine.",a:"Temp Tables allow parallel AE processing. You define a record as Temp Table type — PeopleSoft creates multiple instances in the DB (MYTEMP_AET, MYTEMP_AET1, MYTEMP_AET2...). Each parallel AE process instance uses its own temp table instance. This prevents data collision between parallel processes. The number of instances is configured on the AE Program properties. Without Temp Tables, parallel processing would cause data overwrites."},
-  {cat:"Advanced",level:"advanced",q:"What is the difference between SavePreChange and SavePostChange?",a:"SavePreChange fires just before the Component Processor executes INSERT/UPDATE SQL — all buffer data is final, but the DB commit has not happened yet. Use it for last-moment buffer manipulation or creating related records. SavePostChange fires after the DB commit is complete — you cannot cancel the save here. Use it for downstream updates, triggering integrations, sending notifications, or any action that requires the data to already be in the database."},
+  // ── SECURITY (20) ──
+  {cat:"Security",level:"beginner",q:"What is PeopleSoft's security hierarchy?",a:"User Profile → Roles → Permission Lists. User Profiles are assigned Roles. Roles bundle Permission Lists. Permission Lists define actual access. Change a Role once — affects all users with that Role."},
+  {cat:"Security",level:"beginner",q:"What does a Permission List control?",a:"Component access (which pages, which modes), process groups (which batch jobs), PS Query access (which record groups), Integration Broker access, sign-on times, PeopleTools access (App Designer, Data Mover, etc.)."},
+  {cat:"Security",level:"beginner",q:"What is row-level security?",a:"Controls which DATA rows a user can see within components they have page access to. An HR admin with Job Data access might only see employees in authorized departments — enforced via security views on the Search Record."},
+  {cat:"Security",level:"intermediate",q:"What is the difference between page-level and row-level security?",a:"Page-level (Permission Lists): can the user access this component, and in which mode? Row-level: which data rows are visible within accessible components? Both are needed — page security controls access, row security controls scope."},
+  {cat:"Security",level:"intermediate",q:"How is row-level security implemented technically?",a:"Security views join the base table with PS_DEPT_SECURITY (or similar) filtered by OPRCLASS. The user's operator class determines which departments they can see. Security view used as Search Record — automatically restricts results."},
+  {cat:"Security",level:"intermediate",q:"What is a Primary Permission List?",a:"Every User Profile has one Primary Permission List that controls their process profile (which processes they can submit), navigation homepage default, and serves as the row-level security operator class. Most critical Permission List on a user."},
+  {cat:"Security",level:"intermediate",q:"What is a Row Security Permission List?",a:"The Permission List that determines which data rows the user can see through row-level security views. Stored in PSOPRCLS on the User Profile. Security views query PS_SCRTY_TBL_DEPT (or similar) using this value to filter results."},
+  {cat:"Security",level:"intermediate",q:"What is a Query Access Tree?",a:"Configured in Permission Lists — defines which PeopleSoft records a user can build PS Queries against. Without tree access to a record, users can't see it in Query Manager interface — preventing queries against sensitive tables."},
+  {cat:"Security",level:"intermediate",q:"What is Data Permission in PeopleSoft Security?",a:"Controls which SetIDs and Business Units a user can access. Configured in Permission Lists under Data Permissions. Restricts access to specific business entities — preventing users from one division seeing another division's data."},
+  {cat:"Security",level:"intermediate",q:"What are Sign-on Times in Permission Lists?",a:"Controls when users can sign into PeopleSoft — days of week and time windows. Used for maintenance windows or restricting off-hours access. Part of Permission List configuration."},
+  {cat:"Security",level:"intermediate",q:"What is the ALLPAGES Permission List?",a:"A special delivered Permission List granting access to all pages. Should NEVER be assigned to regular business users — grants unrestricted access to all components in all modules. Use only for system administrators and emergency access."},
+  {cat:"Security",level:"intermediate",q:"What is a Role in PeopleSoft security?",a:"A bundle of Permission Lists assigned to users sharing the same access needs. Example: HR Coordinator Role bundles Permission Lists for Job Data, Personal Data, Benefits, Absence. Assign the Role to all HR Coordinators — one change applies everywhere."},
+  {cat:"Security",level:"intermediate",q:"What is Fluid security vs Classic security?",a:"Both use the same Permission List/Role model. Fluid tiles use CREF security — users must have access to the CREF to see the tile. NavBar items are also CREF-controlled. The underlying component security (page access modes) remains the same."},
+  {cat:"Security",level:"intermediate",q:"What is definition security in Application Designer?",a:"Controls which PeopleSoft object definitions (Records, Pages, Components, PeopleCode) a developer can view/modify in Application Designer. Separate from runtime page security. Controlled in PeopleTools → Security → Definition Security."},
+  {cat:"Security",level:"advanced",q:"What is a Department Security Tree?",a:"A tree structure in PeopleSoft defining which departments each security group can access. Users with a given Row Security Permission List can see employees in all departments under their authorized tree nodes. Changes to tree propagate automatically."},
+  {cat:"Security",level:"advanced",q:"How do you troubleshoot a user who can't see a component in the menu?",a:"Check: 1) User's Roles include a Role that has the correct Permission List. 2) Permission List has the component in the correct navigation folder with appropriate access mode. 3) CREF exists and is active in Portal Registry. 4) User's browser cache is cleared."},
+  {cat:"Security",level:"advanced",q:"What is Single Sign-On (SSO) in PeopleSoft?",a:"Allows users authenticated in one system (like Oracle Identity Manager) to access PeopleSoft without re-entering credentials. Implemented via trusted tokens, SAML, or PeopleSoft's PS_TOKEN mechanism. Requires Integration Broker node configuration."},
+  {cat:"Security",level:"advanced",q:"What is PeopleSoft's encryption for sensitive data?",a:"Credit card numbers, national IDs, bank accounts can be encrypted using PeopleSoft's built-in encryption framework (RC2/3DES/AES). Encrypted fields display masked values on pages. Application Engine jobs can process encrypted values without exposing them."},
+  {cat:"Security",level:"advanced",q:"What is a portal node in PeopleSoft security?",a:"Defines a PeopleSoft system instance in the Portal (default node = local system). Content References (CREFs) can point to remote nodes for cross-system navigation. Single Sign-On between nodes uses the PS_TOKEN mechanism with trusted nodes."},
+  {cat:"Security",level:"advanced",q:"What is auditing in PeopleSoft and how is it configured?",a:"Record-level auditing (record field changes) configured in App Designer on the record — logs to PS_AUDIT_RECORDNAME. Component-level auditing logs all component saves. Audit tables record: operator, timestamp, old value, new value, action (Add/Update/Delete)."},
 
-  // REAL PROJECT
-  {cat:"Real Project",level:"advanced",q:"An employee's data shows incorrectly in a report for last January. How do you debug this?",a:"First check if the report query includes effective dating criteria (WHERE EFFDT <= report_date AND EFFSEQ = MAX). Without this, the query returns today's current row, not January's. Second, check PS_JOB directly — look at the employee's rows for January and compare. Third, verify the report's business date parameter. Most PeopleSoft reporting errors involving wrong data are due to missing or incorrect effective dating criteria."},
-  {cat:"Real Project",level:"advanced",q:"A custom batch process is failing with Error status in Process Monitor. How do you approach this?",a:"Step 1: Process Monitor → click the process → View Log/Trace. The log contains the actual error — the status just says 'failed'. Step 2: Check the Run Control — are the parameters valid (date ranges, EMPLID exists, Pay Group correct)? Step 3: Check the AE trace file for the last executed SQL. Step 4: Run that SQL manually in a query tool with the same parameters. Step 5: Check for data issues (null values, referential integrity, permissions)."},
-  {cat:"Real Project",level:"advanced",q:"You need to load 50,000 employee records from an external system into PeopleSoft HCM. What approach do you recommend?",a:"Recommended: Component Interface (CI) via Application Engine. The CI fires all delivered PeopleCode events (FieldEdit, SaveEdit, business rules) ensuring data integrity. Build an AE that reads from a staging table (loaded from the file), calls the CI for each employee, and logs errors to an error table. Alternative for simple data: Data Mover (DMS) for direct table load, but this bypasses business rules — only use for non-critical reference data."},
-  {cat:"Real Project",level:"advanced",q:"Performance issue: a page with a 500-row grid takes 45 seconds to load. How do you diagnose and fix?",a:"Enable App Server SQL trace. Look for repeated identical SQL statements — SQLExec in RowInit is the classic cause. Fix: move the lookup to PostBuild using CreateSQL once to build an array/object keyed by EMPLID or DEPTID, then in RowInit just read from the array. Second check: is the grid's record a SQL Table or SQL View? Adding JOIN to a view to bring department names eliminates all RowInit lookups. Third: check indexes on the main record's key fields."},
+  // ── APPLICATION ENGINE (15) ──
+  {cat:"Application Engine",level:"intermediate",q:"What is Application Engine?",a:"PeopleSoft's batch processing framework for large-scale data operations. Runs outside online session. Uses Sections, Steps, and Actions (Do Select, Do When, SQL, PeopleCode, Call Section). Has checkpoint/restart capability."},
+  {cat:"Application Engine",level:"intermediate",q:"What are the AE Action types?",a:"SQL (execute SQL statement), PeopleCode (run PeopleCode), Do Select (loop through rows), Do When (conditional — if this is true, execute this step), Do While (loop while condition), Do Until (loop until condition), Call Section (invoke another section)."},
+  {cat:"Application Engine",level:"intermediate",q:"What is checkpoint/restart in Application Engine?",a:"AE saves its progress at each Section. If it fails mid-way, restarting resumes from the last successful Section — not from the beginning. Prevents reprocessing of already-completed work. Configured per AE program."},
+  {cat:"Application Engine",level:"intermediate",q:"What is the Temp Table pattern in AE?",a:"Record type Temp Table creates multiple DB instances (MYTEMP_AET, MYTEMP_AET1...). Each parallel AE instance uses its own instance — preventing data collision. Instance count configured on AE Program properties page."},
+  {cat:"Application Engine",level:"intermediate",q:"What is Do Select in Application Engine?",a:"Loops through rows returned by a SQL SELECT. For each row, executes the child Steps. The 'Select/Fetch' action type. Two modes: Re-Select (re-executes SELECT each iteration) and Select Once (fetches all rows then iterates). Select Once is more efficient."},
+  {cat:"Application Engine",level:"intermediate",q:"What is %AE_APPLID and %AE_SECTION?",a:"System variables: %AE_APPLID returns the current AE Program ID, %AE_SECTION returns the current Section name. Used in error logging and diagnostics within AE PeopleCode to identify which program/section is currently executing."},
+  {cat:"Application Engine",level:"intermediate",q:"What is the difference between State Records and Work Records in AE?",a:"State Records persist values between Steps and Sections throughout the AE run. Work Records are temporary. State Records are typically defined in the AE Program properties. Work Records are used for intermediate calculations cleared between iterations."},
+  {cat:"Application Engine",level:"intermediate",q:"How do you pass parameters to an Application Engine?",a:"Via Run Control record (user-submitted) or State Record (programmatic call via CallAppEngine). CallAppEngine: &stateRec.EMPLID.Value = 'KR001'; CallAppEngine('MY_AE', &stateRec); AE reads values from State Record during execution."},
+  {cat:"Application Engine",level:"advanced",q:"What is parallel processing in Application Engine?",a:"Using Temp Tables, multiple instances of the same AE program process different data subsets simultaneously. Master AE spawns child processes via PeopleSoft Process Scheduler. Each child uses a different Temp Table instance. Master waits for all children to complete."},
+  {cat:"Application Engine",level:"advanced",q:"What is CommitWork in Application Engine?",a:"CommitWork() in AE PeopleCode commits the current transaction to DB without ending the AE run. Critical for batch processes handling millions of rows — commits prevent enormous DB transaction logs. After CommitWork, checkpoint saves the restart position."},
+  {cat:"Application Engine",level:"advanced",q:"What is the AE trace file?",a:"Detailed execution log showing every Step executed, SQL statements run, row counts, and timings. Activated by setting trace options on Process Monitor submission or Run Control. Invaluable for diagnosing where an AE fails or performs slowly."},
+  {cat:"Application Engine",level:"advanced",q:"What is a Dynamic SQL action in Application Engine?",a:"SQL text built at runtime using PeopleCode — the SQL statement can change based on conditions. Set %BIND(FIELD) in the SQL action, then set the field value in preceding PeopleCode step. More flexible but harder to optimize than static SQL."},
+  {cat:"Application Engine",level:"advanced",q:"How do you call one AE program from another?",a:"Call Section action with the external program's Section. Or CallAppEngine() in PeopleCode step — synchronous call, waits for completion. Useful for modular AE design — common sections reused across multiple programs."},
+  {cat:"Application Engine",level:"advanced",q:"What is the difference between PSAESRV and running AE directly?",a:"PSAESRV runs AE programs within the App Server domain — used for real-time AE calls from components (CallAppEngine). Running AE directly via Process Scheduler spawns a standalone process. Both use the same AE engine but different execution contexts."},
+  {cat:"Application Engine",level:"advanced",q:"What happens if an AE fails mid-run?",a:"Status shows Error in Process Monitor. Log file shows the last Step executed and the error message. Fix the root cause (data issue, SQL error, business rule violation). Restart with the same Process Instance — AE resumes from the last checkpoint Section."},
+
+  // ── INTEGRATION BROKER (15) ──
+  {cat:"Integration Broker",level:"intermediate",q:"What is Integration Broker?",a:"PeopleSoft's enterprise messaging platform for real-time and asynchronous integrations. Core concepts: Service Operations (what is exchanged), Nodes (identify systems), Handlers (PeopleCode processing), Routing Rules (direction of messages). Supports REST, SOAP, and async messaging."},
+  {cat:"Integration Broker",level:"intermediate",q:"What is a Service Operation?",a:"Defines what data is exchanged — the name, message structure (request/response), and type (Synchronous, Asynchronous, One-way). Every integration uses a Service Operation. Example: EMPLOYEE_SYNC.v1 for sending employee data to a payroll system."},
+  {cat:"Integration Broker",level:"intermediate",q:"What is the difference between Synchronous and Asynchronous messaging?",a:"Synchronous: sender waits for response before continuing — used for real-time lookups, validations. Asynchronous: sender sends and continues without waiting — used for bulk data transfer, notifications. Async is more resilient but harder to debug."},
+  {cat:"Integration Broker",level:"intermediate",q:"What is a Node in Integration Broker?",a:"Identifies a system in the integration network — could be the local PeopleSoft system, a remote PeopleSoft system, or an external third-party system. Default Local Node = current PeopleSoft instance. Remote Nodes need URL configuration."},
+  {cat:"Integration Broker",level:"intermediate",q:"What is an IB Handler?",a:"PeopleCode program (Application Class) that processes an incoming message — reads the message, transforms data, saves to PS tables. OnMessage method handles the main processing. Error handling via OnError method."},
+  {cat:"Integration Broker",level:"intermediate",q:"What is a Routing Rule in Integration Broker?",a:"Connects a Service Operation to sender/receiver Nodes. Defines direction (inbound or outbound), active status, and transformation (if message format needs converting between systems). Each Service Operation needs at least one Routing Rule."},
+  {cat:"Integration Broker",level:"intermediate",q:"What is the Integration Gateway?",a:"The entry point for all incoming messages — a Java web application on the web server tier. Receives HTTP/HTTPS requests from external systems, routes them to the correct Service Operation in the App Server. Configured in Integration Gateway.properties."},
+  {cat:"Integration Broker",level:"advanced",q:"What is a REST Service Operation?",a:"Exposes PeopleSoft data via REST API. GET (retrieve), POST (create), PUT (update), DELETE operations. URI template defines the URL pattern. Response format can be JSON or XML. Requires correct routing and handler PeopleCode. Widely used for cloud integrations."},
+  {cat:"Integration Broker",level:"advanced",q:"What is publish/subscribe in Integration Broker?",a:"Publisher Service Operations send messages to a queue. Subscriber Service Operations read and process queued messages. Allows decoupling — publisher doesn't know who receives. Used for event-driven integrations where multiple systems need the same data."},
+  {cat:"Integration Broker",level:"advanced",q:"What is a Message Channel?",a:"Groups related async Service Operations — controls processing order and throughput. Messages in a channel are processed sequentially by default. Multiple channels can process in parallel. Channel retry settings control what happens on processing failure."},
+  {cat:"Integration Broker",level:"advanced",q:"How do you monitor failed Integration Broker messages?",a:"PeopleTools → Integration Broker → Monitor → Asynchronous Services → Failed. Shows failed messages with error details. Can retry manually after fixing the issue. Also check Integration Broker log files in App Server for connection/gateway errors."},
+  {cat:"Integration Broker",level:"advanced",q:"What is a WSDL in PeopleSoft IB?",a:"Web Service Description Language — auto-generated by PeopleSoft for SOAP Service Operations. Describes the service interface — message structure, operations, endpoint URL. External systems consume the WSDL to integrate with PeopleSoft via SOAP."},
+  {cat:"Integration Broker",level:"advanced",q:"What is transform PeopleCode in Integration Broker?",a:"PeopleCode that transforms message structure between PeopleSoft and external format. Runs during message routing. Converts PS XML structure to third-party format (or vice versa). Example: mapping EMPLID to ExternalEmployeeID, converting date formats."},
+  {cat:"Integration Broker",level:"advanced",q:"What is a Component Interface used for in integrations?",a:"CI provides programmatic component access from IB handlers. Instead of writing direct SQL, the handler calls the CI — which fires all PeopleCode events ensuring business rules run. Standard pattern: IB handler → CI call → data saved with full validation."},
+  {cat:"Integration Broker",level:"advanced",q:"What are the steps to set up a new outbound REST integration in PeopleSoft?",a:"1) Create REST-based Service Operation. 2) Define request/response message structure. 3) Configure target system as a Node with REST URL. 4) Create Routing Rule (outbound, local node → target node). 5) Write Handler PeopleCode to call the service. 6) Test via IB Monitor."},
+
+  // ── PS QUERY & REPORTING (15) ──
+  {cat:"PS Query",level:"beginner",q:"What are the three PS Query types?",a:"User Query (private — creator only), Role Query (shared with users having a specific Role), Public Query (all users with query access). Controlled in Query Manager."},
+  {cat:"PS Query",level:"beginner",q:"What is a Prompt in PS Query?",a:"Runtime parameter — user enters a filter value when running the query. Makes queries reusable for different values. Example: prompt for Department ID so the same query can report on any department without modification."},
+  {cat:"PS Query",level:"intermediate",q:"What is a Query Access Tree?",a:"Security configuration in Permission Lists defining which PeopleSoft records users can query. Without tree access to a record, users can't see it in Query Manager — prevents access to sensitive data through ad-hoc queries."},
+  {cat:"PS Query",level:"intermediate",q:"What is a Connected Query?",a:"Links multiple PS Queries in a parent-child relationship — child query uses a field from the parent as a parameter. Useful for producing hierarchical data (e.g., parent: employees, child: each employee's job history) in one query run."},
+  {cat:"PS Query",level:"intermediate",q:"What is the difference between an Inner Join and Left Outer Join in PS Query?",a:"Inner Join: returns only rows matching in both records — employee must have matching job data. Left Outer Join: returns all rows from the primary record even if no match in the joined record — shows employees even without job data."},
+  {cat:"PS Query",level:"intermediate",q:"What is a HAVING clause in PS Query?",a:"Filters aggregate results (after GROUP BY). Example: show only departments with more than 10 employees. WHERE filters individual rows; HAVING filters grouped results. Configured in PS Query's Criteria section with aggregate functions."},
+  {cat:"PS Query",level:"intermediate",q:"What is BI Publisher?",a:"PeopleSoft's formatted reporting tool. Creates PDF, Excel, RTF, HTML output from templates. Uses PS Query or Application Engine as data source. Bursting feature distributes report sections to individual recipients. Used for pay slips, tax forms, audit reports."},
+  {cat:"PS Query",level:"intermediate",q:"What is SQR?",a:"Structured Query Report — PeopleSoft's legacy batch reporting language. SQR programs are text files combining SQL, procedural logic, and output formatting. Still widely used for complex payroll reports, tax filings, and data migration. Runs via Process Scheduler."},
+  {cat:"PS Query",level:"intermediate",q:"How do you schedule a PS Query to run automatically?",a:"Create a BI Publisher report using the PS Query as data source. Schedule the BIP report via Process Scheduler Run Control. Alternatively, use an Application Engine to call the query via SQLExec and output results. Pure PS Query cannot be scheduled directly."},
+  {cat:"PS Query",level:"advanced",q:"What are Aggregate functions in PS Query?",a:"COUNT, SUM, AVG, MIN, MAX — applied to fields in PS Query. Use with GROUP BY to summarize data. Example: COUNT(EMPLID) per DEPTID to get headcount by department. Results filtered with HAVING clause, not WHERE."},
+  {cat:"PS Query",level:"advanced",q:"What is PS/nVision?",a:"PeopleSoft's Excel-based reporting tool for financial analysis — primarily used in FSCM. Creates Excel spreadsheets with live PeopleSoft data. Uses DrillDown for navigating from summary to detail. Common for GL balance sheets, budget vs actual reporting."},
+  {cat:"PS Query",level:"advanced",q:"What is Query Viewer vs Query Manager?",a:"Query Manager: full access — create, edit, run, delete queries. Query Viewer: run-only access — cannot create or modify. Access controlled via Permission Lists. Most business users get Query Viewer; analysts get Query Manager."},
+  {cat:"PS Query",level:"advanced",q:"What is XMLP/BI Publisher data source?",a:"BIP supports three data source types: PS Query (most common), Rowset-based (from Application Engine), and XML file. PS Query data source is simplest — define the query, map fields to BIP template layout. AE data sources handle complex multi-level data."},
+  {cat:"PS Query",level:"advanced",q:"What is bursting in BI Publisher?",a:"Automatically splits a single report and distributes each section to a different recipient. Example: generate all employee pay slips in one run, burst to each employee's email. Configured in BIP delivery options. Eliminates manual report distribution."},
+  {cat:"PS Query",level:"advanced",q:"What is the Reporting Tools security consideration?",a:"PS Query can bypass row-level security if the query directly accesses base tables instead of security views. Query Access Trees control which tables users can query, but the tree doesn't enforce row-level filtering. Custom security views must be used as query records."},
+
+  // ── COMPONENT INTERFACE (10) ──
+  {cat:"Component Interface",level:"intermediate",q:"What is a Component Interface?",a:"Provides programmatic access to a PeopleSoft component — fires the same PeopleCode events as the online component. Used for data migration (via AE), external integrations (via IB), and automated testing. Business rules always run through CI."},
+  {cat:"Component Interface",level:"intermediate",q:"When should you use CI instead of direct SQL?",a:"Whenever business rules must run — hire, transfer, benefit enrollment. Direct SQL inserts bypass FieldEdit, SaveEdit, PostBuild, workflow. CI fires all events ensuring data integrity. Use direct SQL only for reference/setup data without business logic."},
+  {cat:"Component Interface",level:"intermediate",q:"What is the CI development process?",a:"1) Open the target component in App Designer. 2) File → Create Component Interface. 3) Map Keys (component search keys → CI keys). 4) Test in CI Tester (App Designer). 5) Generate PeopleCode template. 6) Use template in AE or IB handler."},
+  {cat:"Component Interface",level:"intermediate",q:"What are CI Properties and Collections?",a:"Properties map to record fields — get/set individual field values. Collections represent grid/scroll data — use GetItem(), InsertItem(). The CI structure mirrors the component structure. Parent CI has child Collections for each Level 1 scroll."},
+  {cat:"Component Interface",level:"intermediate",q:"What is CI error handling?",a:"Wrap CI calls in Try/Catch. Check &ci.Error after each operation. Error messages from PeopleCode Error() statements in component events are trapped by the CI caller. Log errors to a staging/error table for reporting."},
+  {cat:"Component Interface",level:"advanced",q:"What is the performance impact of CI-based data loading?",a:"Each CI call opens component, fires all events, saves, closes. For 50,000 records: 50,000 component opens + all PeopleCode events each time. Significantly slower than direct SQL but ensures business rules. Benchmark: typically 500-2000 records/hour depending on component complexity."},
+  {cat:"Component Interface",level:"advanced",q:"What is a CI Find method?",a:"Searches for existing component data — equivalent to the component search dialog. FindKeyProperty specifies search criteria. Returns a collection of matching keys. Use before Get to verify a record exists before trying to open it."},
+  {cat:"Component Interface",level:"advanced",q:"What is CI versioning?",a:"CIs have a version number. When the underlying component changes (fields added/removed), the CI must be regenerated. Calling code referencing old properties that no longer exist fails at runtime. Version management is critical during upgrades."},
+  {cat:"Component Interface",level:"advanced",q:"What is the difference between CI Get and CI Create?",a:"Get: opens existing component data (like Update mode). Must find existing keys. Create: opens component in Add mode to create new records. Both fire the appropriate component events. GetEffDt handles effective-dated creates."},
+  {cat:"Component Interface",level:"advanced",q:"What is CI Cancel?",a:"Discards all changes made through the CI without saving. Equivalent to clicking Cancel on the page. Important for error scenarios — if processing fails partway, Cancel prevents partial data from being saved to DB."},
+
+  // ── REAL PROJECT (20) ──
+  {cat:"Real Project",level:"advanced",q:"Page loads in 45 seconds. SQL trace shows 500 identical SELECTs. Cause?",a:"SQLExec in RowInit. Fires for every grid row — 500 rows = 500 DB calls. Fix: pre-fetch all data in PostBuild using CreateSQL into an object, then read from the object in RowInit. One DB call instead of 500."},
+  {cat:"Real Project",level:"advanced",q:"User can see page but cannot save. No error appears.",a:"Permission List access mode is Display Only. Change to Update/Display. The Save button is hidden or disabled in Display Only mode. Check user's Roles → Permission Lists → component access mode."},
+  {cat:"Real Project",level:"advanced",q:"Custom component shows all employees to all users.",a:"PS_JOB used as Search Record bypasses row-level security. Replace with a security view joining PS_JOB with department security tables. View auto-filters based on user's Row Security Permission List."},
+  {cat:"Real Project",level:"advanced",q:"Component migrated to QA but not showing in menu.",a:"App Designer objects migrated but Portal CREF not migrated. CREFs are Portal objects — must be explicitly included in project and migrated. Run project migration including Portal objects."},
+  {cat:"Real Project",level:"advanced",q:"Batch process Error status in Process Monitor. How to diagnose?",a:"Process Monitor → click process → View Log/Trace. Read actual error message. Check Run Control parameters (valid dates, company, pay group). Run failing SQL manually with same parameters. Check for null values and referential integrity issues."},
+  {cat:"Real Project",level:"advanced",q:"Employee report shows wrong department for last January.",a:"Report fetches today's current row instead of historical. Add effective dating WHERE clause referencing the report period date: WHERE EFFDT <= TO_DATE('2023-01-31','YYYY-MM-DD'). Without this, always shows today's department."},
+  {cat:"Real Project",level:"advanced",q:"How to load 50,000 employees from an external file?",a:"Stage data in a PS table. Build AE reading from staging table. Call Component Interface for each employee — fires all business rules. Log errors to error table. Retry failed records after data correction. Never use direct SQL for hire transactions."},
+  {cat:"Real Project",level:"advanced",q:"After upgrade, customization is gone.",a:"Directly modified a delivered object — upgrade overwrote it. Future fix: clone with custom prefix (ZZ_COMPNAME) before modifying. For PT 8.55+, use Event Mapping — completely upgrade-safe. Always use your own prefix, never modify delivered objects directly."},
+  {cat:"Real Project",level:"advanced",q:"PS Query returning 15x expected rows when joining PS_PERSONAL_DATA and PS_JOB.",a:"Missing effective dating on PS_JOB. Each employee has 15+ rows in PS_JOB. Without MAX(EFFDT) criteria, 1 PERSONAL_DATA row × 15 JOB rows = 15 result rows per employee. Add effective dating WHERE clause to PS_JOB criteria."},
+  {cat:"Real Project",level:"advanced",q:"Integration Broker message failing. How to diagnose?",a:"IB Monitor → Asynchronous Services → Failed. Read error message and stack trace. Common causes: target system down, incorrect URL in Node configuration, message format mismatch, authentication failure. Fix root cause, then retry from Monitor."},
+  {cat:"Real Project",level:"advanced",q:"User reports data they entered yesterday is gone.",a:"Check audit tables if auditing enabled. Check Component Interface error log if data was loaded by batch. Check if another batch process overwrote the data. Verify user saved — did they click Save or just navigate away? Check if scheduled job ran that resets data."},
+  {cat:"Real Project",level:"advanced",q:"How do you move configuration data from DEV to PROD?",a:"Data Mover (DMS) for setup/reference tables. App Designer project for object definitions. Change Assistant for PUM patches. For transaction data migrations — Component Interface via AE. Never use direct SQL in PROD for business data."},
+  {cat:"Real Project",level:"advanced",q:"Payroll batch runs but produces zero results.",a:"'No rows selected' = Run Control parameters are wrong. Check: Pay Period End Date is valid, Pay Group exists, Company is correct, Calendar ID matches, employees exist with that Pay Group. Verify Run Control values against the actual pay calendar."},
+  {cat:"Real Project",level:"advanced",q:"How do you find which PeopleCode fires on a specific page?",a:"App Designer → open the component → right-click any field → View PeopleCode. Also use PeopleCode cross-reference: Find In → PeopleCode (Ctrl+F in App Designer). App Server SQL trace with PeopleCode trace shows every program that fires during a component session."},
+  {cat:"Real Project",level:"advanced",q:"User says their PS Query returns different results than a developer's identical query.",a:"Row-level security difference. The user's Query Access Tree or Row Security Permission List restricts which departments/BUs they can see. Developer with ALLPAGES or broader access sees everything. Check user's Permission Lists and Query Access Tree configuration."},
+  {cat:"Real Project",level:"advanced",q:"How do you determine which database table a PeopleSoft page stores data in?",a:"Open component in App Designer → right-click page → click the record name → it shows the record definition. The physical table = PS_RECORDNAME. Also: navigate to the page, press F1 for field help which shows record.field. Or use SQL trace to see which tables are accessed."},
+  {cat:"Real Project",level:"advanced",q:"System is slow for all users during month-end. How to diagnose?",a:"Check App Server domain status in PSADMIN — number of active PSAPPSRV processes, queue depth. Check DB for long-running SQL (v$session on Oracle). Check if month-end batch jobs are running simultaneously with online users. Consider running batch in off-hours or adding App Server capacity."},
+  {cat:"Real Project",level:"advanced",q:"How do you test a PeopleCode change without impacting other developers?",a:"Use a separate sandbox database. Or if sharing, create a copy of the component with a custom prefix (ZZ_) and test there. Never modify shared development objects without checking the impact on other developers' work. Use App Designer's Compare feature before migrating."},
+  {cat:"Real Project",level:"advanced",q:"A delivered component needs a new field that persists to DB. What is the correct approach?",a:"Create extension record ZZ_COMPNAME_EXT with same primary keys as delivered record + your custom fields. Add the extension record to the component alongside the delivered record. Add page fields bound to the extension record. Custom PeopleCode writes to extension record on save."},
+  {cat:"Real Project",level:"advanced",q:"How do you handle an emergency data fix in production?",a:"Last resort only: Data Mover script for simple updates, reviewed by at least two people, run during maintenance window, with DB backup first. For transactional data (PS_JOB, benefits) — always use Component Interface to ensure business rules and audit trail. Document all changes in a change ticket."},
 ];
+
+// Add 200Q shuffle support: show 50 random at a time
+let INTERVIEW_QA = shuffleAndSliceIQA(50);
+
+function shuffleAndSliceIQA(count) {
+  const arr = [...INTERVIEW_QA_ALL];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr.slice(0, count);
+}
+
+function refreshIQA() {
+  INTERVIEW_QA = shuffleAndSliceIQA(50);
+  iqaState.reviewed = new Set();
+  iqaState.bookmarked = new Set();
+  iqaState.level = 'all';
+  iqaState.cat = 'all';
+  iqaState.search = '';
+  buildIQACatSidebar();
+  renderIQA();
+  document.getElementById('iqaSearchBar').value = '';
+  document.querySelectorAll('.iqa-pro-filter').forEach(b => b.classList.remove('active'));
+  document.querySelector('.iqa-pro-filter').classList.add('active');
+}
 
 /* ═══════════════════════════════════════════════
    PRO INTERVIEW ENGINE
 ═══════════════════════════════════════════════ */
-let iqaState = {
-  level: 'all',
-  cat: 'all',
-  search: '',
-  reviewed: new Set(),
-  bookmarked: new Set(),
-};
-
-function showInterview() {
-  ['homepageView','appView','glossaryView','quizView','labView'].forEach(id => {
-    const el = document.getElementById(id); if(el) el.style.display='none';
-  });
-  document.getElementById('interviewView').style.display = 'block';
-  buildIQACatSidebar();
-  renderIQA();
-  window.scrollTo(0,0);
-}
+let iqaState = { level:'all', cat:'all', search:'', reviewed:new Set(), bookmarked:new Set() };
 
 function buildIQACatSidebar() {
-  const cats = ['all', ...new Set(INTERVIEW_QA.map(q => q.cat))];
-  const sidebar = document.getElementById('iqaCatSidebar');
+  const cats = ['all',...new Set(INTERVIEW_QA.map(q=>q.cat))];
+  const sidebar = document.getElementById('iqaCatSidebar'); if(!sidebar) return;
   sidebar.innerHTML = cats.map(cat => {
-    const count = cat === 'all' ? INTERVIEW_QA.length : INTERVIEW_QA.filter(q => q.cat === cat).length;
-    return `<button class="iqa-cat-btn ${cat === iqaState.cat ? 'active' : ''}"
-      onclick="setIQACat('${cat}',this)">
-      <span>${cat === 'all' ? 'All Categories' : cat}</span>
-      <span class="iqa-cat-count">${count}</span>
-    </button>`;
+    const count = cat==='all' ? INTERVIEW_QA.length : INTERVIEW_QA.filter(q=>q.cat===cat).length;
+    return `<button class="iqa-cat-btn ${cat===iqaState.cat?'active':''}" onclick="setIQACat('${cat.replace(/'/g,"\\'")}',this)"><span>${cat==='all'?'All Categories':cat}</span><span class="iqa-cat-count">${count}</span></button>`;
   }).join('');
 }
-
-function setIQACat(cat, btn) {
-  iqaState.cat = cat;
-  document.querySelectorAll('.iqa-cat-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderIQA();
-}
-
-function setIQALevel(level, btn) {
-  iqaState.level = level;
-  document.querySelectorAll('.iqa-pro-filter').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderIQA();
-}
-
-function filterIQA() {
-  iqaState.search = document.getElementById('iqaSearchBar').value.toLowerCase();
-  renderIQA();
-}
+function setIQACat(cat,btn){ iqaState.cat=cat; document.querySelectorAll('.iqa-cat-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderIQA(); }
+function setIQALevel(level,btn){ iqaState.level=level; document.querySelectorAll('.iqa-pro-filter').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderIQA(); }
+function filterIQA(){ iqaState.search=document.getElementById('iqaSearchBar').value.toLowerCase(); renderIQA(); }
 
 function renderIQA() {
-  let qs = INTERVIEW_QA;
-  if (iqaState.level !== 'all') qs = qs.filter(q => q.level === iqaState.level);
-  if (iqaState.cat !== 'all') qs = qs.filter(q => q.cat === iqaState.cat);
-  if (iqaState.search) qs = qs.filter(q =>
-    q.q.toLowerCase().includes(iqaState.search) ||
-    q.a.toLowerCase().includes(iqaState.search) ||
-    q.cat.toLowerCase().includes(iqaState.search)
-  );
-
-  const levelTag = {beginner:'🌱 Beginner',intermediate:'⚡ Intermediate',advanced:'🔥 Advanced',scenario:'🏢 Real Project'};
-  const levelClass = {beginner:'tag-level-b',intermediate:'tag-level-i',advanced:'tag-level-a',scenario:'tag-level-s'};
-  const numClass = {beginner:'num-beginner',intermediate:'num-intermediate',advanced:'num-advanced',scenario:'num-scenario'};
-
-  document.getElementById('iqaPanelTitle').textContent =
-    iqaState.cat === 'all' ? 'All Questions' : iqaState.cat;
-  document.getElementById('iqaPanelCount').textContent = `${qs.length} question${qs.length !== 1 ? 's' : ''}`;
-
-  document.getElementById('iqaContent').innerHTML = qs.length === 0
-    ? `<div style="padding:40px;text-align:center;color:var(--faint);font-size:14px">No questions match your filters.</div>`
-    : qs.map((q, i) => {
-      const globalIdx = INTERVIEW_QA.indexOf(q);
-      const isReviewed = iqaState.reviewed.has(globalIdx);
-      const isBookmarked = iqaState.bookmarked.has(globalIdx);
-      const highlightedQ = iqaState.search
-        ? q.q.replace(new RegExp(`(${iqaState.search})`, 'gi'), '<mark style="background:rgba(240,165,0,0.25);color:var(--gold)">$1</mark>')
-        : q.q;
-      return `
-      <div class="iqa-card ${isReviewed ? 'reviewed' : ''}" id="iqa-card-${globalIdx}">
-        <button class="iqa-card-header" onclick="toggleIQACard(${globalIdx})" aria-expanded="false" aria-controls="iqa-body-${globalIdx}">
-          <div class="iqa-card-num ${numClass[q.level]}">${globalIdx + 1}</div>
-          <div class="iqa-card-meta">
-            <div class="iqa-card-q">${highlightedQ}</div>
-            <div class="iqa-card-tags">
-              <span class="iqa-tag ${levelClass[q.level]}">${levelTag[q.level]}</span>
-              <span class="iqa-tag tag-cat">${q.cat}</span>
-              ${isBookmarked ? '<span class="iqa-tag" style="background:rgba(240,165,0,0.1);color:var(--gold)">🔖 Saved</span>' : ''}
-              ${isReviewed ? '<span class="iqa-tag" style="background:rgba(34,197,94,0.08);color:var(--green)">✓ Reviewed</span>' : ''}
-            </div>
-          </div>
-          <span class="iqa-card-chevron">›</span>
-        </button>
-        <div class="iqa-card-body" id="iqa-body-${globalIdx}">
-          <div class="iqa-answer-label">✅ Expert Answer</div>
-          <div class="iqa-answer-text">${formatIQAAnswer(q.a)}</div>
-          <div class="iqa-answer-actions">
-            <button class="iqa-copy-btn" onclick="copyIQAAnswer(${globalIdx},this)">📋 Copy Answer</button>
-            <button class="iqa-bookmark-btn ${isBookmarked ? 'bookmarked' : ''}" onclick="toggleIQABookmark(${globalIdx},this)">
-              ${isBookmarked ? '🔖 Saved' : '🔖 Save'}
-            </button>
-            <span class="iqa-progress-note">${isReviewed ? '✓ Reviewed' : ''}</span>
-          </div>
-        </div>
-      </div>`;
-    }).join('');
-
+  let qs=INTERVIEW_QA;
+  if(iqaState.level!=='all') qs=qs.filter(q=>q.level===iqaState.level);
+  if(iqaState.cat!=='all') qs=qs.filter(q=>q.cat===iqaState.cat);
+  if(iqaState.search) qs=qs.filter(q=>q.q.toLowerCase().includes(iqaState.search)||q.a.toLowerCase().includes(iqaState.search)||q.cat.toLowerCase().includes(iqaState.search));
+  const lTag={beginner:'🌱 Beginner',intermediate:'⚡ Intermediate',advanced:'🔥 Advanced',scenario:'🏢 Real Project'};
+  const lCls={beginner:'tag-level-b',intermediate:'tag-level-i',advanced:'tag-level-a',scenario:'tag-level-s'};
+  const nCls={beginner:'num-beginner',intermediate:'num-intermediate',advanced:'num-advanced',scenario:'num-scenario'};
+  const pt=document.getElementById('iqaPanelTitle'); if(pt) pt.textContent=iqaState.cat==='all'?'All Questions':iqaState.cat;
+  const pc=document.getElementById('iqaPanelCount'); if(pc) pc.textContent=`${qs.length} question${qs.length!==1?'s':''}`;
+  const content=document.getElementById('iqaContent'); if(!content) return;
+  if(!qs.length){content.innerHTML='<div style="padding:40px;text-align:center;color:var(--faint)">No questions match your filters.</div>';return;}
+  content.innerHTML=qs.map(q=>{
+    const gi=INTERVIEW_QA.indexOf(q);
+    const rev=iqaState.reviewed.has(gi), bkm=iqaState.bookmarked.has(gi);
+    const hl=iqaState.search?q.q.replace(new RegExp(`(${iqaState.search})`,'gi'),'<mark style="background:rgba(240,165,0,.25);color:var(--gold)">$1</mark>'):q.q;
+    return `<div class="iqa-card" id="iqa-card-${gi}"><button class="iqa-card-header" onclick="toggleIQACard(${gi})" aria-expanded="false"><div class="iqa-card-num ${nCls[q.level]||'num-beginner'}">${gi+1}</div><div class="iqa-card-meta"><div class="iqa-card-q">${hl}</div><div class="iqa-card-tags"><span class="iqa-tag ${lCls[q.level]||'tag-level-b'}">${lTag[q.level]||q.level}</span><span class="iqa-tag tag-cat">${q.cat}</span>${bkm?'<span class="iqa-tag" style="background:rgba(240,165,0,.1);color:var(--gold)">🔖 Saved</span>':''}${rev?'<span class="iqa-tag" style="background:rgba(34,197,94,.08);color:var(--green)">✓ Reviewed</span>':''}</div></div><span class="iqa-card-chevron">›</span></button><div class="iqa-card-body" id="iqa-body-${gi}"><div class="iqa-answer-label">✅ Expert Answer</div><div class="iqa-answer-text">${q.a.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/`([^`]+)`/g,'<code style="background:var(--s3);color:var(--cyan);padding:1px 6px;border-radius:4px;font-size:.9em;font-family:var(--fm)">$1</code>')}</div><div class="iqa-answer-actions"><button class="iqa-copy-btn" onclick="copyIQAAnswer(${gi},this)">📋 Copy Answer</button><button class="iqa-bookmark-btn ${bkm?'bookmarked':''}" onclick="toggleIQABookmark(${gi},this)">${bkm?'🔖 Saved':'🔖 Save'}</button><span class="iqa-progress-note">${rev?'✓ Reviewed':''}</span></div></div></div>`;
+  }).join('');
   updateIQAProgress();
 }
+function toggleIQACard(idx){ const c=document.getElementById(`iqa-card-${idx}`); if(!c) return; const o=c.classList.contains('open'); c.classList.toggle('open',!o); c.querySelector('.iqa-card-header').setAttribute('aria-expanded',!o); if(!o){iqaState.reviewed.add(idx);updateIQAProgress();} }
+function copyIQAAnswer(idx,btn){ navigator.clipboard.writeText(INTERVIEW_QA[idx].a).then(()=>{btn.classList.add('copied');btn.textContent='✅ Copied!';setTimeout(()=>{btn.classList.remove('copied');btn.textContent='📋 Copy Answer';},2000);}); }
+function toggleIQABookmark(idx,btn){ if(iqaState.bookmarked.has(idx)){iqaState.bookmarked.delete(idx);btn.classList.remove('bookmarked');btn.textContent='🔖 Save';}else{iqaState.bookmarked.add(idx);btn.classList.add('bookmarked');btn.textContent='🔖 Saved';} }
+function updateIQAProgress(){ const t=INTERVIEW_QA.length,r=iqaState.reviewed.size; const f=document.getElementById('iqaProgressFill'),l=document.getElementById('iqaProgressLabel'),c=document.getElementById('iqaReviewedCount'); if(f)f.style.width=(r/t*100)+'%'; if(l)l.textContent=`${r} / ${t} reviewed`; if(c)c.textContent=r; }
 
-function formatIQAAnswer(text) {
-  return text
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/`([^`]+)`/g, '<code style="background:var(--s3);color:var(--cyan);padding:1px 6px;border-radius:4px;font-size:0.9em;font-family:var(--fm)">$1</code>');
-}
+/* ── LAB ENGINE ── */
+function backToLab(){ document.getElementById('labHome').style.display='block'; ['labDebug','labEventFlow','labMatcher','labScenario','labAppDesigner','labPSSim'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';}); window.scrollTo(0,0); }
+function openLabMode(mode){ document.getElementById('labHome').style.display='none'; const map={debug:'labDebug',eventflow:'labEventFlow',matcher:'labMatcher',scenario:'labScenario',appdesigner:'labAppDesigner',pssim:'labPSSim'}; const el=document.getElementById(map[mode]); if(el){el.style.display='block';window.scrollTo(0,0);} if(mode==='debug')initDebug(); if(mode==='eventflow')initEventFlow(); if(mode==='matcher')initMatcher(); if(mode==='scenario')initScenario(); if(mode==='appdesigner')initAppDesigner(); if(mode==='pssim')initPSSim(); }
 
-function toggleIQACard(idx) {
-  const card = document.getElementById(`iqa-card-${idx}`);
-  const body = document.getElementById(`iqa-body-${idx}`);
-  const btn = card.querySelector('.iqa-card-header');
-  const isOpen = card.classList.contains('open');
-  card.classList.toggle('open', !isOpen);
-  btn.setAttribute('aria-expanded', !isOpen);
-  if (!isOpen) {
-    // Mark as reviewed
-    iqaState.reviewed.add(idx);
-    updateIQAProgress();
-  }
-}
-
-function copyIQAAnswer(idx, btn) {
-  const q = INTERVIEW_QA[idx];
-  navigator.clipboard.writeText(q.a).then(() => {
-    btn.classList.add('copied');
-    btn.textContent = '✅ Copied!';
-    setTimeout(() => { btn.classList.remove('copied'); btn.textContent = '📋 Copy Answer'; }, 2000);
-  });
-}
-
-function toggleIQABookmark(idx, btn) {
-  if (iqaState.bookmarked.has(idx)) {
-    iqaState.bookmarked.delete(idx);
-    btn.classList.remove('bookmarked');
-    btn.textContent = '🔖 Save';
-  } else {
-    iqaState.bookmarked.add(idx);
-    btn.classList.add('bookmarked');
-    btn.textContent = '🔖 Saved';
-  }
-}
-
-function updateIQAProgress() {
-  const total = INTERVIEW_QA.length;
-  const reviewed = iqaState.reviewed.size;
-  const pct = Math.round((reviewed / total) * 100);
-  const fill = document.getElementById('iqaProgressFill');
-  const label = document.getElementById('iqaProgressLabel');
-  const count = document.getElementById('iqaReviewedCount');
-  if (fill) fill.style.width = pct + '%';
-  if (label) label.textContent = `${reviewed} / ${total} reviewed`;
-  if (count) count.textContent = reviewed;
-}
-
-/* ═══════════════════════════════════════════════
-   LAB SIMULATOR ENGINE
-═══════════════════════════════════════════════ */
-function showLab() {
-  ['homepageView','appView','glossaryView','quizView','interviewView'].forEach(id => {
-    const el = document.getElementById(id); if(el) el.style.display='none';
-  });
-  document.getElementById('labView').style.display = 'block';
-  backToLab();
-  window.scrollTo(0,0);
-}
-
-function backToLab() {
-  document.getElementById('labHome').style.display = 'block';
-  ['labDebug','labEventFlow','labMatcher','labScenario','labAppDesigner','labPSSim'].forEach(id => {
-    const el = document.getElementById(id); if(el) el.style.display='none';
-  });
-}
-
-function openLabMode(mode) {
-  document.getElementById('labHome').style.display = 'none';
-  const modeMap = {debug:'labDebug',eventflow:'labEventFlow',matcher:'labMatcher',
-    scenario:'labScenario',appdesigner:'labAppDesigner',pssim:'labPSSim'};
-  const el = document.getElementById(modeMap[mode]);
-  if(el) { el.style.display='block'; window.scrollTo(0,0); }
-  if(mode==='debug') initDebug();
-  if(mode==='eventflow') initEventFlow();
-  if(mode==='matcher') initMatcher();
-  if(mode==='scenario') initScenario();
-  if(mode==='appdesigner') initAppDesigner();
-  if(mode==='pssim') initPSSim();
-}
-
-/* ── MODE 1: DEBUG ── */
-const DEBUG_CHALLENGES = [
-  {
-    title:"Performance Issue in Job Data Component",
-    desc:"An HR coordinator reports the Job Data component takes 30+ seconds to load when an employee has many job rows. Identify the problematic line.",
-    code:[
-      {n:1,t:"/* PostBuild — Initialize component */"},
-      {n:2,t:"Function InitComponent()"},
-      {n:3,t:"   Local Rowset &rs;"},
-      {n:4,t:"   Local Record &rec;"},
-      {n:5,t:"   &rs = GetRowset(Scroll.JOB);"},
-      {n:6,t:"   For &i = 1 To &rs.ActiveRowCount"},
-      {n:7,t:"      &rec = &rs.GetRow(&i).GetRecord(Record.JOB);"},
-      {n:8,t:"      SQLExec(\"SELECT DESCR FROM PS_DEPT_TBL WHERE DEPTID=:1\", &rec.DEPTID.Value, &deptName);"},
-      {n:9,t:"      &rec.DEPTID_DESCR.Value = &deptName;"},
-      {n:10,t:"   End-For;"},
-      {n:11,t:"End-Function;"},
-    ],
-    bugLine:8,
-    hint:"Think about how many times this SQL runs...",
-    explanation:"Line 8 is the bug — SQLExec inside a For loop causes N+1 queries. If there are 50 job rows, this executes 50 separate SQL calls to PS_DEPT_TBL. Fix: use a single CreateSQL to pre-fetch all department names into an object before the loop, then look up from the object in RowInit."
-  },
-  {
-    title:"Scope Bug — Variable Not Available",
-    desc:"A developer set a flag in PostBuild but it's not accessible in SaveEdit. Find the scope error.",
-    code:[
-      {n:1,t:"/* PostBuild */"},
-      {n:2,t:"Local Boolean &isNewHire;"},
-      {n:3,t:"If JOB.ACTION.Value = \"HIR\" Then"},
-      {n:4,t:"   &isNewHire = True;"},
-      {n:5,t:"End-If;"},
-      {n:6,t:""},
-      {n:7,t:"/* SaveEdit — checks flag set in PostBuild */"},
-      {n:8,t:"If &isNewHire Then"},
-      {n:9,t:"   If JOB.DEPTID.Value = \"\" Then"},
-      {n:10,t:"      Error \"New hires must have a Department.\";"},
-      {n:11,t:"   End-If;"},
-      {n:12,t:"End-If;"},
-    ],
-    bugLine:2,
-    hint:"Local variables only exist within a single PeopleCode execution...",
-    explanation:"Line 2 is the bug — declaring &isNewHire as Local means it only exists during the PostBuild execution. By the time SaveEdit runs, it's a completely new execution — the Local variable is gone and &isNewHire is empty. Fix: declare it as Component Boolean &isNewHire so it persists across all events in the component transaction."
-  },
-  {
-    title:"Missing None() Check",
-    desc:"This code crashes when no department is found. Find the missing validation.",
-    code:[
-      {n:1,t:"/* FieldChange on DEPTID */"},
-      {n:2,t:"Local string &deptDescr;"},
-      {n:3,t:"SQLExec(\"SELECT DESCR FROM PS_DEPT_TBL WHERE DEPTID=:1 AND EFFDT=(SELECT MAX(EFFDT) FROM PS_DEPT_TBL WHERE DEPTID=:1 AND EFFDT<=%CurrentDateIn)\","},
-      {n:4,t:"   JOB.DEPTID.Value, JOB.DEPTID.Value, &deptDescr);"},
-      {n:5,t:"JOB.DEPTID_DESCR.Value = &deptDescr;"},
-      {n:6,t:"MessageBox(0, \"\", 0, 0, \"Department: \" | &deptDescr);"},
-    ],
-    bugLine:5,
-    hint:"What if the DEPTID doesn't exist in PS_DEPT_TBL?",
-    explanation:"Line 5 is the bug — if SQLExec finds no matching row, &deptDescr is empty string. The code assigns an empty value without checking. While this won't crash in all cases, the real issue is Line 6 which will show 'Department: ' with nothing. Best practice: after SQLExec, always check the result before using it. If the field is critical, use an Error or Warning when the lookup fails."
-  },
-  {
-    title:"Wrong Event for Field Default",
-    desc:"A developer wants to default DEPTID to 'CORP' when a component first opens. The code runs but the field keeps clearing. Find the wrong event choice.",
-    code:[
-      {n:1,t:"/* FieldChange on BUSINESS_UNIT */"},
-      {n:2,t:"/* Developer tries to default DEPTID when component loads */"},
-      {n:3,t:"If JOB.DEPTID.Value = \"\" Then"},
-      {n:4,t:"   JOB.DEPTID.Value = \"CORP\";"},
-      {n:5,t:"End-If;"},
-    ],
-    bugLine:1,
-    hint:"FieldChange fires when a user CHANGES a field. When does a default need to be set?",
-    explanation:"Line 1 is the bug — using FieldChange on BUSINESS_UNIT is wrong. FieldChange only fires when the user actively changes BUSINESS_UNIT. For setting a default when the component first loads, the correct event is FieldDefault (fires before the user sees the field) or PostBuild (fires once after all rows load). FieldDefault is the canonical place for defaulting field values."
-  },
-  {
-    title:"Effective Dating Query Bug",
-    desc:"This query returns multiple rows for the same employee causing duplicate results in a report. Find the SQL error.",
-    code:[
-      {n:1,t:"/* SQLExec to get employee department */"},
-      {n:2,t:"Local string &deptId;"},
-      {n:3,t:"SQLExec(\"SELECT DEPTID FROM PS_JOB WHERE EMPLID=:1\","},
-      {n:4,t:"   PERSONAL_DATA.EMPLID.Value, &deptId);"},
-      {n:5,t:"JOB.DEPTID.Value = &deptId;"},
-    ],
-    bugLine:3,
-    hint:"PS_JOB can have 20+ rows per employee. Which one is current?",
-    explanation:"Line 3 is the bug — the SQL has no effective dating WHERE clause. PS_JOB has one row per job change over an employee's entire career. Without MAX(EFFDT) <= today and MAX(EFFSEQ), SQLExec returns the first row found (could be the hire row from 10 years ago). Correct SQL: SELECT DEPTID FROM PS_JOB WHERE EMPLID=:1 AND EFFDT=(SELECT MAX(EFFDT) FROM PS_JOB WHERE EMPLID=:1 AND EFFDT<=%CurrentDateIn) AND EFFSEQ=(SELECT MAX(EFFSEQ) FROM PS_JOB WHERE EMPLID=:1 AND EFFDT=...)"
-  },
-  {
-    title:"SavePostChange Misuse",
-    desc:"A developer wants to cancel the save if a condition is not met, but Error() in SavePostChange does nothing. Find the wrong event.",
-    code:[
-      {n:1,t:"/* SavePostChange */"},
-      {n:2,t:"/* Developer tries to cancel save if salary too high */"},
-      {n:3,t:"If JOB.ANNUAL_RT.Value > 500000 Then"},
-      {n:4,t:"   Error \"Salary exceeds maximum grade. Save cancelled.\";"},
-      {n:5,t:"End-If;"},
-      {n:6,t:"/* Downstream integration call */"},
-      {n:7,t:"CallAppEngine(\"HR_NOTIF_AE\");"},
-    ],
-    bugLine:1,
-    hint:"Once data is committed to DB, can you still cancel?",
-    explanation:"Line 1 is the bug — the wrong event. SavePostChange fires AFTER the database commit is complete. At this point you cannot cancel the save — the data is already in the database. Error() in SavePostChange is silently ignored. Move the salary validation to SaveEdit, which fires BEFORE the DB commit and where Error() stops the save and highlights the issue. SavePostChange is only for downstream actions that need the data already saved."
-  },
+const DEBUG_CHALLENGES=[
+  {title:"Performance — Page loads in 30 seconds",
+   desc:"HR component takes 30+ seconds to load. Identify the problematic line.",
+   code:[{n:1,t:"/* PostBuild — Initialize */"},{n:2,t:"Function Init()"},{n:3,t:"  Local Rowset &rs;"},{n:4,t:"  &rs = GetRowset(Scroll.JOB);"},{n:5,t:"  For &i = 1 To &rs.ActiveRowCount"},{n:6,t:"    Local Record &rec = &rs.GetRow(&i).GetRecord(Record.JOB);"},{n:7,t:"    SQLExec('SELECT DESCR FROM PS_DEPT_TBL WHERE DEPTID=:1', &rec.DEPTID.Value, &dn);"},{n:8,t:"    &rec.DEPTID_DESCR.Value = &dn;"},{n:9,t:"  End-For;"},{n:10,t:"End-Function;"}],
+   bugLine:7,hint:"How many times does this SQL run for 200 rows?",
+   explanation:"Line 7 — SQLExec in a loop = N+1 queries. 200 rows = 200 DB calls. Fix: pre-fetch all department names in PostBuild using CreateSQL once into an object, then look up from memory in the loop. One DB call instead of 200."},
+  {title:"Scope Bug — Variable Lost Between Events",
+   desc:"Flag set in PostBuild not accessible in SaveEdit. Find the scope error.",
+   code:[{n:1,t:"/* PostBuild */"},{n:2,t:"Local Boolean &isNew;"},{n:3,t:"If JOB.ACTION.Value = 'HIR' Then"},{n:4,t:"   &isNew = True;"},{n:5,t:"End-If;"},{n:6,t:""},{n:7,t:"/* SaveEdit — checks the flag */"},{n:8,t:"If &isNew Then"},{n:9,t:"   Error 'Dept required for new hire';"},{n:10,t:"End-If;"}],
+   bugLine:2,hint:"Local variables only exist for ONE program execution. PostBuild and SaveEdit are separate...",
+   explanation:"Line 2 — Local scope means &isNew only exists during PostBuild execution. SaveEdit is a completely separate execution — the variable is gone and empty. Fix: declare as Component Boolean &isNew so it persists across all events in the same transaction."},
+  {title:"Missing Effective Dating in SQL",
+   desc:"Query returns wrong/multiple rows for one employee. Find the SQL bug.",
+   code:[{n:1,t:"Local string &dept;"},{n:2,t:"SQLExec('SELECT DEPTID FROM PS_JOB WHERE EMPLID=:1',"},{n:3,t:"  PERSONAL_DATA.EMPLID.Value, &dept);"},{n:4,t:"JOB.DEPTID.Value = &dept;"}],
+   bugLine:2,hint:"How many rows does PS_JOB have per employee? Which one is current?",
+   explanation:"Line 2 — no effective dating WHERE clause. PS_JOB has 20+ rows per employee across their career. Without MAX(EFFDT) <= today and MAX(EFFSEQ), SQLExec returns the first row found — possibly from years ago. Add the full effective dating subquery."},
+  {title:"Wrong Event for Field Default",
+   desc:"Developer wants to default DEPTID when component opens. Field keeps clearing. Wrong event.",
+   code:[{n:1,t:"/* FieldChange on BUSINESS_UNIT */"},{n:2,t:"If JOB.DEPTID.Value = '' Then"},{n:3,t:"   JOB.DEPTID.Value = 'CORP';"},{n:4,t:"End-If;"}],
+   bugLine:1,hint:"FieldChange fires when a USER changes the field. When should a default be set on load?",
+   explanation:"Line 1 — wrong event. FieldChange fires only when the user actively changes BUSINESS_UNIT. For component-load defaulting use FieldDefault (fires before user sees the field) or PostBuild (fires once after all rows load). FieldDefault is the canonical event for defaults."},
+  {title:"SavePostChange Misuse",
+   desc:"Error() in SavePostChange does nothing. Data already saved. Identify the wrong event.",
+   code:[{n:1,t:"/* SavePostChange */"},{n:2,t:"If JOB.ANNUAL_RT.Value > 500000 Then"},{n:3,t:"   Error 'Salary exceeds maximum. Save cancelled.';"},{n:4,t:"End-If;"}],
+   bugLine:1,hint:"Can you cancel a save AFTER the database commit has already happened?",
+   explanation:"Line 1 — wrong event. SavePostChange fires AFTER the DB commit is complete. Error() here is silently ignored — data is already saved. Move the validation to SaveEdit which fires BEFORE the commit and where Error() actually stops the save."},
 ];
 
-let debugState = { idx:0, selected:null, score:0 };
-
-function initDebug() {
-  debugState = { idx:0, selected:null, score:0 };
-  renderDebugChallenge();
+let debugState={idx:0,selected:null,score:0};
+function initDebug(){debugState={idx:0,selected:null,score:0};renderDebugChallenge();}
+function renderDebugChallenge(){
+  const ch=DEBUG_CHALLENGES[debugState.idx]; debugState.selected=null;
+  document.getElementById('debugCounter').textContent=`Challenge ${debugState.idx+1} of ${DEBUG_CHALLENGES.length}`;
+  document.getElementById('debugScore').textContent=`Score: ${debugState.score}`;
+  document.getElementById('debugScenario').innerHTML=`<div class="matcher-scenario__label">🏢 Scenario</div><div class="matcher-scenario__text">${ch.desc}</div>`;
+  document.getElementById('debugCode').innerHTML=ch.code.map(l=>`<div class="lab-code-line" id="dline-${l.n}" onclick="selectDebugLine(${l.n})"><span class="lab-code-linenum">${l.n}</span><span class="lab-code-text">${l.t.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</span></div>`).join('');
+  document.getElementById('debugHint').textContent=ch.hint;
+  document.getElementById('debugCheckBtn').disabled=true;
+  document.getElementById('debugCheckBtn').style.display='block';
+  document.getElementById('debugNextBtn').style.display='none';
+  const res=document.getElementById('debugResult');
+  res.classList.remove('show','correct','wrong'); res.innerHTML='';
 }
-
-function renderDebugChallenge() {
-  const ch = DEBUG_CHALLENGES[debugState.idx];
-  debugState.selected = null;
-  document.getElementById('debugCounter').textContent = `Challenge ${debugState.idx+1} of ${DEBUG_CHALLENGES.length}`;
-  document.getElementById('debugScore').textContent = `Score: ${debugState.score}`;
-  document.getElementById('debugScenario').innerHTML = `<div class="matcher-scenario__label">Scenario</div><div class="matcher-scenario__text">${ch.desc}</div>`;
-  document.getElementById('debugCode').innerHTML = ch.code.map(line =>
-    `<div class="lab-code-line" id="dline-${line.n}" onclick="selectDebugLine(${line.n})">
-      <span class="lab-code-linenum">${line.n}</span>
-      <span class="lab-code-text">${escapeCodeHtml(line.t)}</span>
-    </div>`
-  ).join('');
-  document.getElementById('debugHint').textContent = '💡 ' + ch.hint;
-  document.getElementById('debugCheckBtn').disabled = true;
-  document.getElementById('debugNextBtn').style.display = 'none';
-  const res = document.getElementById('debugResult');
-  res.classList.remove('show','correct','wrong');
-  res.innerHTML = '';
-}
-
-function escapeCodeHtml(str) {
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-function selectDebugLine(n) {
-  document.querySelectorAll('.lab-code-line').forEach(l => l.classList.remove('selected'));
-  document.getElementById(`dline-${n}`).classList.add('selected');
-  debugState.selected = n;
-  document.getElementById('debugCheckBtn').disabled = false;
-}
-
-function checkDebugAnswer() {
-  const ch = DEBUG_CHALLENGES[debugState.idx];
-  const correct = debugState.selected === ch.bugLine;
-  if(correct) debugState.score++;
-  document.getElementById('debugScore').textContent = `Score: ${debugState.score}`;
-  // Highlight
-  document.querySelectorAll('.lab-code-line').forEach(l => l.style.pointerEvents='none');
+function selectDebugLine(n){document.querySelectorAll('.lab-code-line').forEach(l=>l.classList.remove('selected'));document.getElementById(`dline-${n}`).classList.add('selected');debugState.selected=n;document.getElementById('debugCheckBtn').disabled=false;}
+function checkDebugAnswer(){
+  const ch=DEBUG_CHALLENGES[debugState.idx];
+  const correct=debugState.selected===ch.bugLine; if(correct)debugState.score++;
+  document.getElementById('debugScore').textContent=`Score: ${debugState.score}`;
+  document.querySelectorAll('.lab-code-line').forEach(l=>l.style.pointerEvents='none');
   document.getElementById(`dline-${ch.bugLine}`).classList.add('correct-line');
-  if(!correct && debugState.selected) document.getElementById(`dline-${debugState.selected}`).classList.add('selected');
-  const res = document.getElementById('debugResult');
-  res.className = `lab-result-box show ${correct?'correct':'wrong'}`;
-  res.innerHTML = `<div class="lab-result-box__title">${correct?'✅ Correct!':'❌ Not quite'}</div>
-    <div class="lab-result-box__text"><strong>Bug on line ${ch.bugLine}:</strong> ${ch.explanation}</div>`;
-  document.getElementById('debugCheckBtn').style.display = 'none';
-  document.getElementById('debugNextBtn').style.display = debugState.idx < DEBUG_CHALLENGES.length-1 ? 'block' : 'none';
-  if(debugState.idx === DEBUG_CHALLENGES.length-1) {
-    document.getElementById('debugNextBtn').style.display = 'none';
-    res.innerHTML += `<br><strong style="color:var(--gold)">Lab Complete! Score: ${debugState.score}/${DEBUG_CHALLENGES.length}</strong>`;
-  }
-}
-
-function nextDebugChallenge() {
-  debugState.idx++;
-  renderDebugChallenge();
-}
-
-/* ── MODE 2: EVENT FLOW ── */
-const EF_CHALLENGES = [
-  {
-    name:"Component Load Sequence — What fires when a user opens a page?",
-    events:[
-      {name:"SearchInit",phase:"load",correct:0},
-      {name:"RowSelect",phase:"load",correct:1},
-      {name:"RowInit",phase:"load",correct:2},
-      {name:"FieldDefault",phase:"load",correct:3},
-      {name:"FieldFormula",phase:"load",correct:4},
-      {name:"PostBuild",phase:"load",correct:5},
-      {name:"Activate",phase:"load",correct:6},
-    ]
-  },
-  {
-    name:"Save Sequence — What fires when a user clicks Save?",
-    events:[
-      {name:"SaveEdit",phase:"save",correct:0},
-      {name:"SavePreChange",phase:"save",correct:1},
-      {name:"WorkFlow",phase:"save",correct:2},
-      {name:"SavePostChange",phase:"save",correct:3},
-    ]
-  },
-  {
-    name:"Field Interaction — What fires when a user changes a field value?",
-    events:[
-      {name:"FieldEdit",phase:"interact",correct:0},
-      {name:"FieldChange",phase:"interact",correct:1},
-    ]
-  },
-];
-let efState = { idx:0, items:[] };
-
-function initEventFlow() { efState.idx=0; loadEFChallenge(); }
-
-function loadEFChallenge() {
-  const ch = EF_CHALLENGES[efState.idx];
-  document.getElementById('efChallengeName').textContent = ch.name;
-  efState.items = [...ch.events].sort(() => Math.random()-0.5);
-  renderEFList();
-  const res = document.getElementById('efResult');
-  res.classList.remove('show','correct','wrong');
-  res.innerHTML = '';
-  document.getElementById('efNextBtn').style.display = 'none';
-}
-
-function renderEFList() {
-  const phaseColors = {load:'phase-load',interact:'phase-interact',save:'phase-save'};
-  const phaseLabels = {load:'Load',interact:'User Action',save:'Save'};
-  document.getElementById('eventDragList').innerHTML = efState.items.map((ev,i) =>
-    `<div class="event-drag-item" draggable="true" data-idx="${i}"
-      ondragstart="efDragStart(event,${i})"
-      ondragover="efDragOver(event,${i})"
-      ondrop="efDrop(event,${i})">
-      <span class="event-drag-handle">⠿</span>
-      <span class="event-drag-num">${i+1}</span>
-      <span style="flex:1;font-family:var(--fm);font-weight:600">${ev.name}</span>
-      <span class="event-phase-badge ${phaseColors[ev.phase]}">${phaseLabels[ev.phase]}</span>
-    </div>`
-  ).join('');
-}
-
-let efDragging = null;
-function efDragStart(e,i){ efDragging=i; e.currentTarget.classList.add('dragging'); }
-function efDragOver(e,i){ e.preventDefault(); }
-function efDrop(e,i){
-  e.preventDefault();
-  if(efDragging===null||efDragging===i) return;
-  const items=[...efState.items];
-  const [moved]=items.splice(efDragging,1);
-  items.splice(i,0,moved);
-  efState.items=items;
-  efDragging=null;
-  renderEFList();
-}
-
-function checkEventOrder() {
-  const ch = EF_CHALLENGES[efState.idx];
-  const correct = efState.items.every((ev,i) => ev.correct === i);
-  const items = document.querySelectorAll('.event-drag-item');
-  efState.items.forEach((ev,i) => {
-    items[i].classList.add(ev.correct === i ? 'correct-pos' : 'wrong-pos');
-    items[i].setAttribute('draggable','false');
-    items[i].style.cursor='default';
-  });
-  const res = document.getElementById('efResult');
-  res.className = `lab-result-box show ${correct?'correct':'wrong'}`;
-  const correctOrder = [...ch.events].sort((a,b)=>a.correct-b.correct).map(e=>e.name).join(' → ');
-  res.innerHTML = `<div class="lab-result-box__title">${correct?'✅ Perfect Order!':'❌ Not quite right'}</div>
-    <div class="lab-result-box__text">Correct sequence: <strong>${correctOrder}</strong></div>`;
-  if(efState.idx < EF_CHALLENGES.length-1) document.getElementById('efNextBtn').style.display='block';
-}
-
-function resetEventOrder() { loadEFChallenge(); }
-function nextEFChallenge() { efState.idx++; loadEFChallenge(); }
-
-/* ── MODE 3: OBJECT MATCHER ── */
-const MATCHER_CHALLENGES = [
-  {q:"Store temporary flag values during a component session — never saved to DB",ans:"Derived/Work Record",opts:["SQL Table","SQL View","Derived/Work Record","Temp Table"],exp:"Derived/Work records exist only in memory during the component transaction. They create no database object and are perfect for temporary flags, calculations, and work fields."},
-  {q:"Run a salary recalculation for 500,000 employees overnight",ans:"Application Engine",opts:["Component Interface","Application Engine","SQR","PS Query"],exp:"Application Engine is PeopleSoft's batch framework for large-scale data processing. It runs outside the online session, has checkpoint/restart capability, and supports parallel processing via Temp Tables."},
-  {q:"Load employee hire data from an external system using PeopleSoft business rules",ans:"Component Interface",opts:["Data Mover","SQL Insert","Component Interface","Application Engine"],exp:"Component Interface fires the same PeopleCode events as the online component — ensuring all business rules, defaults, and validations run during the data load. Perfect for inbound integrations."},
-  {q:"Display department name next to EMPLID without a DB insert",ans:"SQL View",opts:["SQL Table","SQL View","Derived/Work Record","Dynamic View"],exp:"SQL View creates a read-only database view that joins records. Use it to display related data (like DESCR from PS_DEPT_TBL) alongside key fields without any DB write."},
-  {q:"Short code list for EMPL_STATUS: A=Active, T=Terminated, L=Leave",ans:"Translate Value (XLAT)",opts:["Prompt Table","Translate Value (XLAT)","Dynamic View","Record Field"],exp:"Translate Values (XLAT) are stored in PSXLATITEM — PeopleSoft's universal lookup table for short stable codes of max 4 characters. Perfect for EMPL_STATUS, ACTION, FULL_PART_TIME."},
-  {q:"Send real-time employee data to an external payroll system via REST",ans:"Integration Broker",opts:["Application Engine","Data Mover","Integration Broker","Component Interface"],exp:"Integration Broker handles real-time synchronous and asynchronous messaging. Use Service Operations with REST routing to send/receive data from external systems."},
-  {q:"Reusable EFFDT + EFFSEQ fields used across 200 records",ans:"SubRecord",opts:["SQL Table","SubRecord","Dynamic View","Derived/Work Record"],exp:"SubRecords are reusable field groups. EFFDT_SBR contains EFFDT and EFFSEQ and is included in hundreds of effective-dated records — defining the fields once and reusing everywhere."},
-  {q:"Migrate reference data between environments with a simple script",ans:"Data Mover (DMS)",opts:["Application Engine","Data Mover (DMS)","Component Interface","SQL Script"],exp:"Data Mover (DMS) uses simple EXPORT/IMPORT scripts to move data between PeopleSoft databases. Ideal for migrating setup/reference data during implementations and upgrades."},
-  {q:"Allow parallel batch processing without data collision between instances",ans:"Temp Table",opts:["SQL Table","SQL View","Temp Table","Derived/Work Record"],exp:"Temp Tables are created multiple times in the DB (MYTEMP_AET, MYTEMP_AET1...). Each parallel AE instance uses its own copy — preventing data collision between concurrent batch processes."},
-  {q:"Upgrade-safe customization — attach custom PeopleCode to a delivered component without modifying it",ans:"Event Mapping",opts:["SubRecord","Event Mapping","Application Package","Component Interface"],exp:"Event Mapping (PT 8.55+) lets you attach custom App Class PeopleCode to delivered component events without touching the delivered object. During upgrades, Oracle replaces the delivered component but your mapping remains intact."},
-];
-let matcherState = { idx:0, score:0, answered:false };
-function initMatcher() { matcherState={idx:0,score:0,answered:false}; renderMatcher(); }
-function renderMatcher() {
-  const ch = MATCHER_CHALLENGES[matcherState.idx];
-  matcherState.answered = false;
-  document.getElementById('matcherCounter').textContent = `Scenario ${matcherState.idx+1} of ${MATCHER_CHALLENGES.length}`;
-  document.getElementById('matcherScore').textContent = `Score: ${matcherState.score}/${matcherState.idx}`;
-  document.getElementById('matcherScenario').textContent = ch.q;
-  document.getElementById('matcherOptions').innerHTML = ch.opts.map(opt =>
-    `<button class="matcher-opt" onclick="checkMatcher('${opt.replace(/'/g,"\\'")}',this)">${opt}</button>`
-  ).join('');
-  const res = document.getElementById('matcherResult');
-  res.classList.remove('show','correct','wrong'); res.innerHTML='';
-  document.getElementById('matcherNextBtn').style.display='none';
-}
-function checkMatcher(chosen, btn) {
-  if(matcherState.answered) return;
-  matcherState.answered = true;
-  const ch = MATCHER_CHALLENGES[matcherState.idx];
-  const correct = chosen === ch.ans;
-  if(correct) matcherState.score++;
-  document.querySelectorAll('.matcher-opt').forEach(b => {
-    b.disabled=true;
-    if(b.textContent===ch.ans) b.classList.add('correct');
-    else if(b===btn) b.classList.add('wrong');
-    else b.classList.add('reveal');
-  });
-  const res = document.getElementById('matcherResult');
+  if(!correct&&debugState.selected) document.getElementById(`dline-${debugState.selected}`).classList.add('selected');
+  const res=document.getElementById('debugResult');
   res.className=`lab-result-box show ${correct?'correct':'wrong'}`;
-  res.innerHTML=`<div class="lab-result-box__title">${correct?'✅ Correct!':'❌ Wrong'}</div>
-    <div class="lab-result-box__text"><strong>Answer: ${ch.ans}</strong><br>${ch.exp}</div>`;
-  document.getElementById('matcherScore').textContent=`Score: ${matcherState.score}/${matcherState.idx+1}`;
-  if(matcherState.idx < MATCHER_CHALLENGES.length-1) document.getElementById('matcherNextBtn').style.display='block';
-  else res.innerHTML+=`<br><strong style="color:var(--gold)">Complete! Final Score: ${matcherState.score}/${MATCHER_CHALLENGES.length}</strong>`;
+  res.innerHTML=`<div class="lab-result-box__title">${correct?'✅ Correct!':'❌ Not quite'}</div><div class="lab-result-box__text"><strong>Bug on line ${ch.bugLine}:</strong> ${ch.explanation}</div>`;
+  document.getElementById('debugCheckBtn').style.display='none';
+  if(debugState.idx<DEBUG_CHALLENGES.length-1)document.getElementById('debugNextBtn').style.display='block';
+  else res.innerHTML+=`<br><strong style="color:var(--gold)">Complete! Score: ${debugState.score}/${DEBUG_CHALLENGES.length}</strong>`;
 }
-function nextMatcher() { matcherState.idx++; renderMatcher(); }
+function nextDebugChallenge(){debugState.idx++;renderDebugChallenge();}
 
-/* ── MODE 4: SCENARIO SOLVER ── */
-const SCENARIO_CHALLENGES = [
-  {q:"An HR coordinator reports the Job Data page loads in 45 seconds. SQL trace shows 300 identical SELECT statements against PS_DEPT_TBL. Root cause?",ans:"SQLExec inside RowInit fires once per row",opts:["Database index is missing on PS_DEPT_TBL","SQLExec inside RowInit fires once per row","App Server has too few PSAPPSRV processes","WebLogic timeout is too short"],exp:"Classic N+1 problem. RowInit fires for every row in the grid. SQLExec inside RowInit = one DB call per row. 300 rows = 300 calls. Fix: pre-fetch all department names in PostBuild once using CreateSQL, then read from the result in RowInit."},
-  {q:"A user can navigate to a custom component and see all fields, but clicking Save does nothing. No error message appears.",ans:"Permission List grants Display Only instead of Update/Display",opts:["The component has no PeopleCode","Permission List grants Display Only instead of Update/Display","The database is in read-only mode","The App Server is overloaded"],exp:"Display Only access mode in the Permission List means the user can view but not edit or save. The Save button is either hidden or disabled. Fix: change the component access mode to Update/Display in the user's Permission List."},
-  {q:"A custom component using PS_JOB as the Search Record shows all employees to all HR users — even those outside their authorized departments.",ans:"PS_JOB bypasses row-level security — need a security view",opts:["The Permission List is too broad","PS_JOB bypasses row-level security — need a security view","Row-level security is not configured in the system","The component has too many pages"],exp:"Using PS_JOB directly as the Search Record bypasses row-level security entirely. Replace it with a security view (e.g., PS_JOB_SRCH_VW) that joins PS_JOB with the department security tables. The view automatically filters results based on the user's security profile."},
-  {q:"A developer migrated a new component from DEV to QA successfully. QA users say the component doesn't appear in any menu.",ans:"Portal CREF was not migrated — only App Designer objects were",opts:["The component PeopleCode has a bug","Portal CREF was not migrated — only App Designer objects were","The database tables were not built in QA","The Permission List was not updated"],exp:"App Designer objects (records, pages, components) and Portal Registry entries (CREFs) are separate objects. The CREF is what makes the component appear in navigation. It must be explicitly included in the project and migrated separately from the App Designer objects."},
-  {q:"A payroll batch process shows Error status in Process Monitor. The log shows: 'No rows selected for processing'. The manager says it worked fine last month.",ans:"Run Control parameters are incorrect — likely wrong pay period dates",opts:["The App Server is down","Run Control parameters are incorrect — likely wrong pay period dates","PS_JOB has a data corruption issue","The process was submitted with wrong user ID"],exp:"'No rows selected' almost always means the selection criteria found nothing. The most common cause is incorrect Run Control parameters — especially date ranges. Check that the Pay Period End Date, Company, and Pay Group on the Run Control match the period being processed."},
-  {q:"An employee's promotion from last month is not showing in a departmental headcount report. The data looks correct in Job Data.",ans:"Report query is missing effective dating — showing current row not historical",opts:["The employee's data was accidentally deleted","Report query is missing effective dating — showing current row not historical","The batch process hasn't run yet","The report has a security issue"],exp:"The report is likely selecting only the current row (today's EFFDT). If the promotion was entered as future-dated but the report should show last month's state, the effective dating WHERE clause must reference the report period date, not just today."},
-  {q:"After a PeopleSoft upgrade, a customized delivered component no longer works. The customization code is gone.",ans:"Oracle overwrote the delivered component during the upgrade — customization was not upgrade-safe",opts:["The database restore failed","Oracle overwrote the delivered component during the upgrade — customization was not upgrade-safe","The developer deleted it by mistake","The Permission List was reset"],exp:"This is the classic upgrade risk. Customizations made directly to Oracle-delivered objects are overwritten when Oracle delivers a new version of that object. The fix going forward: use Event Mapping (PT 8.55+) or clone delivered objects with a custom prefix before modifying."},
-  {q:"A PS Query joining PS_PERSONAL_DATA and PS_JOB returns 15x the expected number of rows.",ans:"Missing effective dating criteria on PS_JOB creates a cross join",opts:["Wrong join key between the two records","Missing effective dating criteria on PS_JOB creates a cross join","PS_PERSONAL_DATA has duplicate rows","The query is running against the wrong database"],exp:"PS_PERSONAL_DATA has 1 row per employee. PS_JOB has 10-30+ rows per employee (one per job change). Joining without effective dating criteria creates a near-Cartesian product: 1 row × 20 rows = 20 result rows per employee. Always add MAX(EFFDT) <= today criteria when joining with any effective-dated table."},
-];
-let scenState = { idx:0, score:0, answered:false };
-function initScenario() { scenState={idx:0,score:0,answered:false}; renderScenario(); }
-function renderScenario() {
-  const ch = SCENARIO_CHALLENGES[scenState.idx];
-  scenState.answered=false;
-  document.getElementById('scenarioCounter').textContent=`Scenario ${scenState.idx+1} of ${SCENARIO_CHALLENGES.length}`;
-  document.getElementById('scenarioScore').textContent=`Score: ${scenState.score}/${scenState.idx}`;
-  document.getElementById('scenarioText').textContent=ch.q;
-  document.getElementById('scenarioOptions').innerHTML=ch.opts.map(opt=>
-    `<button class="matcher-opt" onclick="checkScenario('${opt.replace(/'/g,"\\'")}',this)">${opt}</button>`
-  ).join('');
-  const res=document.getElementById('scenarioResult');
-  res.classList.remove('show','correct','wrong'); res.innerHTML='';
-  document.getElementById('scenarioNextBtn').style.display='none';
-}
-function checkScenario(chosen,btn) {
-  if(scenState.answered) return;
-  scenState.answered=true;
-  const ch=SCENARIO_CHALLENGES[scenState.idx];
-  const correct=chosen===ch.ans;
-  if(correct) scenState.score++;
-  document.querySelectorAll('#scenarioOptions .matcher-opt').forEach(b=>{
-    b.disabled=true;
-    if(b.textContent===ch.ans) b.classList.add('correct');
-    else if(b===btn) b.classList.add('wrong');
-    else b.classList.add('reveal');
-  });
-  const res=document.getElementById('scenarioResult');
-  res.className=`lab-result-box show ${correct?'correct':'wrong'}`;
-  res.innerHTML=`<div class="lab-result-box__title">${correct?'✅ Correct Diagnosis!':'❌ Not quite'}</div>
-    <div class="lab-result-box__text"><strong>${ch.ans}</strong><br>${ch.exp}</div>`;
-  document.getElementById('scenarioScore').textContent=`Score: ${scenState.score}/${scenState.idx+1}`;
-  if(scenState.idx<SCENARIO_CHALLENGES.length-1) document.getElementById('scenarioNextBtn').style.display='block';
-  else res.innerHTML+=`<br><strong style="color:var(--gold)">Complete! Final Score: ${scenState.score}/${SCENARIO_CHALLENGES.length}</strong>`;
-}
-function nextScenario() { scenState.idx++; renderScenario(); }
+const EF_CHALLENGES=[{name:"Component Load Sequence",events:[{name:"SearchInit",phase:"load",correct:0},{name:"RowSelect",phase:"load",correct:1},{name:"RowInit",phase:"load",correct:2},{name:"FieldDefault",phase:"load",correct:3},{name:"FieldFormula",phase:"load",correct:4},{name:"PostBuild",phase:"load",correct:5},{name:"Activate",phase:"load",correct:6}]},{name:"Save Sequence",events:[{name:"SaveEdit",phase:"save",correct:0},{name:"SavePreChange",phase:"save",correct:1},{name:"WorkFlow",phase:"save",correct:2},{name:"SavePostChange",phase:"save",correct:3}]},{name:"Field Interaction",events:[{name:"FieldEdit",phase:"interact",correct:0},{name:"FieldChange",phase:"interact",correct:1}]},];
+let efState={idx:0,items:[]};
+function initEventFlow(){efState.idx=0;loadEFChallenge();}
+function loadEFChallenge(){const ch=EF_CHALLENGES[efState.idx];document.getElementById('efChallengeName').textContent=ch.name;efState.items=[...ch.events].sort(()=>Math.random()-.5);renderEFList();const res=document.getElementById('efResult');res.classList.remove('show','correct','wrong');res.innerHTML='';document.getElementById('efNextBtn').style.display='none';}
+function renderEFList(){const pC={load:'phase-load',interact:'phase-interact',save:'phase-save'},pL={load:'Load',interact:'User Action',save:'Save'};document.getElementById('eventDragList').innerHTML=efState.items.map((ev,i)=>`<div class="event-drag-item" draggable="true" ondragstart="efDragStart(event,${i})" ondragover="efDragOver(event)" ondrop="efDrop(event,${i})"><span class="event-drag-handle">⠿</span><span class="event-drag-num">${i+1}</span><span style="flex:1;font-family:var(--fm);font-weight:600">${ev.name}</span><span class="event-phase-badge ${pC[ev.phase]}">${pL[ev.phase]}</span></div>`).join('');}
+let efDragging=null;
+function efDragStart(e,i){efDragging=i;}
+function efDragOver(e){e.preventDefault();}
+function efDrop(e,i){e.preventDefault();if(efDragging===null||efDragging===i)return;const items=[...efState.items];const[m]=items.splice(efDragging,1);items.splice(i,0,m);efState.items=items;efDragging=null;renderEFList();}
+function checkEventOrder(){const ch=EF_CHALLENGES[efState.idx];const ok=efState.items.every((ev,i)=>ev.correct===i);document.querySelectorAll('.event-drag-item').forEach((el,i)=>{el.classList.add(efState.items[i].correct===i?'correct-pos':'wrong-pos');el.setAttribute('draggable','false');el.style.cursor='default';});const co=[...ch.events].sort((a,b)=>a.correct-b.correct).map(e=>e.name).join(' → ');const res=document.getElementById('efResult');res.className=`lab-result-box show ${ok?'correct':'wrong'}`;res.innerHTML=`<div class="lab-result-box__title">${ok?'✅ Perfect!':'❌ Not quite'}</div><div class="lab-result-box__text">Correct order: <strong>${co}</strong></div>`;if(efState.idx<EF_CHALLENGES.length-1)document.getElementById('efNextBtn').style.display='block';}
+function resetEventOrder(){loadEFChallenge();}
+function nextEFChallenge(){efState.idx++;loadEFChallenge();}
 
-/* ── MODE 5: APP DESIGNER SIMULATOR ── */
-const ADS_TASKS = [
-  {id:'add_emplid',label:'Add EMPLID field (CHAR, 11, Key)'},
-  {id:'add_effdt', label:'Add EFFDT field (DATE, Key)'},
-  {id:'add_deptid',label:'Add DEPTID field (CHAR, 10)'},
-  {id:'add_setid', label:'Add SETID field (CHAR, 5)'},
-  {id:'build',     label:'Click Build to create the table'},
-];
-let adsState = { fields:[], tasksCompleted:new Set() };
+const MATCHER_CHALLENGES=[{q:"Store temporary flag during component session — never saved to DB",ans:"Derived/Work Record",opts:["SQL Table","SQL View","Derived/Work Record","Temp Table"],exp:"Derived/Work records exist only in buffer. No DB object. Perfect for temporary flags."},{q:"Run overnight salary recalculation for 500,000 employees",ans:"Application Engine",opts:["Component Interface","Application Engine","SQR","PS Query"],exp:"AE is the batch framework for large-scale operations outside the online session."},{q:"Load employee hire data using PeopleSoft business rules",ans:"Component Interface",opts:["Data Mover","SQL Insert","Component Interface","Application Engine"],exp:"CI fires all component PeopleCode events ensuring full data integrity."},{q:"Display department name without saving it",ans:"SQL View",opts:["SQL Table","SQL View","Derived/Work Record","Dynamic View"],exp:"SQL View creates read-only DB view joining records. Use for display without DB write."},{q:"Short code list: A=Active, T=Terminated (max 4 chars)",ans:"Translate Value (XLAT)",opts:["Prompt Table","Translate Value (XLAT)","Dynamic View","Record Field"],exp:"XLAT values in PSXLATITEM handle short stable codes of max 4 characters."},{q:"Send real-time employee data to external system via REST",ans:"Integration Broker",opts:["AE","Data Mover","Integration Broker","Component Interface"],exp:"Integration Broker handles real-time sync/async messaging via REST, SOAP, internal PS."},{q:"EFFDT and EFFSEQ fields reused in 200 records",ans:"SubRecord",opts:["SQL Table","SubRecord","Dynamic View","Derived/Work"],exp:"SubRecords are reusable field groups. EFFDT_SBR included in hundreds of records."},{q:"Move setup data from DEV to PROD",ans:"Data Mover (DMS)",opts:["AE","Data Mover (DMS)","Component Interface","SQL Script"],exp:"DMS EXPORT/IMPORT moves PS table data between databases. Ideal for reference data."},{q:"Allow parallel batch without data collision",ans:"Temp Table",opts:["SQL Table","SQL View","Temp Table","Derived/Work"],exp:"Temp Tables create multiple instances (AET, AET1...) — each parallel AE gets its own."},{q:"Attach custom code to delivered component without modifying it",ans:"Event Mapping",opts:["SubRecord","Event Mapping","Application Package","Component Interface"],exp:"Event Mapping (PT 8.55+) attaches App Class PeopleCode to delivered events — upgrade-safe."},];
+let matcherState={idx:0,score:0,answered:false};
+function initMatcher(){matcherState={idx:0,score:0,answered:false};renderMatcher();}
+function renderMatcher(){const ch=MATCHER_CHALLENGES[matcherState.idx];matcherState.answered=false;document.getElementById('matcherCounter').textContent=`Scenario ${matcherState.idx+1} of ${MATCHER_CHALLENGES.length}`;document.getElementById('matcherScore').textContent=`Score: ${matcherState.score}/${matcherState.idx}`;document.getElementById('matcherScenario').textContent=ch.q;document.getElementById('matcherOptions').innerHTML=ch.opts.map(o=>`<button class="matcher-opt" onclick="checkMatcher(this)">${o}</button>`).join('');const res=document.getElementById('matcherResult');res.classList.remove('show','correct','wrong');res.innerHTML='';document.getElementById('matcherNextBtn').style.display='none';}
+function checkMatcher(btn){if(matcherState.answered)return;matcherState.answered=true;const ch=MATCHER_CHALLENGES[matcherState.idx];const ok=btn.textContent===ch.ans;if(ok)matcherState.score++;document.querySelectorAll('.matcher-opt').forEach(b=>{b.disabled=true;if(b.textContent===ch.ans)b.classList.add('correct');else if(b===btn)b.classList.add('wrong');else b.classList.add('reveal');});const res=document.getElementById('matcherResult');res.className=`lab-result-box show ${ok?'correct':'wrong'}`;res.innerHTML=`<div class="lab-result-box__title">${ok?'✅ Correct!':'❌ Wrong'}</div><div class="lab-result-box__text"><strong>${ch.ans}</strong> — ${ch.exp}</div>`;document.getElementById('matcherScore').textContent=`Score: ${matcherState.score}/${matcherState.idx+1}`;if(matcherState.idx<MATCHER_CHALLENGES.length-1)document.getElementById('matcherNextBtn').style.display='block';else res.innerHTML+=`<br><strong style="color:var(--gold)">Complete! ${matcherState.score}/${MATCHER_CHALLENGES.length}</strong>`;}
+function nextMatcher(){matcherState.idx++;renderMatcher();}
 
-function initAppDesigner() {
-  adsState = { fields:[], tasksCompleted:new Set() };
-  document.getElementById('adsOutput').textContent = 'Ready.';
-  renderADSFields();
-  renderADSTasks();
-  const res = document.getElementById('adsResult');
-  res.classList.remove('show','correct','wrong'); res.innerHTML='';
-}
+const SCENARIO_CHALLENGES=[{q:"Page loads in 45 seconds. SQL trace: 500 identical SELECTs against PS_DEPT_TBL.",ans:"SQLExec in RowInit fires once per row",opts:["DB index missing","SQLExec in RowInit fires once per row","Too few App Server processes","WebLogic timeout"],exp:"Classic N+1. RowInit × 500 rows = 500 DB calls. Fix: pre-fetch in PostBuild with CreateSQL."},{q:"User can see component, but Save does nothing. No error message.",ans:"Permission List grants Display Only",opts:["No PeopleCode","Permission List grants Display Only","DB is read-only","App Server overloaded"],exp:"Display Only = read-only. Save button hidden/disabled. Change access mode to Update/Display."},{q:"Custom component shows all employees — even outside authorized departments.",ans:"PS_JOB as Search Record bypasses row-level security",opts:["Permission List too broad","PS_JOB as Search Record bypasses row-level security","Row security not configured","Too many pages"],exp:"PS_JOB bypasses security views. Replace with PS_JOB_SRCH_VW that joins with security tables."},{q:"Migrated component to QA. Doesn't appear in any menu.",ans:"Portal CREF not migrated",opts:["PeopleCode bug","Portal CREF not migrated","DB tables not built","Permission List missing"],exp:"App Designer objects and Portal CREFs migrate separately. CREF must be explicitly included."},{q:"Payroll batch: Error status. Log says 'No rows selected for processing'.",ans:"Run Control parameters incorrect",opts:["App Server down","Run Control parameters incorrect","PS_JOB corrupted","Wrong user"],exp:"'No rows' = criteria found nothing. Check Pay Period, Pay Group, Company, Calendar ID."},{q:"After upgrade, customization is gone.",ans:"Oracle overwrote the delivered object",opts:["DB restore failed","Oracle overwrote the delivered object","Developer deleted it","Permission List reset"],exp:"Delivered objects overwritten during upgrades. Use Event Mapping (PT 8.55+) or clone with custom prefix."},{q:"PS Query joining PS_PERSONAL_DATA + PS_JOB returns 15x expected rows.",ans:"Missing effective dating on PS_JOB",opts:["Wrong join key","Missing effective dating on PS_JOB","PERSONAL_DATA has duplicates","Wrong database"],exp:"PS_JOB has 15+ rows per employee. Without MAX(EFFDT): 1 × 15 = 15 per employee. Add effective dating."},{q:"Employee report shows wrong department for last January.",ans:"Report missing effective dating — shows today not January",opts:["Data deleted","Report missing effective dating — shows today not January","Batch not run","Security issue"],exp:"Report fetches current row. For historical: WHERE EFFDT <= report_date in the query."},];
+let scenState={idx:0,score:0,answered:false};
+function initScenario(){scenState={idx:0,score:0,answered:false};renderScenario();}
+function renderScenario(){const ch=SCENARIO_CHALLENGES[scenState.idx];scenState.answered=false;document.getElementById('scenarioCounter').textContent=`Scenario ${scenState.idx+1} of ${SCENARIO_CHALLENGES.length}`;document.getElementById('scenarioScore').textContent=`Score: ${scenState.score}/${scenState.idx}`;document.getElementById('scenarioText').textContent=ch.q;document.getElementById('scenarioOptions').innerHTML=ch.opts.map(o=>`<button class="matcher-opt" onclick="checkScenario(this)">${o}</button>`).join('');const res=document.getElementById('scenarioResult');res.classList.remove('show','correct','wrong');res.innerHTML='';document.getElementById('scenarioNextBtn').style.display='none';}
+function checkScenario(btn){if(scenState.answered)return;scenState.answered=true;const ch=SCENARIO_CHALLENGES[scenState.idx];const ok=btn.textContent===ch.ans;if(ok)scenState.score++;document.querySelectorAll('#scenarioOptions .matcher-opt').forEach(b=>{b.disabled=true;if(b.textContent===ch.ans)b.classList.add('correct');else if(b===btn)b.classList.add('wrong');else b.classList.add('reveal');});const res=document.getElementById('scenarioResult');res.className=`lab-result-box show ${ok?'correct':'wrong'}`;res.innerHTML=`<div class="lab-result-box__title">${ok?'✅ Correct!':'❌ Not quite'}</div><div class="lab-result-box__text"><strong>${ch.ans}</strong><br>${ch.exp}</div>`;document.getElementById('scenarioScore').textContent=`Score: ${scenState.score}/${scenState.idx+1}`;if(scenState.idx<SCENARIO_CHALLENGES.length-1)document.getElementById('scenarioNextBtn').style.display='block';else res.innerHTML+=`<br><strong style="color:var(--gold)">Complete! ${scenState.score}/${SCENARIO_CHALLENGES.length}</strong>`;}
+function nextScenario(){scenState.idx++;renderScenario();}
 
-function renderADSTasks() {
-  document.getElementById('adsTaskList').innerHTML = ADS_TASKS.map(t=>
-    `<div class="ads-task ${adsState.tasksCompleted.has(t.id)?'done':''}" id="ads-task-${t.id}">
-      <div class="ads-task-check">${adsState.tasksCompleted.has(t.id)?'✓':''}</div>
-      ${t.label}
-    </div>`
-  ).join('');
-}
-
-function renderADSFields() {
-  document.getElementById('adsFieldBody').innerHTML = adsState.fields.length === 0
-    ? `<tr><td colspan="6" style="text-align:center;color:#888;padding:16px">No fields defined. Add fields from the properties panel →</td></tr>`
-    : adsState.fields.map((f,i)=>
-        `<tr ${i===adsState.fields.length-1?'class="selected"':''}>
-          <td>${i+1}</td><td><strong>${f.name}</strong></td><td>${f.type}</td>
-          <td>${f.len||''}</td>
-          <td>${f.key?'<span style="color:#1f5a9a;font-size:16px">☑</span>':''}</td>
-          <td></td>
-        </tr>`
-      ).join('');
-}
-
-function adsAddField() {
-  const sel = document.getElementById('adsAddFieldSelect');
-  const val = sel.value;
-  if(!val) return;
-  const [name,type,len] = val.split('|');
-  const isKey = (name==='EMPLID'||name==='EFFDT');
-  // Check duplicate
-  if(adsState.fields.find(f=>f.name===name)) {
-    document.getElementById('adsOutput').textContent = `Field ${name} already exists.`; return;
-  }
-  adsState.fields.push({name,type,len,key:isKey});
-  renderADSFields();
-  document.getElementById('adsOutput').textContent = `Field ${name} added successfully.`;
-  // Mark task
-  const taskMap = {EMPLID:'add_emplid',EFFDT:'add_effdt',DEPTID:'add_deptid',SETID:'add_setid'};
-  if(taskMap[name]) { adsState.tasksCompleted.add(taskMap[name]); renderADSTasks(); }
-  sel.value='';
-}
-
-function adsBuild() {
-  const requiredFields = ['EMPLID','EFFDT','DEPTID','SETID'];
-  const presentFields = adsState.fields.map(f=>f.name);
-  const missing = requiredFields.filter(f=>!presentFields.includes(f));
-  const out = document.getElementById('adsOutput');
-  if(missing.length > 0) {
-    out.textContent = `Build failed: Missing required fields: ${missing.join(', ')}. Add all fields before building.`; return;
-  }
-  const lines = [
+const ADS_TASKS=[{id:'add_emplid',label:'Add EMPLID (CHAR 11, Key)'},{id:'add_effdt',label:'Add EFFDT (DATE, Key)'},{id:'add_deptid',label:'Add DEPTID (CHAR 10)'},{id:'add_setid',label:'Add SETID (CHAR 5)'},{id:'build',label:'Click Build → Create Table'},];
+let adsState={fields:[],tasksCompleted:new Set()};
+function initAppDesigner(){adsState={fields:[],tasksCompleted:new Set()};document.getElementById('adsOutput').textContent='Ready.';renderADSFields();renderADSTasks();const r=document.getElementById('adsResult');r.classList.remove('show','correct','wrong');r.innerHTML='';}
+function renderADSTasks(){document.getElementById('adsTaskList').innerHTML=ADS_TASKS.map(t=>`<div class="ads-task ${adsState.tasksCompleted.has(t.id)?'done':''}" id="ads-task-${t.id}"><div class="ads-task-check">${adsState.tasksCompleted.has(t.id)?'✓':''}</div>${t.label}</div>`).join('');}
+function renderADSFields(){document.getElementById('adsFieldBody').innerHTML=adsState.fields.length===0?`<tr><td colspan="6" style="text-align:center;color:#888;padding:16px">No fields. Add from properties panel →</td></tr>`:adsState.fields.map((f,i)=>`<tr ${i===adsState.fields.length-1?'class="selected"':''}><td>${i+1}</td><td><strong>${f.name}</strong></td><td>${f.type}</td><td>${f.len||''}</td><td>${f.key?'<span style="color:#1f5a9a;font-size:16px">☑</span>':''}</td><td></td></tr>`).join('');}
+function adsAddField(){const sel=document.getElementById('adsAddFieldSelect');const val=sel.value;if(!val)return;const[name,type,len]=val.split('|');if(adsState.fields.find(f=>f.name===name)){document.getElementById('adsOutput').textContent=`${name} already exists.`;return;}adsState.fields.push({name,type,len,key:name==='EMPLID'||name==='EFFDT'});renderADSFields();document.getElementById('adsOutput').textContent=`${name} added.`;const m={EMPLID:'add_emplid',EFFDT:'add_effdt',DEPTID:'add_deptid',SETID:'add_setid'};if(m[name]){adsState.tasksCompleted.add(m[name]);renderADSTasks();}sel.value='';}
+function adsBuild(){
+  const req=['EMPLID','EFFDT','DEPTID','SETID'];
+  const present=adsState.fields.map(f=>f.name);
+  const missing=req.filter(f=>!present.includes(f));
+  const o=document.getElementById('adsOutput');
+  if(missing.length>0){o.textContent='Build failed. Missing fields: '+missing.join(', ');return;}
+  const ddl=[
     'Starting Build...',
     'Generating CREATE TABLE DDL...',
     '',
     'CREATE TABLE PS_EMP_DEPT_DATA (',
-    '   EMPLID      CHAR(11)  NOT NULL,',
-    '   EFFDT       DATE      NOT NULL,',
-    '   DEPTID      CHAR(10)  NOT NULL,',
-    '   SETID       CHAR(5)   NOT NULL',
+    '  EMPLID  CHAR(11) NOT NULL,',
+    '  EFFDT   DATE     NOT NULL,',
+    '  DEPTID  CHAR(10) NOT NULL,',
+    '  SETID   CHAR(5)  NOT NULL',
     ')',
     '',
-    'Building Indexes...',
-    'CREATE UNIQUE INDEX PS_EMP_DEPT_DATA ON PS_EMP_DEPT_DATA (EMPLID, EFFDT)',
+    'CREATE UNIQUE INDEX PS_EMP_DEPT_DATA',
+    '  ON PS_EMP_DEPT_DATA (EMPLID, EFFDT)',
     '',
     'SQL build succeeded.',
     '1 record processed: 0 errors, 0 warnings',
     'SQL written to C:\\TEMP\\PPSBUILD.SQL',
   ];
-  out.textContent = lines.join('\n');
+  o.textContent=ddl.join('\n');
   adsState.tasksCompleted.add('build');
   renderADSTasks();
-  // Check if all tasks done
-  if(adsState.tasksCompleted.size === ADS_TASKS.length) {
-    const res = document.getElementById('adsResult');
-    res.className = 'lab-result-box show correct';
-    res.innerHTML = `<div class="lab-result-box__title">✅ Record Built Successfully!</div>
-      <div class="lab-result-box__text">You created the <strong>EMP_DEPT_DATA</strong> SQL Table record with all required fields and built the physical database table <strong>PS_EMP_DEPT_DATA</strong>. This is exactly how developers create new records in PeopleSoft Application Designer.</div>`;
+  if(adsState.tasksCompleted.size===ADS_TASKS.length){
+    const r=document.getElementById('adsResult');
+    r.className='lab-result-box show correct';
+    r.innerHTML='<div class="lab-result-box__title">✅ Record Built Successfully!</div><div class="lab-result-box__text">You created <strong>PS_EMP_DEPT_DATA</strong> with all required fields and built the physical database table — just like real Application Designer development.</div>';
   }
 }
 
-/* ── MODE 6: PS SIMULATOR ── */
-const PS_TILES = [
-  {icon:'📊',title:'Timesheet Compliance',subtitle:'Updated every Monday',type:'chart'},
-  {icon:'⏰',title:'Timesheet',subtitle:'Enter & approve time',type:'tile'},
-  {icon:'📁',title:'Quick Projects',subtitle:'Contract & billing',type:'tile'},
-  {icon:'👤',title:'My Profile',subtitle:'Personal information',type:'tile'},
-  {icon:'✅',title:'Approvals',subtitle:'Pending items',type:'tile'},
-  {icon:'📈',title:'Reporting Tasks',subtitle:'Run & schedule reports',type:'tile'},
-];
-const PS_NAV_ITEMS = [
-  {label:'Recently Visited', icon:'🕒', subs:['Job Data','Personal Details','Benefits']},
-  {label:'Favorites', icon:'⭐', subs:['Employee Search','Pay Rate Change']},
-  {label:'Navigator', icon:'🧭', subs:[]},
-  {label:'Employee Self Service', icon:'👤', subs:['Personal Details','Pay','Benefits Summary']},
-  {label:'HR Administrator', icon:'🏢', subs:['Job Data','Position Management','Department Table']},
-  {label:'Benefits Administration', icon:'🛡️', subs:['Enrollment','Benefit Summary','Dependents']},
-  {label:'Payroll', icon:'💰', subs:['Run Payroll','Pay Calendar','Earnings Codes']},
-  {label:'Workforce Administration', icon:'📋', subs:['Personal Info','Job Information','Employment Data']},
-  {label:'Classic Home', icon:'🏠', subs:[]},
-];
-const PS_COMPONENTS = {
-  'Job Data': {title:'Job Data',subtitle:'Workforce Administration > Job Information > Job Data',fields:[{label:'Employee ID',val:'KR00123'},{label:'Name',val:'Koushik Ram M'},{label:'Effective Date',val:'03/30/2026'},{label:'Action',val:'HIR — Hire'},{label:'Department',val:'IT0001 — Information Technology'},{label:'Job Code',val:'IT001 — Software Developer'},{label:'Location',val:'HYD — Hyderabad'}]},
-  'Personal Details': {title:'Personal Details',subtitle:'Employee Self Service > Personal Information > Personal Details',fields:[{label:'Employee ID',val:'KR00123'},{label:'Name',val:'Koushik Ram M'},{label:'Date of Birth',val:'01/01/1999'},{label:'National ID',val:'XXXXX1234'},{label:'Email',val:'koushik@company.com'},{label:'Phone',val:'+91 9876543210'}]},
-  'Pay Rate Change': {title:'Pay Rate Change',subtitle:'HR Administrator > Compensation > Pay Rate Change',fields:[{label:'Employee ID',val:'KR00123'},{label:'Effective Date',val:'04/01/2026'},{label:'Action',val:'PAY — Pay Rate Change'},{label:'Current Salary',val:'₹ 8,00,000'},{label:'New Salary',val:'₹ 9,50,000'},{label:'Pay Group',val:'IND — India Monthly'}]},
-  'Department Table': {title:'Department Table',subtitle:'Set Up HCM > Foundation Tables > Organization > Departments',fields:[{label:'SetID',val:'SHARE'},{label:'Department ID',val:'IT0001'},{label:'Effective Date',val:'01/01/2020'},{label:'Description',val:'Information Technology'},{label:'Manager',val:'TechLead001'},{label:'Location',val:'HYD'}]},
-};
-
-let psSimUser = '';
-function initPSSim() {
-  showPSScreen('psLoginScreen');
-  document.getElementById('psUserId').value='';
-  document.getElementById('psPassword').value='';
-  document.getElementById('psLoginError').classList.remove('show');
-}
-function showPSScreen(id) {
-  ['psLoginScreen','psHomeScreen','psComponentScreen'].forEach(s=>{
-    const el=document.getElementById(s); if(el) el.classList.remove('active');
-  });
-  const el=document.getElementById(id); if(el) el.classList.add('active');
-}
-function psSignIn() {
-  const uid=document.getElementById('psUserId').value.trim();
-  const pwd=document.getElementById('psPassword').value;
-  document.getElementById('psLoginError').classList.remove('show');
-  if(!uid||!pwd) { document.getElementById('psLoginError').textContent='Please enter both User ID and Password.'; document.getElementById('psLoginError').classList.add('show'); return; }
-  psSimUser = uid;
-  document.getElementById('psLoggedUser').textContent = `Logged in as: ${uid.toUpperCase()}`;
-  buildPSHome();
-  showPSScreen('psHomeScreen');
-}
-function psSignOut() { showPSScreen('psLoginScreen'); }
-function psGoHome() { showPSScreen('psHomeScreen'); buildPSHome(); }
-
-function buildPSHome() {
-  // Tiles
-  document.getElementById('psTilesGrid').innerHTML = PS_TILES.map((t,i)=>
-    t.type==='chart'
-    ? `<div class="ps-tile chart-tile" onclick="psOpenComponent('${t.title}')">
-        <div class="ps-tile__chart-title">${t.title}</div>
-        <div style="display:flex;align-items:flex-end;gap:4px;height:60px;margin-bottom:6px">
-          ${[40,65,50,80,55,90,75].map(h=>`<div style="width:12px;background:#1e4d8c;height:${h}%;border-radius:2px 2px 0 0;opacity:0.7"></div>`).join('')}
-        </div>
-        <div style="font-size:10px;color:#888">${t.subtitle}</div>
-      </div>`
-    : `<div class="ps-tile" onclick="psOpenComponent('${t.title}')">
-        <div class="ps-tile__icon">${t.icon}</div>
-        <div class="ps-tile__title">${t.title}</div>
-        <div class="ps-tile__subtitle">${t.subtitle}</div>
-      </div>`
-  ).join('');
-  // Quick links
-  const qlinks = [
-    {icon:'📋',label:'View PeopleSoft'},
-    {icon:'✅',label:'Asset Allowances'},
-    {icon:'🔍',label:'Run a Query'},
-    {icon:'📄',label:'Your Docs'},
-  ];
-  document.getElementById('psQuickLinks').innerHTML = qlinks.map(q=>
-    `<div class="ps-quicklink" onclick="alert('${q.label} — Component would open here')"><span>${q.icon}</span>${q.label}</div>`
-  ).join('');
-  // NavBar
-  buildPSNav('');
-  document.getElementById('psNavBar').style.display='flex';
-}
-
-function psToggleNav() {
-  const nav=document.getElementById('psNavBar');
-  nav.style.display=nav.style.display==='none'?'flex':'none';
-}
-
-function buildPSNav(filter) {
-  document.getElementById('psNavItems').innerHTML = PS_NAV_ITEMS
-    .filter(item=>!filter||item.label.toLowerCase().includes(filter)||item.subs.some(s=>s.toLowerCase().includes(filter)))
-    .map((item,i)=>`
-      <div class="ps-navbar-section">
-        <div class="ps-navbar-item" onclick="psToggleNavItem(${i})">
-          <span class="ps-navbar-item-icon">${item.icon}</span>
-          ${item.label}
-          ${item.subs.length?'<span style="margin-left:auto;color:#aaa;font-size:12px">›</span>':''}
-        </div>
-        ${item.subs.length?`<div class="ps-navbar-sub" id="psnav-sub-${i}">
-          ${item.subs.map(s=>`<div class="ps-navbar-sub-item" onclick="psOpenComponent('${s}')"><span class="ps-sub-icon">📄</span>${s}</div>`).join('')}
-        </div>`:''}
-      </div>`
-    ).join('');
-}
-
-function psNavSearch(val) { buildPSNav(val.toLowerCase()); }
-
-function psToggleNavItem(i) {
-  const sub=document.getElementById(`psnav-sub-${i}`);
-  if(sub) sub.classList.toggle('open');
-}
-
-function psOpenComponent(name) {
-  const comp = PS_COMPONENTS[name];
-  const content = document.getElementById('psComponentContent');
-  showPSScreen('psComponentScreen');
-  if(!comp) {
-    content.innerHTML=`<div style="padding:20px"><p style="font-family:'Segoe UI';color:#888;font-size:14px">← <button onclick="psGoHome()" style="background:none;border:none;color:#1e4d8c;cursor:pointer;font-size:13px;font-family:'Segoe UI'">Back to Home</button></p><div style="background:#fff;border:1px solid #ddd;border-radius:6px;padding:24px;text-align:center;color:#888;font-family:'Segoe UI'">🚧 This component is not available in the simulator yet.<br><br><button onclick="psGoHome()" style="background:#1e4d8c;color:#fff;border:none;padding:8px 20px;border-radius:4px;cursor:pointer;font-family:'Segoe UI'">← Back to Homepage</button></div></div>`;
-    return;
-  }
-  content.innerHTML=`
-    <p style="font-family:'Segoe UI';font-size:12px;color:#888;margin-bottom:4px">
-      <button onclick="psGoHome()" style="background:none;border:none;color:#1e4d8c;cursor:pointer;font-size:12px;font-family:'Segoe UI'">🏠 Home</button>
-      › ${comp.subtitle}
-    </p>
-    <div style="background:#fff;border:1px solid #ddd;border-radius:6px;overflow:hidden">
-      <div style="background:linear-gradient(180deg,#1e4d8c,#163f75);padding:12px 16px;display:flex;align-items:center;justify-content:space-between">
-        <div style="color:#fff;font-family:'Segoe UI';font-size:14px;font-weight:600">${comp.title}</div>
-        <div style="display:flex;gap:8px">
-          <button style="background:rgba(255,255,255,0.2);color:#fff;border:none;padding:5px 14px;font-size:12px;cursor:pointer;border-radius:3px;font-family:'Segoe UI'">💾 Save</button>
-          <button onclick="psGoHome()" style="background:rgba(255,255,255,0.1);color:#fff;border:none;padding:5px 14px;font-size:12px;cursor:pointer;border-radius:3px;font-family:'Segoe UI'">✕ Cancel</button>
-        </div>
-      </div>
-      <div style="padding:20px">
-        <table style="width:100%;border-collapse:collapse;font-family:'Segoe UI';font-size:13px">
-          ${comp.fields.map(f=>`
-            <tr>
-              <td style="padding:8px 16px 8px 0;color:#555;font-weight:600;width:180px;vertical-align:top">${f.label}</td>
-              <td style="padding:8px 0"><input type="text" value="${f.val}" style="border:1px solid #ccc;padding:6px 10px;border-radius:3px;font-size:13px;font-family:'Segoe UI';color:#222;min-width:200px"/></td>
-            </tr>`).join('')}
-        </table>
-      </div>
-    </div>`;
-}
-
-
-
-
-/* PSLearn — Application Logic */
+function psSignIn(){const u=document.getElementById('psUserId').value.trim(),p=document.getElementById('psPassword').value;document.getElementById('psLoginError').classList.remove('show');if(!u||!p){document.getElementById('psLoginError').textContent='Enter both User ID and Password.';document.getElementById('psLoginError').classList.add('show');return;}document.getElementById('psLoggedUser').textContent=`Logged in as: ${u.toUpperCase()}`;buildPSHome();showPSScreen('psHomeScreen');}
+function psSignOut(){showPSScreen('psLoginScreen');}
+function psGoHome(){showPSScreen('psHomeScreen');buildPSHome();}
+function buildPSHome(){document.getElementById('psTilesGrid').innerHTML=PS_TILES.map(t=>t.type==='chart'?`<div class="ps-tile chart-tile" onclick="psOpenComponent('${t.title}')"><div class="ps-tile__chart-title">${t.title}</div><div style="display:flex;align-items:flex-end;gap:4px;height:60px;margin-bottom:6px">${[40,65,50,80,55,90,75].map(h=>`<div style="width:12px;background:#1e4d8c;height:${h}%;border-radius:2px 2px 0 0;opacity:.7"></div>`).join('')}</div><div style="font-size:10px;color:#888">${t.subtitle}</div></div>`:`<div class="ps-tile" onclick="psOpenComponent('${t.title}')"><div class="ps-tile__icon">${t.icon}</div><div class="ps-tile__title">${t.title}</div><div class="ps-tile__subtitle">${t.subtitle}</div></div>`).join('');document.getElementById('psQuickLinks').innerHTML=[{i:'📋',l:'View PeopleSoft'},{i:'✅',l:'Asset Allowances'},{i:'🔍',l:'Run a Query'},{i:'📄',l:'Your Docs'}].map(q=>`<div class="ps-quicklink" onclick="alert('${q.l}')"><span>${q.i}</span>${q.l}</div>`).join('');buildPSNav('');document.getElementById('psNavBar').style.display='flex';}
+function psToggleNav(){const n=document.getElementById('psNavBar');n.style.display=n.style.display==='none'?'flex':'none';}
+function buildPSNav(f){document.getElementById('psNavItems').innerHTML=PS_NAV.filter(item=>!f||item.label.toLowerCase().includes(f)||item.subs.some(s=>s.toLowerCase().includes(f))).map((item,i)=>`<div class="ps-navbar-section"><div class="ps-navbar-item" onclick="psToggleNavItem(${i})"><span class="ps-navbar-item-icon">${item.icon}</span>${item.label}${item.subs.length?'<span style="margin-left:auto;color:#aaa;font-size:12px">›</span>':''}</div>${item.subs.length?`<div class="ps-navbar-sub" id="psnav-sub-${i}">${item.subs.map(s=>`<div class="ps-navbar-sub-item" onclick="psOpenComponent('${s}')"><span class="ps-sub-icon">📄</span>${s}</div>`).join('')}</div>`:''}</div>`).join('');}
+function psNavSearch(v){buildPSNav(v.toLowerCase());}
+function psToggleNavItem(i){const s=document.getElementById(`psnav-sub-${i}`);if(s)s.classList.toggle('open');}
+function psOpenComponent(name){const c=PS_COMPS[name];showPSScreen('psComponentScreen');const el=document.getElementById('psComponentContent');if(!c){el.innerHTML=`<p style="font-family:'Segoe UI';font-size:13px;color:#888"><button onclick="psGoHome()" style="background:none;border:none;color:#1e4d8c;cursor:pointer;font-family:'Segoe UI'">🏠 Home</button></p><div style="background:#fff;border:1px solid #ddd;border-radius:6px;padding:24px;text-align:center;color:#888;font-family:'Segoe UI'">🚧 Not in simulator yet.<br><br><button onclick="psGoHome()" style="background:#1e4d8c;color:#fff;border:none;padding:8px 20px;border-radius:4px;cursor:pointer">← Home</button></div>`;return;}el.innerHTML=`<p style="font-family:'Segoe UI';font-size:12px;color:#888;margin-bottom:4px"><button onclick="psGoHome()" style="background:none;border:none;color:#1e4d8c;cursor:pointer;font-size:12px;font-family:'Segoe UI'">🏠</button> › ${c.sub}</p><div style="background:#fff;border:1px solid #ddd;border-radius:6px;overflow:hidden"><div style="background:linear-gradient(180deg,#1e4d8c,#163f75);padding:12px 16px;display:flex;align-items:center;justify-content:space-between"><div style="color:#fff;font-family:'Segoe UI';font-size:14px;font-weight:600">${c.title}</div><div style="display:flex;gap:8px"><button style="background:rgba(255,255,255,.2);color:#fff;border:none;padding:5px 14px;font-size:12px;cursor:pointer;border-radius:3px;font-family:'Segoe UI'">💾 Save</button><button onclick="psGoHome()" style="background:rgba(255,255,255,.1);color:#fff;border:none;padding:5px 14px;font-size:12px;cursor:pointer;border-radius:3px;font-family:'Segoe UI'">✕</button></div></div><div style="padding:20px"><table style="width:100%;border-collapse:collapse;font-family:'Segoe UI';font-size:13px">${c.fields.map(f=>`<tr><td style="padding:8px 16px 8px 0;color:#555;font-weight:600;width:160px">${f.l}</td><td><input type="text" value="${f.v}" style="border:1px solid #ccc;padding:6px 10px;border-radius:3px;font-size:13px;font-family:'Segoe UI';color:#222;min-width:200px"/></td></tr>`).join('')}</table></div></div>`;}
 
 
 /* ═══════════════════════════════════════════════
@@ -1017,7 +614,7 @@ function psOpenComponent(name) {
 /* ═══════════════════════════════════════════════
    QUIZ ENGINE — 100 QUESTION BANK
 ═══════════════════════════════════════════════ */
-// QUIZ_BANK — loaded from pslearn-data.js
+// QUIZ_BANK in pslearn-data.js
 
 /* ═══════════════════════════════════════════════
    QUIZ STATE & ENGINE
@@ -1040,10 +637,7 @@ const QUIZ_MODULE_CATEGORIES = [
 ];
 
 function showQuiz() {
-  ['homepageView','appView','glossaryView'].forEach(id => {
-    const el = document.getElementById(id);
-    if(el) el.style.display = 'none';
-  });
+  switchView('quizView');
   document.getElementById('quizView').style.display = 'block';
   document.getElementById('quizHome').style.display = 'block';
   document.getElementById('quizActive').style.display = 'none';
@@ -1296,7 +890,7 @@ function buildReview(){
 /* ═══════════════════════════════════════════════
    HOMEPAGE DATA
 ═══════════════════════════════════════════════ */
-// CURRICULUM_LIST — loaded from pslearn-data.js
+// CURRICULUM_LIST in pslearn-data.js
 
 /* ═══════════════════════════════════════════════
    VISITED TOPICS TRACKER
@@ -1398,8 +992,7 @@ function homepageSearch(val) {
 
     chunks.forEach(({text, label}) => {
       const lc = text.toLowerCase();
-      const expandedQ = expandQuery(q);
-      if (!lc.includes(q) && !lc.includes(expandedQ) && !fuzzyMatch(text, q)) return;
+      if (!lc.includes(q)) return;
 
       // Score based on where match is found
       if (label === 'Title') score += 100;
@@ -1497,10 +1090,10 @@ document.addEventListener('keydown', e => {
 
   if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
     e.preventDefault();
-    if (currentTopicIndex < TOPICS.length - 1) openTopic(currentTopicIndex + 1);
+    if (currentTopicIndex < (currentIsIntermediate ? INTERMEDIATE_TOPICS : TOPICS).length - 1) openTopic(currentTopicIndex + 1, currentIsIntermediate);
   } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
     e.preventDefault();
-    if (currentTopicIndex > 0) openTopic(currentTopicIndex - 1);
+    if (currentTopicIndex > 0) openTopic(currentTopicIndex - 1, currentIsIntermediate);
   }
 });
 
@@ -1508,87 +1101,7 @@ document.addEventListener('keydown', e => {
 /* ═══════════════════════════════════════════════
    VIEW MANAGEMENT
 ═══════════════════════════════════════════════ */
-function showHome() {
-  ['appView','glossaryView','quizView','interviewView','labView'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = 'none';
-  });
-  document.getElementById('homepageView').style.display = 'block';
-  closeDrawer();
-  showResumeBanner();
-  window.scrollTo(0,0);
-}
 
-function showApp() {
-  document.getElementById('homepageView').style.display = 'none';
-  document.getElementById('appView').style.display = 'block';
-  ['glossaryView','quizView','interviewView','labView'].forEach(id => {
-    const el = document.getElementById(id); if(el) el.style.display='none';
-  });
-}
-
-function openTopic(index) {
-  currentTopicIndex = index;
-  visited.add(index);
-  saveProgress(); // persist to localStorage
-  showApp();
-  buildSidebar();
-  renderTopic(index);
-  updateProgress();
-  // Update mobile topbar
-  const topic = TOPICS[index];
-  const titleEl = document.getElementById('mobileTopicTitle');
-  const countEl = document.getElementById('mobileTopicCount');
-  if (titleEl) titleEl.textContent = topic.title;
-  if (countEl) countEl.textContent = `${String(index+1).padStart(2,'0')}/${TOPICS.length}`;
-  // Update desktop back bar breadcrumb
-  const bc = document.getElementById('desktopTopicBreadcrumb');
-  if (bc) bc.textContent = `Topic ${index+1} of ${TOPICS.length} — ${topic.title}`;
-  // Close drawer after topic selection on mobile
-  closeDrawer();
-  // Auto-open first section
-  setTimeout(() => {
-    const firstHeader = document.querySelector('.section-block__header');
-    if (firstHeader) firstHeader.click();
-  }, 50);
-}
-
-/* ═══════════════════════════════════════════════
-   SIDEBAR
-═══════════════════════════════════════════════ */
-function buildSidebar(filter = '') {
-  const body = document.getElementById('sidebarBody');
-  body.innerHTML = '';
-
-  let lastModule = -1;
-
-  TOPICS.forEach((topic, idx) => {
-    if (filter && !topic.title.toLowerCase().includes(filter.toLowerCase())) return;
-
-    if (topic.module !== lastModule) {
-      const mod = MODULES[topic.module];
-      const header = document.createElement('div');
-      header.className = 'sidebar__module-header';
-      header.innerHTML = `<span>${mod.icon}</span><span style="color:${mod.color}">${mod.name}</span>`;
-      body.appendChild(header);
-      lastModule = topic.module;
-    }
-
-    const btn = document.createElement('button');
-    btn.className = 'sidebar__topic' + (idx === currentTopicIndex ? ' active' : '');
-    btn.innerHTML = `
-      <span class="sidebar__topic-num">${topic.num}</span>
-      <span style="flex:1;text-align:left">${topic.title}</span>
-      ${visited.has(idx) && idx !== currentTopicIndex ? '<span style="color:var(--green);font-size:11px">✓</span>' : ''}
-    `;
-    btn.onclick = () => openTopic(idx);
-    body.appendChild(btn);
-  });
-}
-
-function filterTopics(val) {
-  buildSidebar(val);
-}
 
 /* ═══════════════════════════════════════════════
    PROGRESS
@@ -1603,9 +1116,10 @@ function updateProgress() {
 /* ═══════════════════════════════════════════════
    TOPIC RENDERER
 ═══════════════════════════════════════════════ */
-function renderTopic(index) {
-  const topic = TOPICS[index];
-  const mod = MODULES[topic.module];
+function renderTopic(index, isIntermediate=false) {
+  const topicList = isIntermediate ? INTERMEDIATE_TOPICS : TOPICS;
+  const topic = topicList[index];
+  const mod = isIntermediate ? {name:"Intermediate",icon:"⚡",color:"#8b5cf6"} : MODULES[topic.module];
   const container = document.getElementById('topicContent');
 
   // ── PRE-CHECKLIST (Feature 7) ──
@@ -2342,17 +1856,10 @@ function renderPageDesignSVG() {
 /* ═══════════════════════════════════════════════
    GLOSSARY DATA & FUNCTIONS (Feature 10)
 ═══════════════════════════════════════════════ */
-// GLOSSARY — loaded from pslearn-data.js
+// GLOSSARY in pslearn-data.js
 
 let currentGlossaryFilter = 'all';
 
-function showGlossary() {
-  document.getElementById('homepageView').style.display = 'none';
-  document.getElementById('appView').style.display = 'none';
-  document.getElementById('glossaryView').style.display = 'block';
-  renderGlossary('', 'all');
-  window.scrollTo(0,0);
-}
 
 function filterGlossary(val) {
   renderGlossary(val, currentGlossaryFilter);
@@ -2455,7 +1962,8 @@ function copyCode(btn, b64) {
       <span>${topic}</span>
       <span class="topic-item__arrow">›</span>
     `;
-    if (isClickable) div.onclick = () => openTopic(i);
+    if (isBeginner) div.onclick = () => openTopic(i, false);
+    if (isIntermediate) div.onclick = () => openTopic(i, true);
     grid.appendChild(div);
   });
 });
@@ -2513,8 +2021,3 @@ const statsObs = new IntersectionObserver(entries => {
 }, { threshold: 0.5 });
 const statsBar = document.querySelector('.stats-bar');
 if (statsBar) statsObs.observe(statsBar);
-
-// Load saved progress on startup
-loadProgress();
-updateProgress();
-showResumeBanner();

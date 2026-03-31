@@ -1902,6 +1902,1262 @@ PTPT1000 (or similar names like ALLPAGES) is the super-user permission list that
   },
 ];
 
+/* ── INTERMEDIATE TOPICS (10) ── */
+const INTERMEDIATE_TOPICS = [
+  {
+    id:"app-engine-basics", module:7, num:"21",
+    title:"Application Engine Basics",
+    level:"intermediate",
+    summary:"Application Engine (AE) is PeopleSoft's batch processing framework for large-scale data operations. Instead of running logic online in a component, AE runs as a separate batch process — handling thousands or millions of rows without impacting online users.",
+    preChecklist:[
+      "You understand PeopleCode basics (SQLExec, variables, loops)",
+      "You know what Process Monitor is and how to submit a batch job",
+      "You understand what a Run Control record is",
+    ],
+    keyPoints:[
+      "AE runs batch jobs outside the online component session — never impacts online users",
+      "Structure: Program → Sections → Steps → Actions (SQL, PeopleCode, Do Select, Do When)",
+      "Checkpoint/restart: AE saves progress per Section — restarts from last successful Section if it fails",
+      "State Records persist values between Steps and Sections throughout the AE run",
+      "CallAppEngine() in PeopleCode triggers AE synchronously from a component SavePostChange",
+    ],
+    sections:[
+      {
+        title:"What is Application Engine?",
+        body:`Application Engine is PeopleSoft's batch processing framework. You use it when you need to process large volumes of data — payroll calculations, data migrations, mass updates, interface file processing — outside of the online component session.
+
+**Why not just write a PeopleCode SavePostChange?**
+Components are designed for real-time single-record transactions. If you need to update 500,000 employee records overnight, a component would time out and block other users. AE runs as a completely separate process via the Process Scheduler.
+
+**The core structure:**
+Every AE Program is organized into:
+- **Sections** — logical groupings (like functions)
+- **Steps** — units of work within a Section
+- **Actions** — what each step actually does (SQL, PeopleCode, Do Select, Call Section, Do When)`
+      },
+      {
+        title:"AE Action Types",
+        body:`AE has 6 action types you'll use constantly:
+
+**SQL** — executes a SQL statement directly. Most AE work is SQL:
+\`\`\`
+UPDATE PS_JOB SET DEPTID = 'HR001'
+WHERE EMPLID = %Bind(EMPLID)
+AND EFFDT = (SELECT MAX(EFFDT)...)
+\`\`\`
+
+**PeopleCode** — runs PeopleCode for complex logic that SQL can't handle. Calls functions, handles errors, calls Component Interfaces.
+
+**Do Select** — loops through rows returned by a SQL SELECT. For each row, executes child Steps. The most common AE pattern:
+\`\`\`
+SELECT EMPLID, DEPTID FROM PS_STAGE_TABLE
+WHERE PROCESSED = 'N'
+\`\`\`
+
+**Do When** — conditional: if this SQL returns a row, execute this Step. Acts as an IF statement in AE flow.
+
+**Do While** — loop while condition is true.
+
+**Call Section** — calls another Section (like a function call). Enables modular AE design.`
+      },
+      {
+        title:"State Records and Run Controls",
+        body:`**State Records** are how AE shares values between Steps. They persist for the entire AE run — unlike Local variables in PeopleCode which only last one program execution.
+
+Example State Record fields:
+- EMPLID — current employee being processed
+- PROCESS_DATE — the date parameter from Run Control
+- ERROR_COUNT — running error count
+- PROCESSED_COUNT — running success count
+
+**Run Control** is how users pass parameters to AE:
+1. User opens Run Control page, enters parameters (Pay Period, Company, Date Range)
+2. User clicks Run — submits to Process Scheduler
+3. AE reads Run Control record at startup using OPRID + RUN_CNTL_ID keys
+4. AE processes using those parameters
+
+**CommitWork()** — called in PeopleCode action to commit the current transaction mid-run. Critical for large batch jobs — prevents one giant DB transaction. After CommitWork, AE saves a checkpoint so if it fails, restart resumes from that point.`
+      },
+      {
+        title:"Checkpoint and Restart",
+        body:`One of AE's most valuable features — if a batch job fails halfway through, you don't start over.
+
+**How it works:**
+- At the start of each Section, AE writes a checkpoint to PS_AERUNCONTROL
+- If the job fails in Section 5 of 8, you can restart the same Process Instance
+- AE resumes from Section 5 — Sections 1-4 are not re-executed
+
+**What you need to ensure:**
+- Each Section's work must be idempotent where possible (safe to re-run)
+- Use a PROCESSED flag on your staging table:
+\`\`\`
+UPDATE PS_STAGE SET PROCESSED = 'Y' WHERE EMPLID = %Bind(EMPLID)
+\`\`\`
+- CommitWork() at the end of each logical unit
+
+**Disabling restart:** Some programs should always run fresh — set "Disable Restart" on the AE Program properties.`
+      },
+      {
+        title:"Running and Monitoring Application Engine",
+        body:`**Submitting AE:**
+1. User navigates to the Run Control page
+2. Enters parameters, clicks Run
+3. Process Scheduler receives the request
+4. PSPRCSRV spawns the AE process
+5. AE reads Run Control, executes Steps, logs output
+
+**Monitoring in Process Monitor:**
+- Status: Queued → Initiated → Processing → Success/Error
+- Click the process → View Log/Trace for detailed execution info
+- The message log shows each Section completed
+- Error log shows the exact Step and SQL that failed
+
+**Enabling AE Trace:**
+Run Control → Process Monitor → Trace options:
+- SQL Trace — logs every SQL executed with row counts and timing
+- PeopleCode Trace — logs every PeopleCode statement
+- Use trace only in DEV/QA — never in PROD (performance impact)
+
+**Typical AE diagnostic steps:**
+1. Process Monitor → Error → View Log/Trace
+2. Read the error message (usually a SQL error or PeopleCode exception)
+3. Identify the Section and Step
+4. Check the SQL or PeopleCode for the issue
+5. Fix data or code, then restart`
+      },
+    ],
+    realWorld:`In an HCM implementation, a client needed to synchronize 80,000 employees from an HR legacy system into PeopleSoft every night. The AE program read from a staging table loaded by an SFTP file, called the Component Interface for each employee to ensure all hire/transfer business rules fired, committed every 500 records, and wrote errors to an error table. The whole job ran in 4 hours with full restart capability — if it failed at record 60,000, it resumed there, not from record 1.`,
+    mistakes:[
+      {title:"Not using CommitWork()", desc:"Processing 500,000 rows in one transaction creates a massive DB undo log. If it fails at row 499,999, the entire transaction rolls back. Always CommitWork() every few hundred rows."},
+      {title:"SQLExec in Do Select PeopleCode", desc:"Putting SQLExec inside PeopleCode that runs for each row of a Do Select creates nested N×N DB calls. Pre-fetch reference data before the loop or use SQL JOINs in the Do Select query itself."},
+      {title:"Not handling errors gracefully", desc:"An unhandled exception in AE PeopleCode causes the entire job to error. Always wrap PeopleCode in Try/Catch and log errors to a table rather than aborting the entire batch run."},
+    ],
+    quiz:[
+      {q:"What AE action type loops through rows from a SQL query?",options:["Do When","Do Select","Call Section","SQL"],correct:1,explanation:"Do Select executes a SELECT, then for each returned row, executes child Steps. The most common AE looping pattern."},
+      {q:"What does CommitWork() do in Application Engine?",options:["Ends the AE program","Commits the current DB transaction mid-run without ending AE","Saves the Run Control","Calls another AE program"],correct:1,explanation:"CommitWork() commits the current transaction to DB and saves a checkpoint — allowing restart from that point if the job fails later. Critical for large batch jobs."},
+      {q:"Where does AE read its processing parameters from?",options:["System variables","Run Control record keyed by OPRID + RUN_CNTL_ID","State Record only","Component buffer"],correct:1,explanation:"At startup, AE reads the Run Control record using the Process Instance's OPRID and RUN_CNTL_ID to get the user-entered parameters."},
+    ],
+    peopleBooksUrl:"https://docs.oracle.com/cd/F44947_01/pt858pbr3/eng/pt/taae/",
+  },
+  {
+    id:"app-engine-advanced", module:7, num:"22",
+    title:"Application Engine Advanced",
+    level:"intermediate",
+    summary:"Parallel processing with Temp Tables, dynamic SQL, and performance optimization patterns that separate basic AE knowledge from expert-level batch development.",
+    preChecklist:[
+      "You completed Application Engine Basics (Topic 21)",
+      "You understand what database indexes are",
+      "You know PeopleCode variable scopes",
+    ],
+    keyPoints:[
+      "Temp Tables enable parallel AE — each instance uses its own table instance, preventing data collision",
+      "Dynamic SQL builds SQL at runtime using PeopleCode — the query can change based on parameters",
+      "Parallel processing spawns multiple AE child processes, each processing a data subset simultaneously",
+      "Meta-SQL functions (%Table, %Bind, %CurrentDateIn) make AE SQL database-independent",
+      "The master-worker pattern: master AE spawns workers, each processes a partition, master waits for all",
+    ],
+    sections:[
+      {
+        title:"Temp Tables and Parallel Processing",
+        body:`**What are Temp Tables in AE?**
+When multiple AE instances run simultaneously, they can't share a staging table — they'd overwrite each other's data. Temp Tables solve this.
+
+When you define a Record as Temp Table type in Application Designer, PeopleSoft creates multiple instances:
+- PS_MYTEMP_AET (base definition)
+- PS_MYTEMP_AET1 (instance 1)
+- PS_MYTEMP_AET2 (instance 2)
+- ... up to the number you configure
+
+Each parallel AE instance is assigned its own instance number. When AE SQL references %Table(MYTEMP), it automatically resolves to PS_MYTEMP_AET1, PS_MYTEMP_AET2, etc. — no collision.
+
+**Configuring Temp Tables:**
+In App Designer → AE Program Properties → Temp Tables tab → Add your Temp Table record → set instance count (typically 5-10 for most programs).
+
+**The parallel pattern:**
+\`\`\`
+Master AE:
+  Section 1: Partition data into groups (by DEPTID ranges)
+  Section 2: Spawn worker AE instances (one per partition)
+  Section 3: Wait for all workers to complete
+  Section 4: Consolidate results, clean up Temp Tables
+
+Worker AE:
+  Section 1: Process my assigned partition from Temp Table
+  Section 2: Write results, update PROCESSED flag
+\`\`\``
+      },
+      {
+        title:"Dynamic SQL in Application Engine",
+        body:`Sometimes your SQL query needs to change based on runtime conditions — a dynamic WHERE clause, or a table name determined at runtime.
+
+**Method 1: %Bind() in SQL action**
+Set a State Record field in a PeopleCode step, then reference it in the SQL action:
+\`\`\`
+/* PeopleCode step */
+MY_STATE_REC.WHERE_CLAUSE.Value = "AND COMPANY = 'GBL'";
+
+/* SQL step uses the value */
+UPDATE PS_JOB
+SET STATUS_FLAG = 'Y'
+WHERE EFFDT <= %CurrentDateIn
+%Bind(WHERE_CLAUSE, NOQUOTES, STATIC)
+\`\`\`
+
+**Method 2: Build SQL in PeopleCode**
+\`\`\`
+Local string &sql;
+&sql = "UPDATE " | %Table(JOB) | " SET STATUS = 'P' ";
+&sql = &sql | "WHERE EMPLID = '" | MY_STATE.EMPLID.Value | "'";
+SQLExec(&sql);
+\`\`\`
+
+**When to use dynamic SQL:**
+- Table name changes based on environment
+- WHERE clause varies by Run Control parameters
+- Column list changes based on configuration
+
+**Warning:** Dynamic SQL is harder to optimize and debug. Use only when static SQL genuinely can't meet the requirement.`
+      },
+      {
+        title:"AE Performance Optimization",
+        body:`**1. Use SQL actions, not PeopleCode, for set-based operations**
+Bad: PeopleCode loop calling SQLExec for each employee:
+\`\`\`
+For &i = 1 To &count
+   SQLExec("UPDATE PS_JOB SET X = :1 WHERE EMPLID = :2", &val, &emplid[&i]);
+End-For;
+\`\`\`
+
+Good: Single set-based SQL:
+\`\`\`
+UPDATE PS_JOB SET X = 'VALUE'
+WHERE EMPLID IN (SELECT EMPLID FROM PS_STAGE_TBL WHERE FLAG = 'N')
+\`\`\`
+
+**2. Stage data in Temp Tables before processing**
+- Load all needed data into Temp Tables in Section 1
+- Process from Temp Tables in Section 2
+- Temp Table queries are faster because they're smaller and indexed for your specific processing
+
+**3. Create indexes on Temp Tables**
+Temp Tables without proper indexes cause full table scans. Add indexes in App Designer on the Temp Table record for the fields used in WHERE clauses.
+
+**4. CommitWork frequency**
+Too few commits = huge rollback segments, failure = restart from beginning.
+Too many commits = overhead per commit, slower total throughput.
+Rule of thumb: commit every 500-1000 rows.
+
+**5. Avoid re-select when Select Once is sufficient**
+Do Select has two modes — Re-Select (re-executes the SELECT each iteration) and Select Once (fetches all, iterates). Use Select Once unless the data genuinely changes during processing.`
+      },
+    ],
+    realWorld:`A client's monthly payroll calculation AE was taking 14 hours for 200,000 employees — too close to the cutoff window. Analysis showed: no indexes on the primary Temp Table, Do Select was set to Re-Select (requerying the DB each iteration), and CommitWork was called every row (massive overhead). Fixes: added correct Temp Table indexes, changed to Select Once, CommitWork every 1,000 rows, and converted two nested PeopleCode loops to single set-based SQL UPDATEs. Result: runtime dropped to 2.5 hours.`,
+    mistakes:[
+      {title:"No indexes on Temp Tables", desc:"Temp Tables without indexes cause full table scans for every Do Select loop iteration. Always create indexes on Temp Table fields used in WHERE clauses — even though Temp Tables are temporary, they need indexes for performance."},
+      {title:"Using Re-Select when Select Once is enough", desc:"Re-Select re-executes the SELECT query on every loop iteration. If the source data doesn't change during processing, this is wasted DB calls. Use Select Once unless you genuinely need fresh data each iteration."},
+      {title:"Forgetting to clean up Temp Tables", desc:"If the AE fails mid-run and doesn't clean up, Temp Table rows from the failed run remain. The next run may process stale data. Always have a cleanup Section at the start that deletes rows from the previous run."},
+    ],
+    quiz:[
+      {q:"Why do Temp Tables have multiple instances (AET, AET1, AET2)?",options:["For backup purposes","To allow parallel AE processes to work simultaneously without data collision","To store different data types","For audit logging"],correct:1,explanation:"Each parallel AE instance gets its own Temp Table instance number. %Table(MYTEMP) resolves differently for each instance — preventing parallel processes from overwriting each other's data."},
+      {q:"What is the correct Do Select mode if source data doesn't change during processing?",options:["Re-Select","Select Once","Do While","Do When"],correct:1,explanation:"Select Once fetches all rows into memory once, then iterates. Re-Select re-executes the SELECT each iteration — wasteful if data doesn't change. Select Once is more efficient for static data sets."},
+    ],
+    peopleBooksUrl:"https://docs.oracle.com/cd/F44947_01/pt858pbr3/eng/pt/taae/",
+  },
+  {
+    id:"component-interface", module:7, num:"23",
+    title:"Component Interface",
+    level:"intermediate",
+    summary:"Component Interface (CI) provides programmatic access to a PeopleSoft component — firing the same PeopleCode events as the online page. The correct way to load data into PeopleSoft when business rules must run.",
+    preChecklist:[
+      "You understand the Component Buffer and PeopleCode events",
+      "You know the difference between Add and Update component modes",
+      "You understand Application Engine basics",
+    ],
+    keyPoints:[
+      "CI fires the same PeopleCode events as the online component — FieldDefault, SaveEdit, PostBuild all run",
+      "Use CI when business rules must execute during data load — never bypass with direct SQL for transactions",
+      "CI is created from an existing component in Application Designer — File → Create Component Interface",
+      "Properties map to fields, Collections map to grids/scrolls",
+      "Error handling: always wrap CI calls in Try/Catch and log errors to a staging table",
+    ],
+    sections:[
+      {
+        title:"What is a Component Interface?",
+        body:`A Component Interface is a programmatic API wrapper around an existing PeopleSoft component. Instead of a human user interacting with the page, your code interacts with the CI — and PeopleSoft treats it exactly like a user opening the page.
+
+**Why does this matter?**
+When you call a CI to hire an employee:
+- FieldDefault fires — defaults the department, location, job code
+- PostBuild fires — initializes component-level logic
+- SaveEdit fires — validates the hire data against business rules
+- WorkFlow fires — routes hire approval if configured
+- SavePostChange fires — triggers downstream integrations
+
+**If you insert directly into PS_JOB via SQL:**
+- None of these events fire
+- Business rules are bypassed
+- Downstream integrations may not trigger
+- Data integrity is at risk
+
+**The rule:** For any transactional data (hires, transfers, benefit enrollment, purchase orders) — use CI. For reference/setup data (department table, job code table) — direct SQL is acceptable.`
+      },
+      {
+        title:"Creating a Component Interface",
+        body:`**Step-by-step in Application Designer:**
+
+1. Open the target component (e.g., JOB_DATA component for hires)
+2. File → Create Component Interface
+3. Application Designer prompts: "Create CI from this component?"
+4. The CI is created with the same name as the component by default
+5. Map the Keys (component search keys become CI keys)
+6. Test in CI Tester: Tools → Test Component Interface
+
+**CI Structure:**
+\`\`\`
+CI: JOB_DATA
+  Keys:
+    EMPLID (required to open existing)
+    EMPL_RCD
+    EFFDT
+  Properties (Level 0):
+    COMPANY.Value
+    DEPTID.Value
+    LOCATION.Value
+  Collections (Level 1 — grids):
+    JOB_EARNS_DIST (get/add earnings distribution rows)
+\`\`\`
+
+**Generated PeopleCode template:**
+After creating the CI, use File → Generate PeopleCode Template. This creates a complete code skeleton showing exactly how to call the CI — extremely useful starting point for your AE or IB handler.`
+      },
+      {
+        title:"Calling a Component Interface from Application Engine",
+        body:`Standard CI call pattern in AE PeopleCode action:
+
+\`\`\`
+import PSXP_RPTDEFNMANAGER:*;
+
+/* Get the CI object */
+Local ApiObject &session;
+Local ApiObject &ci;
+Local ApiObject &keys;
+
+&session = %Session;
+&ci = &session.GetCompIntfc(CompIntfc.JOB_DATA);
+
+If None(&ci) Then
+   /* CI not found — log error */
+   MY_STATE.ERROR_MSG.Value = "Could not get CI JOB_DATA";
+   Return;
+End-If;
+
+/* Set mode */
+&ci.InteractiveMode = False;  /* faster — batches validations */
+&ci.GetHistoryItems = False;  /* don't load all history rows */
+&ci.EditHistoryItems = False;
+
+/* Set keys to find existing record */
+&ci.EMPLID = MY_STATE.EMPLID.Value;
+&ci.EMPL_RCD = 0;
+
+/* Get existing component */
+If &ci.Get() Then
+   /* Add new effective-dated row */
+   &ci.JOB.InsertItem(&ci.JOB.Count);
+   Local ApiObject &newRow = &ci.JOB.Item(&ci.JOB.Count);
+   &newRow.EFFDT = MY_STATE.PROCESS_DATE.Value;
+   &newRow.EFFSEQ = 0;
+   &newRow.ACTION = "XFR";
+   &newRow.DEPTID = MY_STATE.NEW_DEPTID.Value;
+   
+   /* Save */
+   If &ci.Save() Then
+      MY_STATE.PROCESSED.Value = "Y";
+   Else
+      MY_STATE.ERROR_MSG.Value = &ci.GetError().ToString();
+   End-If;
+Else
+   MY_STATE.ERROR_MSG.Value = "Employee not found: " | MY_STATE.EMPLID.Value;
+End-If;
+\`\`\``
+      },
+      {
+        title:"CI Error Handling and Performance",
+        body:`**Error Handling:**
+Always wrap CI calls and check return values:
+\`\`\`
+If Not &ci.Save() Then
+   Local ApiObject &errObj = &ci.GetError();
+   MY_STATE.ERROR_MSG.Value = &errObj.ToString();
+   /* Don't abort — log error and continue to next record */
+End-If;
+\`\`\`
+
+Write errors to an error table with EMPLID, error message, and timestamp. Report on errors after the batch completes rather than stopping mid-run.
+
+**Performance Considerations:**
+CI is significantly slower than direct SQL because it:
+- Opens a full component buffer per record
+- Fires all PeopleCode events
+- Performs all validations
+
+Typical throughput: 500–2,000 records per hour depending on component complexity.
+
+For 50,000 records: expect 25–100 hours with a single AE instance. Use parallel processing with Temp Tables to split the workload across multiple instances.
+
+**InteractiveMode = False:**
+Setting this to False batches validations instead of checking field-by-field — faster but still fires all events on Save. Always set this for batch CI calls.`
+      },
+    ],
+    realWorld:`During an HCM implementation, the client needed to transfer 12,000 employees to new departments due to a reorganization. Direct SQL UPDATE to PS_JOB would have missed the workflow approval routing, salary grade validation, and position management updates. Using CI in an AE program took 6 hours but ensured every transfer went through the same business rules as online entries — including workflow routing to managers for approval and all downstream position budget updates.`,
+    mistakes:[
+      {title:"Using direct SQL for hire transactions", desc:"Inserting directly into PS_JOB bypasses all PeopleCode events, workflow, and validations. The data may look correct but downstream processes (payroll, benefits enrollment triggers) may not fire. Always use CI for transactional data."},
+      {title:"Not setting InteractiveMode = False", desc:"InteractiveMode = True (default) validates each field as it's set — like a user tabbing through the page. For batch processing this is extremely slow. Always set InteractiveMode = False for AE CI calls."},
+      {title:"Loading the entire history with GetHistoryItems = True", desc:"For effective-dated components, loading all history rows wastes memory and time. Set GetHistoryItems = False and EditHistoryItems = False unless you specifically need to read or modify historical rows."},
+    ],
+    quiz:[
+      {q:"Why use Component Interface instead of direct SQL for employee hire?",options:["CI is faster than SQL","CI fires all PeopleCode events ensuring business rules and workflow run","CI is required by Oracle","SQL cannot insert into PS_JOB"],correct:1,explanation:"CI fires FieldDefault, PostBuild, SaveEdit, WorkFlow, SavePostChange — exactly like a user doing the hire online. Direct SQL bypasses all of these, risking data integrity and missing downstream processes."},
+      {q:"What does setting InteractiveMode = False do?",options:["Disables all PeopleCode","Batches validations for faster batch processing — events still fire on Save","Prevents the CI from saving","Disables error handling"],correct:1,explanation:"InteractiveMode = False batches field-level validations instead of checking each field individually. All events still fire on Save. Significantly improves batch CI performance."},
+    ],
+    peopleBooksUrl:"https://docs.oracle.com/cd/F44947_01/pt858pbr3/eng/pt/tcif/",
+  },
+  {
+    id:"integration-broker-basics", module:8, num:"24",
+    title:"Integration Broker Basics",
+    level:"intermediate",
+    summary:"Integration Broker is PeopleSoft's enterprise messaging platform for connecting PeopleSoft with external systems — via REST, SOAP, or internal PS messaging. Understanding the core architecture is essential for any integration project.",
+    preChecklist:[
+      "You understand PeopleCode Application Classes",
+      "You know what a Service and API is conceptually",
+      "You completed Component Interface (Topic 23)",
+    ],
+    keyPoints:[
+      "Integration Broker handles real-time and async messaging between PeopleSoft and external systems",
+      "Core objects: Service Operation, Node, Handler, Routing Rule, Integration Gateway",
+      "Synchronous = sender waits for response. Asynchronous = fire and forget, message queued",
+      "The Integration Gateway is the entry point — receives all inbound HTTP requests",
+      "All IB activity is monitored and retried via Integration Broker Monitor",
+    ],
+    sections:[
+      {
+        title:"Integration Broker Architecture",
+        body:`Integration Broker has three main layers:
+
+**1. Integration Gateway (Web Server tier)**
+The front door for all inbound messages. A Java application on the web server that:
+- Receives HTTP/HTTPS requests from external systems
+- Routes them to the correct Service Operation in the App Server
+- Returns the response back to the caller
+Configured in: PeopleTools → Integration Broker → Configuration → Gateways
+
+**2. Service Operation (the what)**
+Defines what data is being exchanged — the contract between systems:
+- Operation name (e.g., EMPLOYEE_SYNC.v1)
+- Message type: request message, response message
+- Operation type: Synchronous, Asynchronous, One-way
+- Version (allows multiple versions to coexist)
+
+**3. Node (the who)**
+Identifies systems in the integration:
+- Local Node = your PeopleSoft instance
+- Remote Node = external system or another PS instance
+- Each node has an URL (for outbound) and authentication settings
+
+**4. Handler (the how)**
+PeopleCode (Application Class) that processes the message:
+- OnMessage method: receives/sends the data
+- OnError method: handles processing failures
+- Transforms data between PS and external formats
+
+**5. Routing Rule (the direction)**
+Connects Service Operation to source and target Nodes:
+- Inbound: external → local node
+- Outbound: local → remote node
+- Can include transformation PeopleCode`
+      },
+      {
+        title:"Synchronous vs Asynchronous Messaging",
+        body:`**Synchronous (Request/Reply)**
+- Sender sends a request and WAITS for a response before continuing
+- Like a phone call — you wait on the line
+- Used when: real-time data lookup, validation against external system, immediate confirmation needed
+- Example: employee change in PS triggers real-time update to payroll system, PS waits for "OK"
+- Timeout risk: if external system is slow, PS transaction hangs
+
+**Asynchronous (Publish/Subscribe)**
+- Sender sends a message and CONTINUES without waiting
+- Like sending an email — you continue your work
+- Used when: bulk data transfer, notifications, event-driven updates
+- Example: overnight employee data sync to 5 downstream systems
+- Messages are queued in PS_MQUEUE and processed when the subscriber is ready
+- Retry: if subscriber is down, messages queue and retry automatically
+
+**Which to use?**
+Choose Sync when: response is needed immediately, data must be validated before PS saves
+Choose Async when: volume is high, timing is flexible, multiple subscribers, subscriber downtime shouldn't block PS`
+      },
+      {
+        title:"Setting Up a Basic Integration",
+        body:`**Outbound REST (PS sends data to external system):**
+
+1. Define the message structure (XML/JSON schema)
+2. Create Service Operation → type: Synchronous → REST
+3. Configure target as a Node with the external system's URL
+4. Create Routing Rule: Local Node → Remote Node, Outbound
+5. Write Handler PeopleCode (OnMessage method):
+\`\`\`
+import PS_PT:Integration:*;
+
+class EMPLOYEE_SYNC_HANDLER extends PS_PT:Integration:IRequestHandler
+   method OnMessage(&MSG As Message) Returns Message;
+end-class;
+
+method OnMessage
+   /+ &MSG as Message +/
+   /+ Returns Message +/
+   Local Message &responseMsg;
+   Local XmlDoc &xmlDoc;
+   
+   /* Get the outbound message data */
+   &xmlDoc = &MSG.GetXmlDoc();
+   
+   /* Transform and send */
+   /* ... processing logic ... */
+   
+   &responseMsg = CreateMessage(Operation.EMPLOYEE_SYNC_RESP);
+   Return &responseMsg;
+end-method;
+\`\`\`
+6. Test via: PeopleTools → Integration Broker → Test → Service Operations
+
+**Inbound (external system sends data to PS):**
+Same setup but Routing is: Remote Node → Local Node, Inbound
+Handler's OnMessage receives the incoming data and processes it (typically calls a CI)`
+      },
+      {
+        title:"Integration Broker Monitor",
+        body:`The IB Monitor is your operational command center for all integrations.
+
+**Location:** PeopleTools → Integration Broker → Monitor → Integration Monitor
+
+**What to monitor:**
+
+*Asynchronous Services:*
+- Publication Queue: messages PS has sent, waiting for delivery
+- Subscription Queue: messages PS has received, waiting for processing
+- Failed: messages that could not be delivered or processed
+
+*Synchronous Services:*
+- Error Log: failed synchronous calls with full error details
+
+**Common failure scenarios:**
+- Target system down → message shows "Failed" with connection error
+- Authentication failure → 401/403 in the error detail
+- Message format mismatch → XML parsing error
+- Business rule violation → PeopleCode Error() in handler
+
+**Retrying failed messages:**
+Fix the root cause (system URL, authentication, data format) → go to Failed messages → select → Resubmit. Messages retry from that point — don't need to re-trigger from the source transaction.`
+      },
+    ],
+    realWorld:`A large university used PeopleSoft HCM for employee data and had 12 downstream systems (payroll vendor, badge system, directory services, LMS, etc.) all needing employee updates. Integration Broker pub/sub pattern: every hire/transfer/termination in PS published an async EMPLOYEE_CHANGE message. All 12 systems subscribed — each with their own handler doing format transformation. When the badge system was down for maintenance, messages queued automatically and delivered when it came back online. PS was never blocked by any subscriber being unavailable.`,
+    mistakes:[
+      {title:"Not monitoring the IB Message Queue", desc:"Async messages can fail silently — they show Error status in the monitor but no one is alerted. Set up automated monitoring of the Failed queue. Many integrations silently accumulate thousands of failed messages that no one noticed."},
+      {title:"Using Synchronous when Async is appropriate", desc:"Sync integrations block the PS transaction if the external system is slow or down. If a batch of 1,000 employees is being saved and the sync call to the payroll system times out, all 1,000 saves fail. Use async for bulk updates."},
+      {title:"Hardcoding Node URLs in Handler PeopleCode", desc:"Handler code should use Node configuration for URLs — not hardcoded strings. When you move from DEV to QA to PROD, only the Node URL changes. Hardcoded URLs break every time you migrate to a new environment."},
+    ],
+    quiz:[
+      {q:"What is the difference between Synchronous and Asynchronous IB messaging?",options:["Sync is faster","Sync waits for response; Async sends and continues without waiting","Async is more secure","Sync uses REST; Async uses SOAP"],correct:1,explanation:"Synchronous: sender waits for response before continuing — like a phone call. Asynchronous: sender continues immediately, message is queued for processing — like email. Choose based on whether an immediate response is required."},
+      {q:"What is the Integration Gateway?",options:["The PeopleCode handler","The entry point for all inbound messages — routes them to Service Operations","The message queue database","The Node configuration screen"],correct:1,explanation:"The Integration Gateway is a Java application on the web server that receives all inbound HTTP requests from external systems and routes them to the correct Service Operation in the App Server."},
+    ],
+    peopleBooksUrl:"https://docs.oracle.com/cd/F44947_01/pt858pbr3/eng/pt/tibr/",
+  },
+  {
+    id:"integration-broker-rest", module:8, num:"25",
+    title:"Integration Broker REST & SOAP",
+    level:"intermediate",
+    summary:"Building real REST and SOAP web services in PeopleSoft — exposing PS data to external systems and consuming external APIs from PeopleCode.",
+    preChecklist:[
+      "You completed Integration Broker Basics (Topic 24)",
+      "You understand JSON and XML formats conceptually",
+      "You know what HTTP verbs (GET, POST, PUT, DELETE) are",
+    ],
+    keyPoints:[
+      "REST uses URI templates (e.g., /employees/{EMPLID}) and HTTP verbs to define operations",
+      "SOAP uses WSDL to define the service contract — PeopleSoft auto-generates WSDL",
+      "Outbound: PS calls an external API. Inbound: external system calls PS",
+      "ConnectorProperties on Nodes define URL, authentication headers, SSL settings",
+      "JSON is now preferred over XML for REST; SOAP always uses XML",
+    ],
+    sections:[
+      {
+        title:"REST Services in PeopleSoft",
+        body:`**Exposing PeopleSoft data via REST (Inbound REST):**
+
+PeopleSoft can expose its data as a REST API — allowing external apps, mobile clients, or other systems to GET/POST/PUT/DELETE PS data.
+
+URI Template examples:
+\`\`\`
+GET  /PSIGW/RESTListeningConnector/PS/EMPLOYEE.v1/{EMPLID}
+POST /PSIGW/RESTListeningConnector/PS/EMPLOYEE.v1/
+PUT  /PSIGW/RESTListeningConnector/PS/EMPLOYEE.v1/{EMPLID}
+\`\`\`
+
+Setup:
+1. Create Service → Add REST-based Service Operation
+2. Set HTTP method (GET, POST, PUT, DELETE)
+3. Define URI template with path parameters
+4. Create request/response message with JSON/XML structure
+5. Write Handler OnMessage PeopleCode to query PS data and return it
+6. Create Inbound Routing Rule
+
+**Calling an External REST API (Outbound REST):**
+\`\`\`
+/* In PeopleCode SavePostChange or AE */
+Local Message &request = CreateMessage(Operation.PAYROLL_NOTIFY);
+Local Rowset &rs = &request.GetRowset();
+&rs.GetRow(1).GetRecord(Record.PAY_NOTIFY).EMPLID.Value = &emplid;
+
+Local Message &response = %IntBroker.SyncRequest(&request);
+Local string &jsonStr = &response.GetContentString();
+\`\`\``
+      },
+      {
+        title:"SOAP Web Services",
+        body:`**Consuming an External SOAP Service:**
+When an external system provides a WSDL (e.g., a vendor benefits enrollment system):
+
+1. PeopleTools → Integration Broker → Web Services → Consume Web Service
+2. Provide the WSDL URL → PeopleSoft auto-creates Node, Service Operation, Message
+3. Write Handler PeopleCode to call the service:
+\`\`\`
+Local Message &request = CreateMessage(Operation.VENDOR_ENROLL);
+/* Set message fields */
+Local Message &response = %IntBroker.SyncRequest(&request);
+\`\`\`
+
+**Exposing PeopleSoft as a SOAP Service:**
+1. Create Service Operation with SOAP type
+2. PeopleSoft auto-generates the WSDL
+3. External systems import the WSDL to consume your PS service
+4. WSDL URL: http://yourserver/PSIGW/PeopleSoftServiceListeningConnector
+
+**Key SOAP concepts:**
+- WSDL defines the interface (operations, data types, endpoint)
+- SOAP Envelope wraps the request/response XML
+- WS-Security handles authentication (username/password token or certificate)
+- PeopleSoft handles SOAP envelope wrapping/unwrapping automatically — your PeopleCode works with message Rowsets/XML, not raw SOAP`
+      },
+      {
+        title:"Authentication and Security",
+        body:`**Node Authentication Options:**
+
+*Password Authentication (Basic Auth):*
+- Configure username/password on the Node connector properties
+- Sent as Base64-encoded HTTP Authorization header
+- Simple but not highly secure — use HTTPS always
+
+*SSL Certificate:*
+- Mutual TLS — both systems present certificates
+- Higher security for financial and healthcare integrations
+- Certificate configured in PeopleSoft Keystore
+
+*OAuth 2.0 (modern APIs):*
+- PS must first call the OAuth token endpoint to get an access token
+- Add token to subsequent API calls as Authorization: Bearer {token}
+- Handle token refresh (tokens typically expire in 1 hour)
+- Implement in PeopleCode — no native OAuth support, code it manually
+
+*WS-Security (SOAP):*
+- Username Token: username/password in SOAP header
+- Signature: digital signature on message contents
+- Encryption: encrypt sensitive parts of SOAP message`
+      },
+    ],
+    realWorld:`A manufacturing company needed PeopleSoft to send real-time employee status changes to their access control system (badge reader) via REST. Every hire, termination, or leave of absence in PS triggered a SavePostChange PeopleCode that called the badge system's REST API — synchronously for terminations (immediate badge deactivation) and asynchronously for hires (badge activation within the hour). OAuth token management was built as a reusable Application Package refreshing the token automatically before expiry.`,
+    mistakes:[
+      {title:"Ignoring SSL certificate validation in DEV", desc:"Developers often disable SSL validation in DEV for convenience. This creates a security gap and a config difference between DEV and PROD. Use proper certificates or at minimum test with valid certs before moving to PROD."},
+      {title:"Not handling REST API rate limits", desc:"External REST APIs often have rate limits (100 calls/minute). Batch AE processes calling an external API for each of 10,000 employees will hit rate limits. Build retry logic with exponential backoff in your AE PeopleCode."},
+    ],
+    quiz:[
+      {q:"What does PeopleSoft auto-generate for a SOAP Service Operation?",options:["A REST endpoint","WSDL — the service contract that external systems use to consume the service","A JSON schema","An OpenAPI specification"],correct:1,explanation:"PeopleSoft automatically generates a WSDL (Web Service Description Language) document for SOAP Service Operations. External systems import this WSDL to understand the service interface and generate their client code."},
+      {q:"What HTTP verb is used for retrieving data in a REST service?",options:["POST","PUT","GET","DELETE"],correct:2,explanation:"GET retrieves data without modifying it. POST creates new records. PUT updates existing records. DELETE removes records. REST APIs use HTTP verbs to indicate the type of operation being performed."},
+    ],
+    peopleBooksUrl:"https://docs.oracle.com/cd/F44947_01/pt858pbr3/eng/pt/tibr/",
+  },
+  {
+    id:"security-advanced", module:9, num:"26",
+    title:"Advanced Security & Row-Level Security",
+    level:"intermediate",
+    summary:"Beyond Permission Lists and Roles — row-level security, department security trees, data permissions, and security troubleshooting techniques used daily on real PeopleSoft projects.",
+    preChecklist:[
+      "You completed Security Basics (Topic 19)",
+      "You understand SQL Views and how they work",
+      "You know what PS_JOB and PS_DEPT_TBL contain",
+    ],
+    keyPoints:[
+      "Row-level security controls which DATA rows a user sees — not just which pages",
+      "Security views join base tables with security tables filtered by OPRCLASS (operator class)",
+      "Department Security Trees define which departments each security profile can access",
+      "Every custom component showing employee data MUST use a security view as its Search Record",
+      "Security troubleshooting: check User Profile → Roles → Permission Lists → component access mode",
+    ],
+    sections:[
+      {
+        title:"Row-Level Security Deep Dive",
+        body:`**How it actually works technically:**
+
+1. Each User Profile has a **Primary Permission List** (their OPRCLASS value)
+2. PeopleSoft maintains PS_SCRTY_TBL_DEPT — a table linking OPRCLASS to authorized departments
+3. Security views JOIN the base transaction table with PS_SCRTY_TBL_DEPT:
+
+\`\`\`sql
+/* Simplified PS security view pattern */
+SELECT J.EMPLID, J.EFFDT, J.DEPTID, J.JOB_CODE
+FROM PS_JOB J
+WHERE J.EFFDT = (SELECT MAX(EFFDT) ...)
+AND EXISTS (
+   SELECT 'X' FROM PS_SCRTY_TBL_DEPT S
+   WHERE S.OPRCLASS = %OperatorClass
+   AND S.DEPTID = J.DEPTID
+)
+\`\`\`
+
+4. This security view is used as the **Search Record** on the component
+5. When a user searches for employees, PS_JOB_SRCH_VW (the security view) automatically filters results to only show employees in authorized departments
+
+**Result:** The HR coordinator in the London office sees only London employees. The New York coordinator sees only New York employees. Same component, same Permission List — different data based on row-level security.
+
+**Critical mistake:** Using PS_JOB directly as the Search Record removes this filter — all users see all employees.`
+      },
+      {
+        title:"Department Security Trees",
+        body:`**What is a Security Tree?**
+A hierarchical structure defining which departments are accessible to each OPRCLASS. Built in PeopleTools → Security → Core Security → Department Security.
+
+**Tree structure example:**
+\`\`\`
+GLOBAL_HR_ADMIN (OPRCLASS)
+└── All Departments (access to everything)
+
+LONDON_HR (OPRCLASS)
+└── UK Region
+    ├── LON-001 (London Finance)
+    ├── LON-002 (London Engineering)
+    └── LON-003 (London Sales)
+
+NY_HR (OPRCLASS)
+└── US Region
+    ├── NY-001 (New York Finance)
+    └── NY-002 (New York Engineering)
+\`\`\`
+
+**How it populates PS_SCRTY_TBL_DEPT:**
+Running the security tree build process (HR Admin → Security → Refresh Security) reads the tree and populates PS_SCRTY_TBL_DEPT with one row per OPRCLASS + DEPTID combination.
+
+**After tree changes:**
+When departments are added or restructured, the security tables must be rebuilt. Many clients automate this via a scheduled AE program that refreshes security tables nightly.`
+      },
+      {
+        title:"Data Permissions",
+        body:`Beyond row-level security by department, PeopleSoft supports broader **Data Permissions** on Permission Lists.
+
+**Business Unit Access:**
+Configured on the Permission List — restricts which Business Units the user can access. A Finance user in Europe shouldn't see North American BU transactions. Set in Permission List → Data Permissions → Business Unit Access.
+
+**SetID Access:**
+Controls which SetID setup data the user can access. A user with access to SetID SHARE can see shared departments. A user restricted to SETUK can only see UK-specific setup.
+
+**TableSet Permission List:**
+Separate from the main Permission List, controls which SetIDs a user can reference when building transactions. Prevents cross-SetID data corruption.
+
+**Process Profile Permission List:**
+Controls what Process Scheduler options a user has — which output types, output destinations, and server names are available when they submit batch jobs.`
+      },
+      {
+        title:"Security Troubleshooting",
+        body:`**User reports they can't access a component:**
+
+Step 1: Verify the component exists and is registered
+- App Designer → find the component → check it's active
+- Portal → CREFs → find the component → check active
+
+Step 2: Check Permission List access
+- PeopleTools → Security → User Profiles → find user → Roles tab
+- For each Role, check Permission Lists
+- Find the Permission List that should grant access
+- Permission List → Pages → find the component → check access mode
+
+Step 3: Check navigation
+- The component must be in a Portal folder the user can access
+- Check the CREF's folder path and the user's Navigation Collection access
+
+Step 4: Row-level security issue
+- User can access the component but sees no data?
+- Check their Row Security Permission List (Primary Permission List)
+- Run PS_SCRTY_TBL_DEPT query: SELECT * FROM PS_SCRTY_TBL_DEPT WHERE OPRCLASS = 'USERCLASS'
+- If empty — security tables need to be rebuilt
+
+**Test as another user:**
+PeopleTools → Security → User Profiles → find user → Roles → use "Test" sign-on to sign in as that user (requires elevated security). See exactly what they see.`
+      },
+    ],
+    realWorld:`During an HCM go-live, several managers reported they could see all employees globally — including employees in other countries with different compensation structures and sensitive salary data. Root cause: a custom component built during development used PS_JOB as the Search Record (fine for development when all testers had global access). In PROD, this bypassed row-level security for all users. Fix: replace the Search Record with the correct PS_JOB_SRCH_VW security view. Applied in 30 minutes but would have caused a major compliance issue if found in an audit.`,
+    mistakes:[
+      {title:"Using base tables as Search Records in custom components", desc:"The most common security hole in PeopleSoft customizations. Always use security views (not PS_JOB, PS_PERSONAL_DATA, etc.) as Search Records for any component displaying employee-sensitive data."},
+      {title:"Not rebuilding security tables after tree changes", desc:"When departments are added or the security tree is modified, PS_SCRTY_TBL_DEPT must be rebuilt. Users will suddenly see too much or too little data if the table is stale. Schedule nightly security table rebuild as a standard operational process."},
+      {title:"Assigning ALLPAGES or PTPT1000 to business users", desc:"These Permission Lists grant developer/admin access to all pages including sensitive HR and financial data. Should never be assigned to business users — only to technical admins in controlled environments."},
+    ],
+    quiz:[
+      {q:"How does row-level security filter data for a specific user?",options:["Through PeopleCode checking the user ID","Through a security view that JOINs the base table with PS_SCRTY_TBL_DEPT filtered by the user's OPRCLASS","Through the Permission List access modes","Through the Department Security Tree directly at runtime"],correct:1,explanation:"Security views join the base table with PS_SCRTY_TBL_DEPT using %OperatorClass (the user's Primary Permission List). The view automatically returns only rows the user is authorized to see — no PeopleCode needed."},
+      {q:"What must be done after modifying the Department Security Tree?",options:["Restart the App Server","Rebuild the security tables (refresh PS_SCRTY_TBL_DEPT)","Clear the browser cache","Run the nightly payroll process"],correct:1,explanation:"The Department Security Tree is a definition — PS_SCRTY_TBL_DEPT is the physical table that security views query. The tree must be 'built' (refreshed) to populate PS_SCRTY_TBL_DEPT with the new structure. Until rebuilt, security is based on the old structure."},
+    ],
+    peopleBooksUrl:"https://docs.oracle.com/cd/F44947_01/pt858pbr3/eng/pt/tpcs/",
+  },
+  {
+    id:"ps-query-advanced", module:9, num:"27",
+    title:"PS Query & Reporting Advanced",
+    level:"intermediate",
+    summary:"Advanced PS Query techniques, BI Publisher for formatted reports, and how reporting tools fit together in a PeopleSoft environment.",
+    preChecklist:[
+      "You completed PS Query Fundamentals (Topic 17)",
+      "You understand effective dating and SQL joins",
+      "You know what Process Scheduler is",
+    ],
+    keyPoints:[
+      "Connected Queries link parent-child queries for hierarchical data without complex SQL",
+      "BI Publisher uses PS Query or AE Rowsets as data sources with template-based formatting",
+      "Aggregate functions (COUNT, SUM, AVG) with GROUP BY and HAVING in PS Query",
+      "Query security: Access Trees control which tables users can query — must be configured per Permission List",
+      "Never expose raw PS_JOB in Query Access Tree — always expose security views instead",
+    ],
+    sections:[
+      {
+        title:"Advanced PS Query Techniques",
+        body:`**Aggregate Functions:**
+In PS Query, right-click a field → choose aggregate (COUNT, SUM, AVG, MIN, MAX).
+
+Example: Headcount by Department:
+\`\`\`
+SELECT DEPTID, COUNT(EMPLID) AS HEADCOUNT
+FROM PS_JOB_VW
+WHERE EFFDT = (MAX effective date query)
+GROUP BY DEPTID
+HAVING COUNT(EMPLID) > 5
+\`\`\`
+
+In PS Query: Add DEPTID as non-aggregate, EMPLID as COUNT aggregate, add HAVING criteria: EMPLID count > 5.
+
+**Expressions:**
+Add calculated fields using the Expression feature. Example: Full Name concatenation:
+\`\`\`
+LAST_NAME | ', ' | FIRST_NAME
+\`\`\`
+
+Or date arithmetic:
+\`\`\`
+%DateDiff(HIRE_DT, %CurrentDateIn)  /* Years of service */
+\`\`\`
+
+**Multiple Joins:**
+PS Query supports joining 5+ records. Each join requires specifying the join type (standard = inner join, left outer join) and the join fields. Build complex queries visually without writing SQL.
+
+**Union Queries:**
+Combine results from two different queries into one result set using UNION or UNION ALL. Both queries must have the same number of fields in the same order. Useful for combining similar data from different tables.`
+      },
+      {
+        title:"BI Publisher for Formatted Reports",
+        body:`**What is BI Publisher?**
+BI Publisher (XMLP) creates professionally formatted output — PDF pay slips, Excel financial reports, HTML dashboards — using templates. Data comes from PS Query or AE, formatting comes from a Word/Excel template.
+
+**The BI Publisher workflow:**
+1. Create PS Query with the report data
+2. Run the Query once, download as XML sample data
+3. In Microsoft Word: install Oracle BI Publisher plugin
+4. Open Word → load XML sample → design the template (tables, fields, formatting)
+5. Upload template to PeopleSoft
+6. Create Report Definition linking query + template
+7. Run report via Process Scheduler → output is PDF/Excel/HTML
+
+**Bursting (report distribution):**
+Split one report run into individual sections and deliver to different people:
+- One payroll run generates pay slips for all 10,000 employees
+- Each employee gets only their own pay slip via email
+- Configured in BIP delivery options with a burst key (EMPLID)
+
+**Common output formats:**
+PDF (most common — pay slips, forms), Excel (financial reports, data extracts), HTML (online dashboards), RTF (editable documents), CSV (data files for downstream systems)`
+      },
+      {
+        title:"Connected Queries",
+        body:`Connected Queries create parent-child query relationships — the parent query's output drives child query parameters. This produces hierarchical data that single-level queries can't easily generate.
+
+**Example: Employee with all their job history**
+- Parent query: get all active employees (EMPLID, Name, Department)
+- Child query: get all PS_JOB rows for that EMPLID
+
+The child query uses %BIND(EMPLID) to receive the parent's EMPLID for each row.
+
+**How to set up:**
+1. Create Parent Query (employees)
+2. Create Child Query with a Prompt field for EMPLID
+3. Connect: Query Manager → Connected Query → add Parent → add Child → map Parent.EMPLID → Child prompt
+
+**Output:**
+Connected Queries produce XML output ideal for BI Publisher templates showing master-detail hierarchical layouts — employee details at top, job history rows below each employee.`
+      },
+    ],
+    realWorld:`An HR analytics team needed a monthly headcount report broken down by department, job family, and full-time/part-time status — with the ability to drill down to employee names. Built as a Connected Query (parent: departments with counts, child: individual employees per department) feeding a BI Publisher Excel template. The report generated automatically on the 1st of each month via Process Scheduler and emailed to all HR business partners via BIP bursting — each BP receiving only their authorized departments, enforced through the Query's row-level security view.`,
+    mistakes:[
+      {title:"Exposing PS_JOB directly in Query Access Tree", desc:"Giving users PS_JOB access in their Query Access Tree lets them query all employees without any row-level security filtering. Always expose security views (PS_JOB_SRCH_VW) in the tree — not base tables."},
+      {title:"Forgetting effective dating in PS Query joins", desc:"When joining PS_JOB with PS_DEPT_TBL in PS Query, both need effective dating criteria. Forgetting DEPT_TBL's effective date criteria returns multiple department description rows per employee — multiplying the result count."},
+    ],
+    quiz:[
+      {q:"What is a Connected Query used for?",options:["Running two queries at the same time","Linking parent-child queries where the parent's output drives child parameters — producing hierarchical data","Connecting to external databases","Running the same query for multiple users simultaneously"],correct:1,explanation:"Connected Queries create a parent-child relationship. The parent query runs first, then for each parent row, the child query runs using parent field values as parameters. Ideal for master-detail reports like employee with their job history."},
+      {q:"What is bursting in BI Publisher?",options:["Running the same report multiple times","Splitting one report and distributing each section to different recipients automatically","Exporting a report in multiple formats","Breaking a large query into smaller queries"],correct:1,explanation:"Bursting splits a single report run into individual sections keyed by a burst field (e.g., EMPLID) and automatically delivers each section to the appropriate recipient (e.g., email each employee their own pay slip)."},
+    ],
+    peopleBooksUrl:"https://docs.oracle.com/cd/F44947_01/pt858pbr3/eng/pt/tqry/",
+  },
+  {
+    id:"data-mover", module:9, num:"28",
+    title:"Data Mover & Migration",
+    level:"intermediate",
+    summary:"Data Mover (DMS) is PeopleSoft's utility for moving data between databases using simple scripts. Essential for migrations, environment refreshes, and setup data promotion across DEV → QA → PROD.",
+    preChecklist:[
+      "You understand PeopleSoft record and table structure",
+      "You know the difference between setup/reference data and transactional data",
+      "You understand what DEV, QA, and PROD environments are",
+    ],
+    keyPoints:[
+      "Data Mover uses EXPORT/IMPORT scripts to move PS table data between databases",
+      "Used for: setup data promotion (DEV→QA→PROD), environment refreshes, data migrations",
+      "DMS bypasses all PeopleCode events — never use for transactional data (use CI instead)",
+      "Scripts have .dms extension and use simple command syntax",
+      "Always test IMPORT scripts in QA before running in PROD — DMS is irreversible without a backup",
+    ],
+    sections:[
+      {
+        title:"What is Data Mover?",
+        body:`Data Mover is PeopleSoft's data transfer utility — a simple scripting language for exporting and importing PS table data between databases.
+
+**Accessed via:**
+Start → PeopleTools → Data Mover (opens a GUI application)
+
+**Two modes:**
+- *Bootstrap mode:* used during initial PS installation before security is set up. Bypasses PS security.
+- *Normal mode:* logs in using PS User ID/Password. Subject to PS security.
+
+**Core DMS commands:**
+\`\`\`dms
+/* EXPORT — reads from DB, writes to .dat file */
+EXPORT PS_DEPT_TBL;
+REM Exports all rows from PS_DEPT_TBL to the output file
+
+/* IMPORT — reads from .dat file, writes to DB */
+IMPORT PS_DEPT_TBL;
+REM Imports all rows into PS_DEPT_TBL in target DB
+
+/* With conditions */
+EXPORT PS_DEPT_TBL WHERE SETID = 'SHARE';
+
+/* DELETE before import to avoid duplicate key errors */
+DELETE_ROWS PS_DEPT_TBL;
+IMPORT PS_DEPT_TBL;
+\`\`\`
+
+**Output files:**
+Export produces .dat files (binary PS format). These files are transferred to the target environment and imported there.`
+      },
+      {
+        title:"Common DMS Use Cases",
+        body:`**1. Promoting setup data from DEV to QA to PROD:**
+\`\`\`dms
+/* Export all custom configuration from DEV */
+SET LOG C:\\temp\\export.log;
+SET OUTPUT C:\\temp\\custom_config.dat;
+EXPORT PS_MY_CONFIG_TBL;
+EXPORT PS_MY_CODES_TBL;
+\`\`\`
+Then in QA/PROD:
+\`\`\`dms
+SET LOG C:\\temp\\import.log;
+SET INPUT C:\\temp\\custom_config.dat;
+DELETE_ROWS PS_MY_CONFIG_TBL;
+IMPORT PS_MY_CONFIG_TBL;
+DELETE_ROWS PS_MY_CODES_TBL;
+IMPORT PS_MY_CODES_TBL;
+\`\`\`
+
+**2. Copying security setup between environments:**
+\`\`\`dms
+EXPORT PSROLEDEFN;
+EXPORT PSROLECLASS;
+EXPORT PSCLASSDEFN;
+\`\`\`
+
+**3. Exporting an App Designer project's data:**
+Object definitions (Records, Pages, etc.) are in PeopleTools tables — migrate using App Designer Project migration, not DMS.
+
+**4. Initial data load for reference tables:**
+Loading chart of accounts, location codes, job families from a legacy system — clean data with no business rules → DMS is appropriate.`
+      },
+      {
+        title:"DMS Limitations and Risks",
+        body:`**DMS bypasses PeopleCode entirely:**
+No FieldDefault, no SaveEdit, no workflow. Data lands directly in the database table. This is fine for reference data (department table, codes) but dangerous for transactional data (employee hires, financial transactions).
+
+**Risks to manage:**
+- *Referential integrity:* DMS doesn't enforce FK constraints. Importing with missing parent data causes runtime errors later.
+- *Sequence numbering:* Some PS tables use auto-generated sequence numbers (DEMAND_ID, CASE_ID). DMS imports the old sequence values — can cause conflicts with existing data.
+- *Effective date conflicts:* Importing older effective-dated rows into a DB that has newer rows can cause data inconsistencies.
+- *No rollback:* DMS IMPORT commits as it goes. If it fails halfway, some data is imported. Always export the target table first as a backup before importing.
+
+**Best practices:**
+1. Always test import in QA first
+2. Export target table as backup before importing
+3. Use DELETE_ROWS before IMPORT to ensure clean load
+4. Review the log file (SET LOG) after every DMS run
+5. Never use DMS on transactional data in PROD without DBA involvement`
+      },
+    ],
+    realWorld:`During a PeopleSoft HCM go-live, the project team needed to load 1,200 departments, 400 job codes, and 250 locations from the client's HR legacy system into PeopleSoft PROD. The data had been cleansed in DEV, validated in QA, and was now ready for PROD. Data Mover scripts exported the three setup tables from QA and imported them into PROD in 20 minutes. The same DMS approach was used to migrate Permission List configurations and Role definitions from DEV → QA → PROD, saving days of manual re-entry.`,
+    mistakes:[
+      {title:"Using DMS for transactional employee data", desc:"Some developers try to load PS_JOB rows directly via DMS to save time. This bypasses all business rules, creates no audit trail, and misses workflow triggers. Always use Component Interface for any transactional data load."},
+      {title:"Not backing up before IMPORT", desc:"DMS IMPORT with DELETE_ROWS is destructive — no undo. Always export the target table first: EXPORT PS_MY_TABLE; (saves current state). If the import corrupts data, you can restore from the export file."},
+    ],
+    quiz:[
+      {q:"What is the main limitation of Data Mover for data migration?",options:["It is very slow","It bypasses all PeopleCode — business rules, validation, and workflow do not fire","It cannot handle large datasets","It only works in bootstrap mode"],correct:1,explanation:"DMS inserts directly into DB tables without firing any PeopleCode events. For reference/setup data this is acceptable. For transactional data (hires, financial transactions), always use Component Interface to ensure business rules and audit trails are maintained."},
+      {q:"What command clears existing rows before importing?",options:["TRUNCATE","CLEAR_TABLE","DELETE_ROWS","REMOVE"],correct:2,explanation:"DELETE_ROWS PS_TABLENAME removes all existing rows before the import. This prevents duplicate key errors when re-importing data that may already exist in the target environment."},
+    ],
+    peopleBooksUrl:"https://docs.oracle.com/cd/F44947_01/pt858pbr3/eng/pt/tpds/",
+  },
+  {
+    id:"process-scheduler-advanced", module:9, num:"29",
+    title:"Process Scheduler & Performance Tuning",
+    level:"intermediate",
+    summary:"Process Scheduler architecture, batch job management, and practical performance tuning techniques for slow PeopleSoft components and queries.",
+    preChecklist:[
+      "You completed Process Monitor basics (Topic 19)",
+      "You understand Application Engine (Topics 21-22)",
+      "You know what SQL indexes are",
+    ],
+    keyPoints:[
+      "Process Scheduler manages all batch job execution — AE, SQR, COBOL, BI Publisher, Crystal",
+      "Process groups control which jobs run on which servers — security and load management",
+      "SQL trace is the primary diagnostic tool for online performance issues",
+      "SQLExec in RowInit and missing indexes are the two most common performance problems",
+      "App Server caching and connection pooling are critical for online scalability",
+    ],
+    sections:[
+      {
+        title:"Process Scheduler Deep Dive",
+        body:`**Process Scheduler architecture:**
+PSPRCSRV (Process Scheduler Server) maintains a queue of process requests in PS_PRCSPARMS. It polls the table every few seconds for new requests, spawns child processes to execute them, and updates status.
+
+**Process Types:**
+- Application Engine (PSAE) — most common
+- SQR Report (SQR) — legacy reporting
+- COBOL SQL (COBOL) — legacy payroll calculations
+- BI Publisher (PSXP) — formatted reports
+- Crystal Reports — legacy formatted reports
+- Application Package — PeopleCode via process
+
+**Process Groups:**
+Groups control which processes run on which servers. Example:
+- PAYROLL_GRP: only runs on the high-memory payroll server
+- REPORT_GRP: runs on the dedicated report server
+- GENERAL_GRP: everything else
+
+Users must have the Process Group in their Permission List to submit processes in that group.
+
+**Recurrence:**
+Schedule a process to run automatically:
+PeopleTools → Process Scheduler → Recurrences → define frequency (daily, weekly, monthly, custom CRON).
+Attach to a Run Control → the process submits itself automatically at the defined time.`
+      },
+      {
+        title:"Performance Tuning — Online",
+        body:`**Step 1: Enable SQL Trace**
+PeopleTools → Utilities → Debug → PeopleCode/SQL Trace (or add trace to App Server domain config).
+Generates a trace file showing every SQL executed with timing.
+
+**Step 2: Identify the problem patterns**
+
+*Pattern 1: Repeated identical SQL*
+\`\`\`
+SELECT DESCR FROM PS_DEPT_TBL WHERE DEPTID=:1 — executed 500 times
+\`\`\`
+Cause: SQLExec in RowInit. Fix: Pre-fetch in PostBuild.
+
+*Pattern 2: Full table scan*
+\`\`\`
+/* Cost: 450,000 rows scanned for result of 1 row */
+SELECT * FROM PS_JOB WHERE LAST_NAME = 'SMITH'
+\`\`\`
+Cause: No index on LAST_NAME. Fix: Add Alternate Search Key (A) to LAST_NAME field in App Designer → Build → Alter → Creates the index.
+
+*Pattern 3: Missing effective dating*
+\`\`\`
+SELECT DEPTID FROM PS_JOB WHERE EMPLID = :1 — returns 30 rows
+\`\`\`
+Cause: No MAX(EFFDT) criteria. Fix: Add correct effective dating WHERE clause.
+
+**Step 3: Fix in App Designer, test, migrate**`
+      },
+      {
+        title:"Performance Tuning — Batch",
+        body:`**AE batch performance checklist:**
+
+1. **Check Do Select mode** — Re-Select vs Select Once. If source data doesn't change during the loop, use Select Once.
+
+2. **Indexes on Temp Tables** — Add indexes to Temp Table records in App Designer for fields used in WHERE clauses of your AE SQL.
+
+3. **Set-based SQL over row-by-row** — Replace PeopleCode loops with single UPDATE/INSERT SQL statements where possible:
+\`\`\`sql
+/* Bad: PeopleCode loop with SQLExec per row */
+/* Good: Single set-based SQL */
+UPDATE PS_JOB SET PROCESS_FLAG = 'Y'
+WHERE EMPLID IN (SELECT EMPLID FROM PS_STAGE WHERE STATUS = 'READY')
+\`\`\`
+
+4. **CommitWork frequency** — too rarely = huge rollback, risk of restart from far back; too often = commit overhead. 500-1000 rows is typical.
+
+5. **Parallel processing** — for truly large volumes, split workload across multiple AE instances using Temp Tables.
+
+6. **DB statistics** — outdated DB statistics cause the optimizer to choose wrong execution plans. Work with your DBA to ensure statistics are updated after large data loads.`
+      },
+    ],
+    realWorld:`A payroll AE that calculated vacation accruals for 150,000 employees was taking 18 hours — too close to the payroll run cutoff. Performance analysis: the main Do Select had no index on PS_JOB_ACCRUAL_TBL causing a full table scan on 2M rows each iteration, plus a PeopleCode loop inside doing individual SQLExec calls for each employee's leave balance. Fixes: created proper composite index on the Temp Table, converted the inner PeopleCode loop to a single set-based SQL UPDATE, increased CommitWork from every row to every 1,000. Final runtime: 2.5 hours.`,
+    mistakes:[
+      {title:"Not analyzing SQL trace before optimizing", desc:"Developers often guess at performance problems and optimize the wrong thing. Always run SQL trace first — it shows exactly which SQL is slow, how many times it runs, and how many rows it processes. Optimize with data, not guesses."},
+      {title:"Missing indexes on key search fields", desc:"Adding an Alternate Search Key (A) designation to a record field in App Designer creates a DB index automatically when you run Build → Alter. Without this, searches on that field do full table scans even for basic lookups."},
+    ],
+    quiz:[
+      {q:"What is the first step when diagnosing a slow PeopleSoft page?",options:["Restart the App Server","Enable SQL trace to identify which SQL statements are slow and how many times they execute","Add more memory to the server","Reduce the number of fields on the page"],correct:1,explanation:"SQL trace is the definitive diagnostic tool. It shows every SQL executed, with timing and row counts. This reveals patterns like N+1 queries (SQLExec in RowInit), missing indexes, and missing effective dating — the most common performance issues."},
+      {q:"How do you create a database index for a PeopleSoft record field?",options:["Write a CREATE INDEX SQL statement manually","Mark the field as Alternate Search Key (A) in App Designer and run Build → Alter Table","Add the field to the primary key","Configure it in PSADMIN"],correct:1,explanation:"Marking a field as Alternate Search Key (A) in Application Designer causes PeopleSoft to create a non-unique database index on that field when you run Build → Alter Table. PeopleSoft manages all index creation through its metadata — no manual SQL needed."},
+    ],
+    peopleBooksUrl:"https://docs.oracle.com/cd/F44947_01/pt858pbr3/eng/pt/tpscr/",
+  },
+  {
+    id:"fluid-ui-basics", module:10, num:"30",
+    title:"Fluid UI & Modern PeopleSoft",
+    level:"intermediate",
+    summary:"Fluid UI is PeopleSoft's modern responsive interface introduced in PT 8.53. Understanding Fluid — homepages, tiles, NavBar, and Activity Guides — is essential for working with current PeopleSoft environments.",
+    preChecklist:[
+      "You understand the Classic UI (pages, components, navigation)",
+      "You know what a Content Reference (CREF) is",
+      "You understand Permission Lists and Roles",
+    ],
+    keyPoints:[
+      "Fluid uses HTML5/CSS3 — responsive on mobile, tablet, and desktop. Classic is desktop-only",
+      "Fluid Homepages contain Tiles — each tile is a CREF linking to a component or WorkCenter",
+      "NavBar provides the main navigation hierarchy — replaces classic menu navigation",
+      "Activity Guides provide step-by-step guided workflows — like a wizard for complex processes",
+      "All new Oracle PeopleSoft functionality is built in Fluid only — Classic pages are no longer enhanced",
+    ],
+    sections:[
+      {
+        title:"Fluid Architecture Overview",
+        body:`**Classic vs Fluid:**
+
+*Classic UI (pre-PT 8.53):*
+- Fixed-width HTML tables
+- Desktop-only — unusable on mobile
+- Grey/white Oracle-style interface
+- Navigation via horizontal/vertical menu bars
+- All delivered PS8-PS9.2 pages built in Classic
+
+*Fluid UI (PT 8.53+):*
+- Responsive HTML5/CSS3 with Oracle JavaScript Extension Toolkit (JET)
+- Works on mobile phones, tablets, and desktops
+- Modern flat design with tiles and cards
+- Navigation via Homepages + Tiles + NavBar
+- All new Oracle functionality built in Fluid only
+
+**Key Fluid components:**
+- **Fluid Homepage** — the landing page after signon. Contains tiles, quicklinks, news.
+- **Tile** — a clickable card on the homepage linking to a component or WorkCenter. Can show dynamic badge counts (e.g., "3 pending approvals").
+- **NavBar** — the icon/sidebar navigation replacing classic menus. Opens folders of CREFs.
+- **WorkCenter** — a multi-panel Fluid page combining a navigation list, a work area, and context tools. Used for complex roles (Benefits Administrator, Payroll Specialist).
+- **Activity Guide** — a step-by-step wizard for multi-component processes (new hire onboarding, annual enrollment).`
+      },
+      {
+        title:"Homepages and Tiles",
+        body:`**Fluid Homepages:**
+Users can have multiple homepages — each focused on a role (Manager Self Service, Employee Self Service, HR Administration). Homepages are configured in PeopleTools → Portal → Structure and Content → Homepages.
+
+**Creating a Tile:**
+1. A Tile is a CREF with special Fluid properties
+2. Tile CREF has an image (PNG, SVG) and optional badge count configuration
+3. Badge count: small red/gold number on the tile showing pending items (e.g., "5 pending approvals") — driven by a PS Query that counts pending rows
+4. Tile CREFs assigned to a Homepage via Tile Collection
+
+**Tile configuration in App Designer:**
+- Object Type: Content Reference (CREF)
+- Content Type: Target
+- URL: links to Fluid component
+- Tile Properties: image, badge query, tile size (small/medium/large/extra-large)
+
+**Dynamic Badge Setup:**
+1. Create a PS Query counting relevant rows for the current user
+2. In Tile CREF → Tile Properties → Badge Query: select the query
+3. The query runs automatically on homepage load — shows count in tile badge
+4. Counts > 0 are highlighted (gold/red) to draw attention`
+      },
+      {
+        title:"Activity Guides",
+        body:`**What is an Activity Guide?**
+A structured step-by-step workflow that guides a user through multiple components in a defined sequence. Think of it as a wizard for complex business processes.
+
+**Examples:**
+- New Hire Onboarding: Step 1 (Personal Data) → Step 2 (Job Data) → Step 3 (Benefits Enrollment) → Step 4 (Document Upload) → Step 5 (Confirmation)
+- Annual Open Enrollment: benefits selection across 5 screens, each validated before proceeding
+- Manager Self Service performance review workflow
+
+**Activity Guide components:**
+- **Activity Guide Composer** (PT 8.57+): low-code tool to create activity guides without programming
+- **Steps**: each step maps to a specific Fluid component or page
+- **Progress Tracker**: visual step indicator showing completed/current/remaining steps
+- **Side Panel**: contextual information visible during all steps
+
+**Activity Guide vs WorkCenter:**
+WorkCenter: ongoing daily work for a role — navigate between tasks freely. 
+Activity Guide: one-time process with a defined start/end — steps must be completed in sequence.`
+      },
+      {
+        title:"Converting Classic Pages to Fluid",
+        body:`**Classic pages do NOT automatically become Fluid.**
+This is a common misconception. Classic pages continue to work in a Fluid environment but they display in a legacy "Classic" rendering mode — not responsive.
+
+**Migration options:**
+
+*Option 1: Run Classic page in Fluid wrapper*
+Classic component wrapped in a Fluid header/footer. Works on desktop. Not truly responsive. Quickest approach for existing components.
+
+*Option 2: Create Fluid version of the Classic component*
+Rebuild the component using Fluid page controls (Group Boxes, Grids with Fluid styling, Responsive layouts). Significant development effort but produces a truly mobile-responsive result.
+
+*Option 3: Event Mapping for Fluid behavior*
+For PT 8.55+ — attach Fluid-specific behaviors to delivered Classic components via Event Mapping without modifying the delivered page.
+
+**Oracle's direction:**
+Oracle no longer delivers new functionality on Classic pages. All new features (Insights dashboards, Activity Guides, Fluid WorkCenters) require Fluid. Organizations still on Classic-only face growing gaps vs the delivered product.`
+      },
+    ],
+    realWorld:`A university with PeopleSoft 9.2 PT 8.58 wanted to roll out Manager Self Service on mobile for their 500 managers. The existing Classic MSS pages were unusable on phones. The project created Fluid homepages with tiles for Leave Approval (badge showing pending count), Team Time Review, and Position Management. Activity Guides handled the annual merit review process — guiding managers through 4 steps with validation at each. Mobile adoption was 78% within the first month — managers approved leave from their phones during commutes instead of waiting to get to a desktop.`,
+    mistakes:[
+      {title:"Assuming Classic pages work on mobile", desc:"Classic pages use fixed-width HTML tables — they render as tiny unreadable content on mobile screens. If mobile access is needed, Fluid development is required. Don't promise mobile access without planning for Fluid development."},
+      {title:"Not securing Fluid tiles with correct CREFs", desc:"Fluid tiles are CREFs — they must be secured in Permission Lists like any other navigation. A tile visible to everyone but pointing to a restricted component creates confusion (users see the tile but get 'Access Denied'). Align tile CREF security with the component's Permission List."},
+      {title:"Rebuilding Fluid from scratch when Event Mapping is sufficient", desc:"For adding small Fluid behaviors to existing Classic components — like showing a toast notification after save — Event Mapping is often sufficient. Full Fluid rebuilds are expensive. Evaluate whether Event Mapping can meet the requirement first."},
+    ],
+    quiz:[
+      {q:"What is the main difference between Fluid UI and Classic UI?",options:["Fluid is faster","Fluid uses responsive HTML5/CSS3 working on mobile/tablet/desktop; Classic uses fixed-width tables for desktop only","Fluid requires a different database","Classic has better security"],correct:1,explanation:"Fluid UI (PT 8.53+) uses responsive HTML5/CSS3 with Oracle JET — works on any device. Classic uses fixed-width HTML tables designed for desktop only. All new Oracle functionality is built exclusively in Fluid."},
+      {q:"What is a Tile in PeopleSoft Fluid UI?",options:["A database partition","A clickable card on a Fluid Homepage linking to a component, optionally showing a dynamic badge count","A PeopleCode function","A security configuration object"],correct:1,explanation:"Tiles are the large clickable cards on Fluid Homepages. Each tile is a CREF with an image and optional badge count (showing pending items count from a PS Query). Users click tiles to navigate to components."},
+    ],
+    peopleBooksUrl:"https://docs.oracle.com/cd/F44947_01/pt858pbr3/eng/pt/tflu/",
+  },
+];
+
 const QUIZ_BANK = [
   /* ── HISTORY & INTRODUCTION (10) ── */
   {cat:"History & Introduction",q:"In what year was PeopleSoft founded?",opts:["1982","1987","1992","1995"],ans:1,exp:"PeopleSoft was founded in 1987 by Dave Duffield and Ken Morris in Pleasanton, California. Their first product was a client-server HR payroll application."},
@@ -2075,6 +3331,6 @@ const GLOSSARY = [
 
 const CURRICULUM_LIST = {
   b: TOPICS.map(t => t.title),
-  i: ["Application Designer Deep Dive","Application Engine","Component Interface","SQR Programming","BI Publisher Reports","Integration Broker","Security & Roles","Process Scheduler","Data Mover & Migration","PeopleSoft Update Manager (PUM)"],
-  a: ["Fluid UI Development","Fluid Tiles & Homepages","Application Packages (OOP)","REST & SOAP Web Services","Performance Tuning","PeopleTools Upgrades","Activity Guides","Event Mapping","Elasticsearch & Search Framework","PeopleCode Debugging Techniques"],
+  i: INTERMEDIATE_TOPICS.map(t => t.title),
+  a: ["Fluid UI Development Advanced","Application Packages (OOP)","REST & SOAP Deep Dive","Performance Tuning Advanced","PeopleTools Upgrades","Activity Guides","Event Mapping","Elasticsearch & Search Framework","PeopleCode Debugging","Fluid WorkCenters"],
 };

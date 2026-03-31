@@ -75,7 +75,7 @@
         <button class="nav__link" onclick="showGlossary()" aria-label="Open Glossary">Glossary</button>
         <button class="nav__link" onclick="showQuiz()" aria-label="Open Quiz Engine">Quiz</button>
         <button class="nav__link" onclick="showInterview()" aria-label="Open Interview Q&A">Interview Prep</button>
-        <button class="nav__link" onclick="showLab()" aria-label="Open Simulation Lab">Simulator 🧪</button>
+        <button class="nav__link" onclick="showLab()" aria-label="Open Simulation Lab">Lab 🧪</button>
         <button class="nav__link" onclick="showHome();setTimeout(()=>document.querySelector('.about-section').scrollIntoView({behavior:'smooth'}),100)" aria-label="About this platform">About</button>
       </div>
       <div class="nav__actions">
@@ -100,8 +100,8 @@
   <div class="container">
     <div class="hero__eyebrow">A Growing PeopleSoft Learning Platform</div>
     <h1 class="hero__headline">
-      Learn PeopleSoft
-      <em>Basic to Advanced</em>
+      Learn PeopleSoft the Way
+      <em>Projects Actually Use It</em>
     </h1>
     <p class="hero__sub">From App Designer basics to real enterprise development — structured, practical, and built for freshers, support engineers, and developers moving into PeopleSoft.</p>
     <div class="hero__actions">
@@ -178,6 +178,181 @@
   </div>
 </section>
 
+<!-- ARCHITECTURE — mini only, link to full lesson -->
+<section class="section" style="position:relative;z-index:1;padding:48px 0">
+  <div class="container">
+    <div class="section-header reveal" style="margin-bottom:28px">
+      <div class="section-header__tag">PeopleSoft Internet Architecture</div>
+      <h2 class="section-header__title">How a Page Request <em>Actually Works</em></h2>
+      <p class="section-header__sub">Every user action flows through three tiers. Understanding this is the foundation of all PeopleSoft development and debugging.</p>
+    </div>
+    <div class="arch-diagram reveal" style="transition-delay:.1s">
+      <div class="arch-node"><div class="arch-node__tag tag--browser">Client</div><div class="arch-node__icon">🌐</div><div class="arch-node__title">Browser</div><div class="arch-node__sub">HTTP/HTTPS</div></div>
+      <div class="arch-arrow"><div class="arch-arrow__line"></div><div class="arch-arrow__label">HTTP/S</div></div>
+      <div class="arch-node"><div class="arch-node__tag tag--web">Tier 1</div><div class="arch-node__icon">⚙️</div><div class="arch-node__title">WebLogic</div><div class="arch-node__sub">Presentation only</div></div>
+      <div class="arch-arrow"><div class="arch-arrow__line"></div><div class="arch-arrow__label">JOLT</div></div>
+      <div class="arch-node"><div class="arch-node__tag tag--app">Tier 2</div><div class="arch-node__icon">🧠</div><div class="arch-node__title">Tuxedo</div><div class="arch-node__sub">PeopleCode · Logic</div></div>
+      <div class="arch-arrow"><div class="arch-arrow__line"></div><div class="arch-arrow__label">SQL</div></div>
+      <div class="arch-node"><div class="arch-node__tag tag--db">Tier 3</div><div class="arch-node__icon">🗃️</div><div class="arch-node__title">Database</div><div class="arch-node__sub">Oracle/SQL Server/DB2</div></div>
+    </div>
+    <div style="text-align:center;margin-top:20px">
+      <button class="btn btn--ghost btn--sm" onclick="openTopic(4)">Explore Full Architecture Lesson →</button>
+    </div>
+  </div>
+</section>
+
+<!-- LEARNING PATHS -->
+<section class="section" style="position:relative;z-index:1;background:var(--s0);border-top:1px solid var(--border)">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-header__tag">Learning Paths</div>
+      <h2 class="section-header__title">Three Paths. <em>One Goal.</em></h2>
+      <p class="section-header__sub">Start with Foundations — Intermediate and Advanced paths are actively being built.</p>
+    </div>
+    <div class="path-grid">
+      <div class="path-card path-card--b reveal" onclick="openTopic(0)" style="cursor:pointer">
+        <div class="path-card__top-bar"></div><div class="path-card__glow"></div>
+        <span class="path-card__icon">🌱</span>
+        <div class="path-card__level">Beginner — 7 Modules · 20 Topics · Live Now</div>
+        <h3 class="path-card__title">PeopleSoft Foundations</h3>
+        <p class="path-card__desc">No prior experience needed. Learn architecture, PeopleTools, records, pages, PeopleCode basics, PS Query, security, and process scheduling.</p>
+        <div class="path-card__topics">
+          <span class="path-card__topic">Module 1 — History, Intro, PeopleTools, Glossary</span>
+          <span class="path-card__topic">Module 2 — Architecture & Cloud (PIA, OCI, PUM)</span>
+          <span class="path-card__topic">Module 3 — UI, Navigation, Pages, Components</span>
+          <span class="path-card__topic">Module 4 — App Designer, Records, Effective Dating</span>
+          <span class="path-card__topic">Module 5 — PeopleCode Basics & Component Buffer</span>
+          <span class="path-card__topic">Module 6 & 7 — PS Query, Security, Process Monitor</span>
+        </div>
+        <button class="btn btn--gold btn--sm" style="margin-top:8px">Start Beginner Path →</button>
+      </div>
+      <div class="path-card path-card--i reveal" style="transition-delay:.1s">
+        <div class="path-card__top-bar"></div><div class="path-card__glow"></div>
+        <span class="path-card__icon">⚡</span>
+        <div class="path-card__level">Intermediate — In Progress (~30% built)</div>
+        <h3 class="path-card__title">Core Development Skills</h3>
+        <p class="path-card__desc">Application Engine, Component Interface, Integration Broker, BI Publisher, advanced security, Process Scheduler, and Data Mover.</p>
+        <div class="path-card__topics">
+          <span class="path-card__topic">Application Engine — batch framework & Meta-SQL</span>
+          <span class="path-card__topic">Component Interface — programmatic APIs</span>
+          <span class="path-card__topic">Integration Broker — messaging & REST/SOAP</span>
+          <span class="path-card__topic">BI Publisher — formatted PDF/Excel reports</span>
+          <span class="path-card__topic">Advanced Security — row-level, trees, auditing</span>
+        </div>
+        <button class="btn btn--gold btn--sm" style="margin-top:8px" onclick="openTopic(0,true)">Start Intermediate Path →</button>
+      </div>
+      <div class="path-card path-card--a reveal" style="transition-delay:.2s">
+        <div class="path-card__top-bar"></div><div class="path-card__glow"></div>
+        <span class="path-card__icon">🔥</span>
+        <div class="path-card__level">Advanced — Planned</div>
+        <h3 class="path-card__title">Expert-Level Mastery</h3>
+        <p class="path-card__desc">Fluid UI development, Application Packages (OOP), REST/SOAP services, performance tuning, Event Mapping, and Elasticsearch.</p>
+        <div class="path-card__topics">
+          <span class="path-card__topic">Fluid UI — responsive HTML5, tiles & homepages</span>
+          <span class="path-card__topic">Application Packages — OOP in PeopleCode</span>
+          <span class="path-card__topic">REST & SOAP via Integration Broker</span>
+          <span class="path-card__topic">Event Mapping — upgrade-safe customization</span>
+          <span class="path-card__topic">Performance Tuning — trace, SQL, caching</span>
+        </div>
+        <span class="path-card__count" style="display:flex;align-items:center;gap:8px;margin-top:12px">
+          <span style="flex:1;height:4px;background:var(--s3);border-radius:99px;overflow:hidden"><span style="display:block;width:5%;height:100%;background:var(--red);border-radius:99px"></span></span>
+          <span>Planned — Coming Later</span>
+        </span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OUTCOMES SECTION -->
+<section class="section" style="position:relative;z-index:1">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-header__tag">Learning Outcomes</div>
+      <h2 class="section-header__title">After the Beginner Path,<br><em>You'll Be Able To...</em></h2>
+      <p class="section-header__sub">Concrete skills you'll have after completing all 20 beginner topics — not vague promises.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px" class="reveal" style="transition-delay:.1s">
+      <div class="outcome-card">
+        <div class="outcome-card__icon">🏗️</div>
+        <div class="outcome-card__title">Explain PeopleSoft Architecture</div>
+        <div class="outcome-card__desc">Describe the three-tier PIA architecture, what each tier does, and why business logic runs in Tuxedo — not the browser.</div>
+      </div>
+      <div class="outcome-card">
+        <div class="outcome-card__icon">🛠️</div>
+        <div class="outcome-card__title">Navigate Application Designer</div>
+        <div class="outcome-card__desc">Create records, define fields, design pages, build components, and register them in the Portal — the core developer workflow.</div>
+      </div>
+      <div class="outcome-card">
+        <div class="outcome-card__icon">⚡</div>
+        <div class="outcome-card__title">Write Basic PeopleCode</div>
+        <div class="outcome-card__desc">Use SQLExec, CreateSQL, field defaulting, SaveEdit validation, and PostBuild logic with confidence in real components.</div>
+      </div>
+      <div class="outcome-card">
+        <div class="outcome-card__icon">📅</div>
+        <div class="outcome-card__title">Understand Effective Dating</div>
+        <div class="outcome-card__desc">Query effective-dated tables correctly, understand why PS_JOB can have 30+ rows per employee, and avoid the most common SQL mistake.</div>
+      </div>
+      <div class="outcome-card">
+        <div class="outcome-card__icon">🔒</div>
+        <div class="outcome-card__title">Configure Basic Security</div>
+        <div class="outcome-card__desc">Set up User Profiles, assign Roles and Permission Lists, understand row-level security, and troubleshoot access issues.</div>
+      </div>
+      <div class="outcome-card">
+        <div class="outcome-card__icon">💼</div>
+        <div class="outcome-card__title">Answer Beginner Interview Questions</div>
+        <div class="outcome-card__desc">Confidently answer the 20 most common PeopleSoft beginner interview questions on architecture, records, PeopleCode, and security.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SAMPLE LESSON PREVIEW -->
+<section class="section" style="position:relative;z-index:1;background:var(--s0);border-top:1px solid var(--border);padding:56px 0">
+  <div class="container">
+    <div class="section-header reveal" style="margin-bottom:32px">
+      <div class="section-header__tag">Sample Lesson</div>
+      <h2 class="section-header__title">See What a Lesson <em>Actually Looks Like</em></h2>
+      <p class="section-header__sub">Every topic is structured the same way — pre-checklist, key takeaways, deep sections, real-world context, common mistakes, and a mini quiz.</p>
+    </div>
+    <div class="sample-lesson reveal" style="transition-delay:.1s">
+      <div class="sample-lesson__header">
+        <span class="sample-lesson__badge">🧱 Module 4: Application Designer & Data Model</span>
+        <h3 class="sample-lesson__title">Effective Dating (EFFDT & EFFSEQ)</h3>
+        <p class="sample-lesson__summary">Instead of overwriting data when something changes, PeopleSoft inserts a new row with a new Effective Date — preserving the complete history of every change forever.</p>
+      </div>
+      <div class="sample-lesson__body">
+        <div class="sample-lesson__col">
+          <div class="sample-lesson__section-label">⚡ Key Takeaways</div>
+          <ul class="sample-lesson__list">
+            <li>EFFDT = the date a row becomes valid</li>
+            <li>EFFSEQ handles multiple changes on the same date</li>
+            <li>PeopleSoft always shows MAX(EFFDT) ≤ today</li>
+            <li>Future-dated rows enter today but activate later</li>
+            <li>Historical rows are never deleted — ever</li>
+          </ul>
+          <div class="sample-lesson__section-label" style="margin-top:16px">🏢 Real-World Context</div>
+          <p style="font-size:13px;color:var(--soft);line-height:1.7">In a 100,000-employee system, PS_JOB alone can have 3M+ rows. Every salary change, promotion, and transfer is a new row — not an update. This is what makes retroactive payroll possible.</p>
+        </div>
+        <div class="sample-lesson__col">
+          <div class="sample-lesson__section-label">⚠️ Common Mistakes</div>
+          <div class="sample-lesson__mistake">
+            <span style="color:var(--red);font-weight:700;font-size:12px">MISTAKE</span>
+            <p style="font-size:13px;color:var(--soft);margin-top:4px">Querying PS_JOB without effective dating WHERE clause — returns ALL rows for an employee (30+ rows), causing duplicate records in reports.</p>
+          </div>
+          <div class="sample-lesson__section-label" style="margin-top:16px">🧠 Mini Quiz Preview</div>
+          <div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px 14px">
+            <p style="font-size:13px;color:var(--text);font-weight:600;margin-bottom:8px">What does PeopleSoft do when an employee gets promoted?</p>
+            <p style="font-size:12px;color:var(--green)">✅ Inserts a new row with the new Effective Date — the old row remains</p>
+          </div>
+        </div>
+      </div>
+      <div style="text-align:center;padding-top:20px;border-top:1px solid var(--border)">
+        <button class="btn btn--gold btn--md" onclick="openTopic(13)">Read Full Lesson on Effective Dating →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- CURRICULUM -->
 <section id="curriculum" class="section--tight curriculum-section">
   <div class="container">
@@ -214,6 +389,21 @@
   </div>
 </section>
 
+<!-- CTA — honest, strong -->
+<section class="section cta-section">
+  <div class="cta-bg" aria-hidden="true"></div>
+  <div class="container cta-inner">
+    <div class="cta-tag reveal">Start Today — No Account Needed</div>
+    <h2 class="cta-title reveal">Learn PeopleSoft the Way<br><em>Projects Actually Use It</em></h2>
+    <p class="cta-sub reveal">Structured, practical, enterprise-focused. Start the Beginner Path and build real foundational knowledge — for free.</p>
+    <div class="cta-actions reveal">
+      <button class="btn btn--gold btn--lg" onclick="openTopic(0)">🚀 Start Beginner Path</button>
+      <button class="btn btn--ghost btn--lg" onclick="showGlossary()">Browse Glossary 📖</button>
+    </div>
+    <p class="cta-note reveal">No login · No payment · Learn at your own pace</p>
+  </div>
+</section>
+
 <!-- ABOUT SECTION — stronger credibility -->
 <section class="section about-section">
   <div class="container">
@@ -237,7 +427,7 @@
           <div class="builder-card__avatar">KR</div>
           <div class="builder-card__name">Koushik Ram M</div>
           <div class="builder-card__role">PeopleSoft Technical Consultant</div>
-          <div class="builder-card__bio">Hands-on experience in HCM, FSCM  Modules — production support, enhancements Worked with PeopleCode, Application Engine, SQR, SQL, PS Query, Integration Broker, security configurations, and validations across enterprise environments.</div>
+          <div class="builder-card__bio">Hands-on experience in HCM, FSCM, and HRMS implementations — production support, enhancements, and full project cycles. Worked with PeopleCode, Application Engine, SQR, SQL, PS Query, Integration Broker, security configurations, and validations across enterprise environments.</div>
           <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px">
             <span class="about-source-chip" style="font-size:10px">PeopleCode</span>
             <span class="about-source-chip" style="font-size:10px">App Engine</span>
@@ -485,10 +675,10 @@
       <button onclick="showHome()" style="background:none;border:none;color:var(--soft);font-size:13px;cursor:pointer;padding:0 0 16px;font-family:var(--fb);display:flex;align-items:center;gap:6px">← Back to Home</button>
       <div class="iqa-pro-tag">💼 Interview Preparation Hub</div>
       <h1 class="iqa-pro-title">PeopleSoft <span>Interview Q&amp;A</span></h1>
-      <p class="iqa-pro-sub">Expert-level answers written for real technical interviews — from fresher to senior consultant level. Study, copy answers, bookmark what you need.</p>
+      <p class="iqa-pro-sub">200 expert questions across Beginner, Intermediate, and Advanced levels. 50 random questions shown each session — click <strong>Refresh</strong> for a new set.</p>
       <div class="iqa-pro-stats">
-        <div class="iqa-pro-stat"><strong id="iqaTotalCount">40</strong> Questions</div>
-        <div class="iqa-pro-stat"><strong>4</strong> Levels</div>
+        <div class="iqa-pro-stat"><strong>200</strong> Total Questions</div>
+        <div class="iqa-pro-stat"><strong id="iqaTotalCount">50</strong> Shown Now</div>
         <div class="iqa-pro-stat"><strong>8</strong> Categories</div>
         <div class="iqa-pro-stat" id="iqaReviewedStat"><strong id="iqaReviewedCount">0</strong> Reviewed</div>
       </div>
@@ -515,6 +705,7 @@
       <button class="iqa-pro-filter f-intermediate" onclick="setIQALevel('intermediate',this)">⚡ Intermediate</button>
       <button class="iqa-pro-filter f-advanced" onclick="setIQALevel('advanced',this)">🔥 Advanced</button>
       <button class="iqa-pro-filter f-scenario" onclick="setIQALevel('scenario',this)">🏢 Real Project</button>
+      <button class="iqa-pro-filter" onclick="refreshIQA()" style="margin-left:auto;background:rgba(240,165,0,0.1);border-color:rgba(240,165,0,0.3);color:var(--gold)">🔀 Refresh 50</button>
     </div>
 
     <div class="iqa-body">
@@ -827,7 +1018,7 @@
           <div class="ps-login-env">HCM Demo Environment</div>
           <div class="ps-login-footer">
             <span>HCM Demo Environment</span>
-            <span>PSLearn Practice Simulator — Educational Use Only.</span>
+            <span>PSLearn Practice Simulator — Educational Use Only</span>
           </div>
         </div>
       </div>
@@ -871,7 +1062,7 @@
           </div>
         </div>
         <div class="ps-home-footer">
-          <span>HCM Demo Environment</span>
+          <span>PSLearn Practice Simulator — Educational Use Only</span>
           <span id="psLoggedUser">Logged in as: HCMUSER</span>
         </div>
       </div>
@@ -892,6 +1083,7 @@
   </div>
 
 </div>
-  
+
+
 </body>
 </html>
