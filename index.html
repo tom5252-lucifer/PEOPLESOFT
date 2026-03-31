@@ -34,6 +34,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="styles.css"/>
+</head>
 <body>
 <a href="#homepageView" class="skip-link">Skip to main content</a>
 
@@ -471,7 +472,7 @@
 <!-- ═══════════════════════════════════════════════
      APP VIEW — LEARNING PLATFORM
 ═══════════════════════════════════════════════ -->
-<div id="appView">
+<div id="appView" style="display:none">
   <!-- MOBILE DRAWER OVERLAY -->
   <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
 
@@ -521,7 +522,7 @@
 <!-- ═══════════════════════════════════════════════
      GLOSSARY VIEW
 ═══════════════════════════════════════════════ -->
-<div id="glossaryView">
+<div id="glossaryView" style="display:none">
   <div class="glossary-layout">
     <div class="glossary-header">
       <button onclick="showHome()" style="background:none;border:none;color:var(--soft);font-size:13px;cursor:pointer;padding:0 0 16px;font-family:var(--fb);display:flex;align-items:center;gap:6px">← Back to Home</button>
@@ -544,7 +545,7 @@
 <!-- ═══════════════════════════════════════════════
      QUIZ VIEW
 ═══════════════════════════════════════════════ -->
-<div id="quizView">
+<div id="quizView" style="display:none">
 
   <!-- QUIZ HOME -->
   <div id="quizHome">
@@ -663,8 +664,6 @@
 </div>
 
 
-<script src="pslearn-data.js"></script>
-<script src="pslearn-app.js"></script>
 
 <!-- INTERVIEW Q&A VIEW — PRO -->
 <div id="interviewView" style="display:none;position:relative;z-index:1;min-height:100vh;padding-top:60px;background:var(--base)" role="main" aria-label="Interview Preparation">
@@ -1085,5 +1084,8 @@
 </div>
 
 
+
+<script src="pslearn-data.js"></script>
+<script src="pslearn-app.js"></script>
 </body>
 </html>
