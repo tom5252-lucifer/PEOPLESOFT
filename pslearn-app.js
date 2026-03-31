@@ -1,6 +1,10 @@
 /* PSLearn — Application Logic */
 /* pslearn.vercel.app | Built by Koushik Ram M */
 
+/* Core state variables */
+const visited = new Set();
+let currentTopicIndex = 0;
+
 /* ═══════════════════════════════════════════════
    VIEW MANAGER — prevents scroll bleed
 ═══════════════════════════════════════════════ */
@@ -892,11 +896,7 @@ function buildReview(){
 ═══════════════════════════════════════════════ */
 // CURRICULUM_LIST in pslearn-data.js
 
-/* ═══════════════════════════════════════════════
-   VISITED TOPICS TRACKER
-═══════════════════════════════════════════════ */
-const visited = new Set();
-let currentTopicIndex = 0;
+/* visited + currentTopicIndex moved to top */
 
 /* ═══════════════════════════════════════════════
    MOBILE DRAWER
