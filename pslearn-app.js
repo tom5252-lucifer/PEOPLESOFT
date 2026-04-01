@@ -406,8 +406,6 @@ const INTERVIEW_QA_ALL = [
 ];
 
 // Add 200Q shuffle support: show 50 random at a time
-let INTERVIEW_QA = shuffleAndSliceIQA(50);
-
 function shuffleAndSliceIQA(count) {
   const arr = [...INTERVIEW_QA_ALL];
   for (let i = arr.length - 1; i > 0; i--) {
@@ -416,6 +414,9 @@ function shuffleAndSliceIQA(count) {
   }
   return arr.slice(0, count);
 }
+
+// Now safe to call — function is defined above
+let INTERVIEW_QA = shuffleAndSliceIQA(50);
 
 function refreshIQA() {
   INTERVIEW_QA = shuffleAndSliceIQA(50);
@@ -606,10 +607,8 @@ function adsBuild(){
 
 function psSignIn(){const u=document.getElementById('psUserId').value.trim(),p=document.getElementById('psPassword').value;document.getElementById('psLoginError').classList.remove('show');if(!u||!p){document.getElementById('psLoginError').textContent='Enter both User ID and Password.';document.getElementById('psLoginError').classList.add('show');return;}document.getElementById('psLoggedUser').textContent=`Logged in as: ${u.toUpperCase()}`;buildPSHome();showPSScreen('psHomeScreen');}
 function psSignOut(){showPSScreen('psLoginScreen');}
-function showPSScreen(id){
-  document.querySelectorAll('.ps-sim-screen').forEach(s=>s.classList.remove('active'));
-  const t=document.getElementById(id);if(t)t.classList.add('active');
-}
+function showPSScreen(id){document.querySelectorAll('.ps-sim-screen').forEach(s=>s.classList.remove('active'));const t=document.getElementById(id);if(t)t.classList.add('active');}
+function initPSSim(){showPSScreen('psLoginScreen');document.getElementById('psLoginError').classList.remove('show');document.getElementById('psUserId').value='';document.getElementById('psPassword').value='';}
 function psGoHome(){showPSScreen('psHomeScreen');buildPSHome();}
 function buildPSHome(){document.getElementById('psTilesGrid').innerHTML=PS_TILES.map(t=>t.type==='chart'?`<div class="ps-tile chart-tile" onclick="psOpenComponent('${t.title}')"><div class="ps-tile__chart-title">${t.title}</div><div style="display:flex;align-items:flex-end;gap:4px;height:60px;margin-bottom:6px">${[40,65,50,80,55,90,75].map(h=>`<div style="width:12px;background:#1e4d8c;height:${h}%;border-radius:2px 2px 0 0;opacity:.7"></div>`).join('')}</div><div style="font-size:10px;color:#888">${t.subtitle}</div></div>`:`<div class="ps-tile" onclick="psOpenComponent('${t.title}')"><div class="ps-tile__icon">${t.icon}</div><div class="ps-tile__title">${t.title}</div><div class="ps-tile__subtitle">${t.subtitle}</div></div>`).join('');document.getElementById('psQuickLinks').innerHTML=[{i:'📋',l:'View PeopleSoft'},{i:'✅',l:'Asset Allowances'},{i:'🔍',l:'Run a Query'},{i:'📄',l:'Your Docs'}].map(q=>`<div class="ps-quicklink" onclick="alert('${q.l}')"><span>${q.i}</span>${q.l}</div>`).join('');buildPSNav('');document.getElementById('psNavBar').style.display='flex';}
 function psToggleNav(){const n=document.getElementById('psNavBar');n.style.display=n.style.display==='none'?'flex':'none';}
