@@ -652,57 +652,50 @@
           <div class="lab-mode-card__desc">Interactive mock Application Designer IDE. Create records, add fields, set keys, and build tables.</div>
           <span class="lab-mode-card__badge badge-live">● Live</span>
         </div>
-        <!-- Mode 6: PS Navigator (Task-Driven) -->
+        <!-- Mode 6: PS Login + Home -->
         <div class="lab-mode-card" onclick="openLabMode('pssim')">
           <div class="lab-mode-card__top-bar" style="background:linear-gradient(90deg,#1e4d8c,#d4a017)"></div>
           <div class="lab-mode-card__icon">🔐</div>
           <div class="lab-mode-card__title">PeopleSoft Navigator</div>
-          <div class="lab-mode-card__desc">Mission-based HCM simulator. Sign in, receive tasks, navigate menus, update records, and learn PS navigation patterns through guided challenges.</div>
+          <div class="lab-mode-card__desc">Sign into a mock PeopleSoft HCM environment. Navigate the Fluid homepage, tiles, and NavBar.</div>
           <span class="lab-mode-card__badge badge-live">● Live</span>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- MODE 1: DEBUG -->
+  <!-- MODE 1: DEBUG SIMULATOR -->
   <div id="labDebug" style="display:none">
     <div class="lab-debug">
       <button class="lab-debug__back" onclick="backToLab()">← Back to Lab</button>
       <div class="lab-debug__header">
-        <div class="lab-debug__tag">🔍 Debug Mode</div>
+        <div class="lab-debug__tag">🐛 Debug Mode</div>
         <h2 class="lab-debug__title">Find the Bug</h2>
-        <p class="lab-debug__sub">Click the line of code that contains the bug. Then check your answer.</p>
+        <p class="lab-debug__sub">Click the buggy line of PeopleCode, use hint tokens, then view the animated fix diff.</p>
       </div>
       <div class="lab-debug__meta">
         <span class="lab-debug__counter" id="debugCounter">Challenge 1 of 6</span>
-        <div style="display:flex;gap:8px">
-          <span id="debugScore" style="font-family:var(--fm);font-size:12px;color:var(--green)">Score: 0</span>
-        </div>
+        <span id="debugScore" style="font-family:var(--fm);font-size:12px;color:var(--green)">Score: 0</span>
       </div>
       <div class="lab-debug__scenario" id="debugScenario"></div>
       <div class="lab-code-block" id="debugCode"></div>
-      <p class="lab-debug__hint" id="debugHint"></p>
-      <div id="debugActions" class="lab-debug__actions"></div>
+      <p class="lab-debug__hint" id="debugHint" style="min-height:22px"></p>
+      <div id="debugActions" style="display:flex;gap:10px;flex-wrap:wrap;margin:16px 0"></div>
       <div class="lab-result-box" id="debugResult"></div>
     </div>
   </div>
 
-  <!-- MODE 2: EVENT FLOW -->
+  <!-- MODE 2: EVENT FLOW TRAINER -->
   <div id="labEventFlow" style="display:none">
     <div class="lab-event-flow">
       <button class="lab-debug__back" onclick="backToLab()">← Back to Lab</button>
       <div class="lab-debug__header">
         <div class="lab-debug__tag" style="color:var(--amber)">⚡ Event Flow Trainer</div>
-        <h2 class="lab-debug__title">Order the Events</h2>
-        <p class="lab-debug__sub">Drag the PeopleCode events into the correct execution order.</p>
+        <h2 class="lab-debug__title">Inject the Missing Event</h2>
+        <p class="lab-debug__sub">The pipeline is broken — one event is missing. Drag it from the bank into the correct slot, then simulate.</p>
       </div>
       <div id="efChallengeName" style="font-family:var(--fm);font-size:13px;color:var(--gold);margin-bottom:14px;background:rgba(240,165,0,0.08);border:1px solid rgba(240,165,0,0.2);border-radius:8px;padding:10px 16px"></div>
-      <div class="event-drag-list" id="eventDragList"></div>
-      <div class="lab-debug__actions">
-        <button class="btn btn--gold btn--sm" onclick="checkEventOrder()">Check Order →</button>
-        <button class="btn btn--ghost btn--sm" onclick="resetEventOrder()">🔀 Shuffle</button>
-        <button class="btn btn--ghost btn--sm" id="efNextBtn" style="display:none" onclick="nextEFChallenge()">Next →</button>
-      </div>
+      <div id="eventDragList"></div>
       <div class="lab-result-box" id="efResult"></div>
     </div>
   </div>
@@ -713,38 +706,26 @@
       <button class="lab-debug__back" onclick="backToLab()">← Back to Lab</button>
       <div class="lab-debug__header">
         <div class="lab-debug__tag" style="color:var(--cyan)">🗂️ Object Matcher</div>
-        <h2 class="lab-debug__title">Pick the Right Object</h2>
-        <p class="lab-debug__sub">Read the scenario and select the correct PeopleSoft object type.</p>
+        <h2 class="lab-debug__title">Drag Scenario to the Right Object</h2>
+        <p class="lab-debug__sub">Drag the sticky note onto the correct PeopleSoft object type. Bonus question follows each match.</p>
       </div>
       <div class="lab-debug__meta">
         <span class="lab-debug__counter" id="matcherCounter">Scenario 1 of 10</span>
         <span id="matcherScore" style="font-family:var(--fm);font-size:12px;color:var(--green)">Score: 0/0</span>
       </div>
-      <div class="matcher-scenario"><div class="matcher-scenario__label">Scenario</div><div class="matcher-scenario__text" id="matcherScenario"></div></div>
-      <div class="matcher-options" id="matcherOptions"></div>
+      <div class="matcher-scenario">
+        <div class="matcher-scenario__label">📋 Scenario</div>
+        <div class="matcher-scenario__text" id="matcherScenario"></div>
+      </div>
+      <div id="matcherOptions"></div>
       <div class="lab-result-box" id="matcherResult"></div>
       <button class="btn btn--ghost btn--sm" id="matcherNextBtn" style="display:none;margin-top:12px" onclick="nextMatcher()">Next Scenario →</button>
     </div>
   </div>
 
-  <!-- MODE 4: SCENARIO SOLVER -->
+  <!-- MODE 4: SCENARIO SOLVER — detective UI injected by pslearn-scenario.js -->
   <div id="labScenario" style="display:none">
-    <div class="lab-matcher">
-      <button class="lab-debug__back" onclick="backToLab()">← Back to Lab</button>
-      <div class="lab-debug__header">
-        <div class="lab-debug__tag" style="color:var(--gold)">📋 Scenario Solver</div>
-        <h2 class="lab-debug__title">Diagnose the Problem</h2>
-        <p class="lab-debug__sub">Real enterprise issue. Pick the correct root cause diagnosis.</p>
-      </div>
-      <div class="lab-debug__meta">
-        <span class="lab-debug__counter" id="scenarioCounter">Scenario 1 of 8</span>
-        <span id="scenarioScore" style="font-family:var(--fm);font-size:12px;color:var(--green)">Score: 0/0</span>
-      </div>
-      <div class="matcher-scenario" id="scenarioBox"><div class="matcher-scenario__label">🏢 Enterprise Scenario</div><div class="matcher-scenario__text" id="scenarioText"></div></div>
-      <div class="matcher-options" id="scenarioOptions"></div>
-      <div class="lab-result-box" id="scenarioResult"></div>
-      <button class="btn btn--ghost btn--sm" id="scenarioNextBtn" style="display:none;margin-top:12px" onclick="nextScenario()">Next Scenario →</button>
-    </div>
+    <div class="lab-matcher"></div>
   </div>
 
   <!-- MODE 5: APP DESIGNER SIMULATOR -->
@@ -863,112 +844,90 @@
     </div>
   </div>
 
-  <!-- MODE 6: PS NAVIGATOR — TASK-DRIVEN SIMULATOR -->
+  <!-- MODE 6: PS LOGIN + HOME SIMULATOR -->
   <div id="labPSSim" style="display:none" class="lab-ps-sim">
-
-    <!-- LOGIN SCREEN -->
+    <!-- Login Screen -->
     <div id="psLoginScreen" class="ps-sim-screen active">
       <div class="ps-login-outer">
         <div class="ps-login-card">
           <div class="ps-login-header">
             <div class="ps-login-brand">PS Learn <span>| PeopleSoft Practice Arena</span></div>
           </div>
-          <div class="ps-login-title">PS Learn HCM</div>
-          <div class="ps-login-subtitle">Mission-Based Navigator — 8 Guided Tasks</div>
+          <div class="ps-login-title">PS Learn</div>
+          <div class="ps-login-subtitle">HCM Demo Environment</div>
           <div class="ps-login-error" id="psLoginError">Invalid User ID or Password. Please try again.</div>
           <div class="ps-login-field">
             <label class="ps-login-label" for="psUserId">User ID</label>
-            <input class="ps-login-input" id="psUserId" type="text" placeholder="e.g. HCMUSER" autocomplete="off"/>
+            <input class="ps-login-input" id="psUserId" type="text" placeholder="Enter your User ID" autocomplete="off"/>
           </div>
           <div class="ps-login-field">
             <label class="ps-login-label" for="psPassword">Password</label>
-            <input class="ps-login-input" id="psPassword" type="password" placeholder="Any password works" onkeydown="if(event.key==='Enter')psSignIn()"/>
+            <input class="ps-login-input" id="psPassword" type="password" placeholder="Enter your password" onkeydown="if(event.key==='Enter')psSignIn()"/>
           </div>
-          <button class="ps-login-btn" onclick="psSignIn()">Sign In →</button>
+          <button class="ps-login-btn" onclick="psSignIn()">Sign In</button>
           <div class="ps-login-footer">
             <span>PSLearn Practice Simulator — Educational Use Only</span>
           </div>
         </div>
       </div>
-      <button onclick="backToLab()" style="position:fixed;top:70px;left:16px;z-index:500;background:rgba(0,0,0,0.6);color:#fff;border:1px solid rgba(255,255,255,0.2);border-radius:6px;padding:6px 14px;font-size:12px;cursor:pointer">← Back to Lab</button>
+      <button onclick="backToLab()" style="position:fixed;top:70px;left:16px;z-index:500;background:rgba(0,0,0,0.5);color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:12px;cursor:pointer">← Back to Lab</button>
     </div>
-
-    <!-- HOME SCREEN -->
+    <!-- Home Screen -->
     <div id="psHomeScreen" class="ps-sim-screen">
-      <div style="display:flex;height:100vh;overflow:hidden">
-        <!-- Main PS area -->
-        <div style="flex:1;display:flex;flex-direction:column;overflow:hidden">
-          <div class="ps-home-topbar">
-            <div class="ps-home-brand">PS Learn <span class="ps-home-brand-sub">| HCM Demo Environment</span></div>
-            <div class="ps-home-topicons">
-              <button class="ps-home-topicon" title="Home" onclick="psGoHome()">🏠</button>
-              <button class="ps-home-topicon" title="Search">🔍</button>
-              <button class="ps-home-topicon" title="Notifications" style="position:relative">🔔<span class="ps-home-notif-badge">1</span></button>
-              <button class="ps-home-topicon" title="NavBar — Open Navigator" onclick="psToggleNav()">⚙️</button>
-              <button class="ps-exit-btn" onclick="psSignOut()">Sign Out</button>
-            </div>
+      <div class="ps-home-outer">
+        <div class="ps-home-topbar">
+          <div class="ps-home-brand">
+            PS Learn <span class="ps-home-brand-sub">| PeopleSoft Practice Arena</span>
           </div>
-          <div class="ps-home-body" style="flex:1;overflow:hidden">
-            <div class="ps-home-content" id="psHomeContent" style="flex:1;overflow-y:auto;padding:20px">
-              <div class="ps-home-tiles" id="psTilesGrid"></div>
-              <div class="ps-quicklinks">
-                <div class="ps-quicklinks-title">Quick Links</div>
-                <div class="ps-quicklinks-row" id="psQuickLinks"></div>
-              </div>
-            </div>
-            <div class="ps-navbar" id="psNavBar" style="display:flex">
-              <div class="ps-navbar-header">
-                <span class="ps-navbar-title">Navigator</span>
-                <button onclick="psToggleNav()" style="background:none;border:none;cursor:pointer;color:#888;font-size:16px">✕</button>
-              </div>
-              <input class="ps-navbar-search" type="text" placeholder="🔍 Search Menu..." oninput="psNavSearch(this.value)"/>
-              <div id="psNavItems" style="overflow-y:auto;flex:1"></div>
-            </div>
-          </div>
-          <div class="ps-home-footer">
-            <span>PSLearn Practice Simulator — Educational Use Only</span>
-            <span id="psLoggedUser">Logged in as: HCMUSER</span>
+          <div class="ps-home-topicons">
+            <button class="ps-home-topicon" title="Home" onclick="psGoHome()">🏠</button>
+            <button class="ps-home-topicon" title="Search">🔍</button>
+            <button class="ps-home-topicon" title="Notifications" style="position:relative">
+              🔔<span class="ps-home-notif-badge">1</span>
+            </button>
+            <button class="ps-home-topicon" title="NavBar" onclick="psToggleNav()">⚙️</button>
+            <button class="ps-exit-btn" onclick="psSignOut()">Sign Out</button>
           </div>
         </div>
-        <!-- Task Panel -->
-        <div id="psTaskPanel" style="width:280px;min-width:260px;background:#0c1020;padding:16px;overflow-y:auto;border-left:1px solid #1f2937;flex-shrink:0;height:100vh;box-sizing:border-box"></div>
+        <div class="ps-home-body">
+          <div class="ps-home-content" id="psHomeContent">
+            <!-- Tiles -->
+            <div class="ps-home-tiles" id="psTilesGrid"></div>
+            <!-- Quick Links -->
+            <div class="ps-quicklinks">
+              <div class="ps-quicklinks-title">Quick Links</div>
+              <div class="ps-quicklinks-row" id="psQuickLinks"></div>
+            </div>
+          </div>
+          <!-- NavBar -->
+          <div class="ps-navbar" id="psNavBar">
+            <div class="ps-navbar-header">
+              <span class="ps-navbar-title">Navigator</span>
+              <button onclick="psToggleNav()" style="background:none;border:none;cursor:pointer;color:#888;font-size:16px">✕</button>
+            </div>
+            <input class="ps-navbar-search" type="text" placeholder="🔍 Search Menu..." oninput="psNavSearch(this.value)"/>
+            <div id="psNavItems"></div>
+          </div>
+        </div>
+        <div class="ps-home-footer">
+          <span>PSLearn Practice Simulator — Educational Use Only</span>
+          <span id="psLoggedUser">Logged in as: HCMUSER</span>
+        </div>
       </div>
     </div>
-
-    <!-- COMPONENT SCREEN -->
+    <!-- Component View -->
     <div id="psComponentScreen" class="ps-sim-screen">
-      <div style="display:flex;height:100vh;overflow:hidden">
-        <div style="flex:1;display:flex;flex-direction:column;overflow:hidden">
-          <div class="ps-home-topbar">
-            <div class="ps-home-brand">PS Learn <span class="ps-home-brand-sub">| HCM Demo Environment</span></div>
-            <div class="ps-home-topicons">
-              <button class="ps-home-topicon" onclick="psGoHome()">🏠</button>
-              <button class="ps-home-topicon" title="NavBar" onclick="psToggleNav()">⚙️</button>
-              <button class="ps-exit-btn" onclick="psSignOut()">Sign Out</button>
-            </div>
-          </div>
-          <!-- NavBar (shared, hidden by default on component screen) -->
-          <div style="display:flex;flex:1;overflow:hidden">
-            <div style="flex:1;overflow-y:auto;padding:24px" id="psComponentContent"></div>
-            <div class="ps-navbar" id="psNavBarComp" style="display:none">
-              <div class="ps-navbar-header">
-                <span class="ps-navbar-title">Navigator</span>
-                <button onclick="psToggleNav()" style="background:none;border:none;cursor:pointer;color:#888;font-size:16px">✕</button>
-              </div>
-              <input class="ps-navbar-search" type="text" placeholder="🔍 Search Menu..." oninput="psNavSearch(this.value)"/>
-              <div id="psNavItemsComp" style="overflow-y:auto;flex:1"></div>
-            </div>
-          </div>
-          <div class="ps-home-footer">
-            <span>PSLearn Practice Simulator</span>
-            <span id="psLoggedUser2"></span>
+      <div class="ps-home-outer">
+        <div class="ps-home-topbar">
+          <div class="ps-home-brand">PS Learn <span class="ps-home-brand-sub">| PeopleSoft Practice Arena</span></div>
+          <div class="ps-home-topicons">
+            <button class="ps-home-topicon" onclick="psGoHome()">🏠</button>
+            <button class="ps-exit-btn" onclick="psSignOut()">Sign Out</button>
           </div>
         </div>
-        <!-- Task Panel (same panel, mirrored) -->
-        <div id="psTaskPanelComp" style="width:280px;min-width:260px;background:#0c1020;padding:16px;overflow-y:auto;border-left:1px solid #1f2937;flex-shrink:0;height:100vh;box-sizing:border-box"></div>
+        <div style="padding:24px;max-width:900px;margin:0 auto" id="psComponentContent"></div>
       </div>
     </div>
-
   </div>
 
 </div>
@@ -977,7 +936,10 @@
 
 <script src="pslearn-data.js"></script>
 <script src="pslearn-app.js"></script>
-<script src="pslearn-lab.js"></script>
+<script src="pslearn-debug.js"></script>
+<script src="pslearn-eventflow.js"></script>
+<script src="pslearn-matcher.js"></script>
+<script src="pslearn-scenario.js"></script>
 <script src="pslearn-pssim.js"></script>
 </body>
 </html>
