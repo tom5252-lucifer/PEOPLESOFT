@@ -2053,3 +2053,13 @@ loadProgress();
 showResumeBanner();
 
 }); // end DOMContentLoaded
+
+/* ─── PSSIM OVERRIDE GUARD ───────────────────────────
+   pslearn-pssim.js (loaded after this file) redefines
+   all functions below. These stubs prevent "undefined"
+   errors if pssim.js hasn't loaded yet.
+─────────────────────────────────────────────────── */
+if (typeof window._psSimGuardInstalled === 'undefined') {
+  window._psSimGuardInstalled = true;
+  // pslearn-pssim.js will override these at runtime.
+}
