@@ -1,0 +1,349 @@
+/* =====================================================
+   PSLearn — Lab v2 Styles
+   Debug · Event Flow Inject · Object Matcher DnD · Detective
+   ===================================================== */
+
+/* ─── SHARED ─────────────────────────────────────── */
+.lab-debug__actions { display:flex; gap:10px; flex-wrap:wrap; margin:16px 0; }
+
+.lab-code-line.wrong-line { background:rgba(239,68,68,0.15)!important; border-left:3px solid var(--red)!important; }
+.lab-code-line.correct-line { background:rgba(34,197,94,0.15)!important; border-left:3px solid var(--green)!important; }
+
+.hint-token {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:18px; height:18px; border-radius:50%;
+  background:var(--gold); color:var(--void);
+  font-size:10px; font-weight:700; font-family:var(--fm);
+  margin-left:4px;
+}
+
+/* ─── DEBUG — code editor actions ───────────────── */
+#debugActions { display:flex; gap:10px; flex-wrap:wrap; margin:16px 0; }
+
+/* ─── EVENT FLOW INJECT ──────────────────────────── */
+.ef-inject-wrap { display:flex; flex-direction:column; gap:18px; }
+
+.ef-scenario-box {
+  background:rgba(240,165,0,0.06);
+  border:1px solid rgba(240,165,0,0.2);
+  border-radius:12px;
+  padding:16px 20px;
+}
+.ef-scenario-label {
+  font-family:var(--fm); font-size:10px; text-transform:uppercase;
+  letter-spacing:.1em; color:var(--gold); margin-bottom:8px;
+}
+.ef-scenario-text { font-size:14px; color:var(--text); line-height:1.6; }
+.ef-scenario-symptom {
+  margin-top:10px; padding:8px 12px;
+  background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.2);
+  border-radius:8px; font-size:12px; color:var(--red); font-family:var(--fm);
+}
+
+.ef-bank-label, .ef-pipeline-label {
+  font-family:var(--fm); font-size:11px; color:var(--soft);
+  text-transform:uppercase; letter-spacing:.08em; margin-bottom:8px;
+}
+
+.ef-event-bank {
+  display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+  padding:14px 18px;
+  background:var(--s1); border:1px dashed var(--border-hi); border-radius:12px;
+}
+.ef-bank-chip {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:10px 18px; border-radius:10px;
+  background:rgba(99,102,241,0.15); border:1.5px solid var(--indigo-hi);
+  color:var(--indigo-hi); font-family:var(--fm); font-size:13px; font-weight:600;
+  cursor:grab; transition:all .2s; user-select:none;
+}
+.ef-bank-chip:active { cursor:grabbing; }
+.ef-bank-chip.dragging { opacity:.5; transform:scale(0.95); }
+.ef-bank-hint { font-size:11px; color:var(--faint); font-style:italic; }
+.ef-chip-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.ef-chip-phase {
+  font-size:10px; padding:2px 7px; border-radius:999px;
+  background:rgba(99,102,241,0.2); color:var(--indigo-hi);
+  margin-left:4px;
+}
+
+/* Pipeline */
+.ef-pipeline {
+  display:flex; flex-direction:column; gap:0;
+  padding:16px; background:var(--s1); border:1px solid var(--border); border-radius:12px;
+}
+.ef-pipeline-node {
+  display:flex; align-items:center; gap:12px;
+  padding:12px 16px; border-radius:8px;
+  background:var(--s2); border:1px solid var(--border-hi);
+  margin:2px 0; transition:all .3s;
+  font-family:var(--fm);
+}
+.ef-pipeline-node.load-node     { border-left:3px solid var(--green); }
+.ef-pipeline-node.interact-node { border-left:3px solid var(--amber); }
+.ef-pipeline-node.save-node     { border-left:3px solid var(--red); }
+
+.ef-node-num {
+  width:24px; height:24px; border-radius:50%;
+  background:var(--s3); color:var(--soft);
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; font-weight:700; flex-shrink:0;
+}
+.ef-node-name { flex:1; font-size:13px; font-weight:600; color:var(--text); }
+.ef-node-phase { font-size:10px; color:var(--faint); }
+
+/* Drop slots */
+.ef-drop-slot {
+  height:28px; border:2px dashed var(--border); border-radius:6px;
+  display:flex; align-items:center; justify-content:center;
+  transition:all .2s; margin:2px 0;
+}
+.ef-drop-slot.drag-over {
+  border-color:var(--indigo); background:rgba(99,102,241,0.1);
+  height:44px;
+}
+.ef-drop-hint { font-size:11px; color:var(--faint); font-style:italic; pointer-events:none; }
+
+/* Simulation animations */
+@keyframes nodeSimulate {
+  0%   { transform:translateX(0); background:var(--s2); }
+  30%  { transform:translateX(6px); background:rgba(99,102,241,0.2); }
+  60%  { transform:translateX(-4px); }
+  100% { transform:translateX(0); }
+}
+.ef-pipeline-node.simulating { animation:nodeSimulate 0.4s ease; }
+.ef-pipeline-node.node-correct { background:rgba(34,197,94,0.12); border-left-color:var(--green)!important; }
+.ef-pipeline-node.node-wrong   { background:rgba(239,68,68,0.12); border-left-color:var(--red)!important; }
+.ef-pipeline-node.node-injected {
+  background:rgba(99,102,241,0.18);
+  border:1.5px solid var(--indigo-hi);
+  box-shadow:0 0 12px rgba(99,102,241,0.3);
+}
+
+.ef-correct-flow {
+  margin-top:12px; display:flex; flex-wrap:wrap; gap:6px; align-items:center;
+}
+.ef-flow-chip {
+  padding:4px 10px; border-radius:6px;
+  background:var(--s2); color:var(--soft);
+  font-family:var(--fm); font-size:11px;
+}
+.ef-chip-injected {
+  background:rgba(99,102,241,0.2); color:var(--indigo-hi);
+  border:1px solid var(--indigo); font-weight:700;
+}
+
+
+/* ─── OBJECT MATCHER DND ─────────────────────────── */
+.matcher-dnd-board {
+  display:grid; grid-template-columns:1fr 1.6fr; gap:24px;
+  margin-top:16px;
+}
+@media(max-width:700px){ .matcher-dnd-board{ grid-template-columns:1fr; } }
+
+.matcher-dnd-label {
+  font-family:var(--fm); font-size:10px; text-transform:uppercase;
+  letter-spacing:.1em; color:var(--soft); margin-bottom:10px;
+}
+
+/* Sticky note */
+.matcher-sticky {
+  position:relative; padding:20px 16px 16px;
+  background:rgba(240,165,0,0.08); border:1.5px solid rgba(240,165,0,0.3);
+  border-radius:10px; cursor:grab;
+  transition:transform .2s, box-shadow .2s;
+  user-select:none; min-height:100px;
+}
+.matcher-sticky:hover { transform:rotate(-1.5deg) scale(1.02); box-shadow:0 8px 24px rgba(240,165,0,0.2); }
+.matcher-sticky.dragging { opacity:.6; transform:scale(0.96); cursor:grabbing; }
+.matcher-sticky__pin { font-size:18px; position:absolute; top:-10px; left:50%; transform:translateX(-50%); }
+.matcher-sticky__text { font-size:14px; color:var(--text); line-height:1.6; margin-top:6px; }
+.matcher-sticky__sub { font-size:11px; color:var(--gold); margin-top:8px; font-family:var(--fm); }
+
+/* Drop slots */
+.matcher-slots { display:flex; flex-direction:column; gap:8px; }
+.matcher-slot {
+  display:flex; align-items:center; gap:10px;
+  padding:12px 16px; border-radius:10px;
+  background:var(--s1); border:1.5px dashed var(--border-hi);
+  transition:all .2s; cursor:pointer;
+  min-height:52px;
+}
+.matcher-slot.slot-hover {
+  border-color:var(--indigo); background:rgba(99,102,241,0.1);
+  transform:scale(1.02);
+}
+.matcher-slot.slot-correct {
+  border-color:var(--green); background:rgba(34,197,94,0.1);
+  border-style:solid;
+}
+.matcher-slot.slot-wrong {
+  border-color:var(--red); background:rgba(239,68,68,0.08);
+  border-style:solid;
+}
+.matcher-slot__icon { font-size:18px; flex-shrink:0; }
+.matcher-slot__label { flex:1; font-size:13px; font-weight:600; color:var(--text); font-family:var(--fm); }
+.matcher-slot__hint { font-size:10px; color:var(--faint); }
+
+.matcher-scenario__num {
+  display:inline-block; padding:2px 8px; border-radius:6px;
+  background:rgba(99,102,241,0.15); color:var(--indigo-hi);
+  font-family:var(--fm); font-size:11px; font-weight:700; margin-right:8px;
+}
+
+/* Follow-up bonus question */
+.matcher-followup {
+  margin-top:16px; padding:16px 18px;
+  background:rgba(99,102,241,0.06); border:1px solid rgba(99,102,241,0.2); border-radius:12px;
+}
+.matcher-followup__label {
+  font-family:var(--fm); font-size:10px; text-transform:uppercase;
+  letter-spacing:.1em; color:var(--indigo-hi); margin-bottom:8px;
+}
+.matcher-followup__q { font-size:14px; color:var(--text); font-weight:600; margin-bottom:12px; }
+.matcher-followup__opts { display:flex; flex-direction:column; gap:8px; }
+.matcher-followup__btn {
+  display:flex; align-items:center; gap:10px;
+  padding:10px 14px; border-radius:8px;
+  background:var(--s2); border:1.5px solid var(--border-hi);
+  color:var(--text); font-size:13px; text-align:left; cursor:pointer;
+  transition:all .2s;
+}
+.matcher-followup__btn:hover { border-color:var(--indigo); background:rgba(99,102,241,0.1); }
+.matcher-followup__btn.fq-correct { border-color:var(--green); background:rgba(34,197,94,0.1); color:var(--green); }
+.matcher-followup__btn.fq-wrong   { border-color:var(--red); background:rgba(239,68,68,0.08); color:var(--red); }
+.matcher-followup__letter {
+  width:22px; height:22px; border-radius:50%; flex-shrink:0;
+  background:var(--s3); color:var(--soft);
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; font-weight:700;
+}
+
+
+/* ─── DETECTIVE / SCENARIO SOLVER ───────────────── */
+.detective-casefile {
+  background:linear-gradient(135deg, rgba(240,165,0,0.06), rgba(240,165,0,0.02));
+  border:1px solid rgba(240,165,0,0.25);
+  border-radius:12px; overflow:hidden; margin:16px 0;
+}
+.detective-casefile__header {
+  display:flex; align-items:center; gap:12px;
+  padding:10px 16px;
+  background:rgba(240,165,0,0.1); border-bottom:1px solid rgba(240,165,0,0.15);
+}
+.detective-badge {
+  font-family:var(--fm); font-size:10px; font-weight:700;
+  text-transform:uppercase; letter-spacing:.12em;
+  padding:3px 10px; border-radius:6px;
+  background:var(--gold); color:var(--void);
+}
+.detective-case-id { font-family:var(--fm); font-size:12px; color:var(--gold); font-weight:600; }
+.detective-brief {
+  padding:16px; font-size:14px; color:var(--text); line-height:1.7;
+}
+
+/* Investigation board */
+.detective-board {
+  margin:16px 0; padding:16px;
+  background:var(--s1); border:1px solid var(--border); border-radius:12px;
+  min-height:80px;
+}
+.detective-board__title {
+  font-family:var(--fm); font-size:11px; text-transform:uppercase;
+  letter-spacing:.08em; color:var(--soft); margin-bottom:12px;
+  display:flex; align-items:center; gap:10px;
+}
+.detective-clue-count {
+  font-size:10px; padding:2px 8px; border-radius:999px;
+  background:rgba(34,197,94,0.12); color:var(--green); font-family:var(--fm);
+}
+.detective-clues { display:flex; flex-direction:column; gap:10px; }
+.detective-clues__empty { font-size:13px; color:var(--faint); font-style:italic; }
+
+@keyframes clueReveal {
+  from { opacity:0; transform:translateY(-8px) scale(0.97); }
+  to   { opacity:1; transform:translateY(0) scale(1); }
+}
+.detective-clue-card {
+  padding:12px 14px; border-radius:10px;
+  animation:clueReveal 0.35s var(--ease);
+}
+.clue-evidence {
+  background:rgba(34,197,94,0.06); border:1px solid rgba(34,197,94,0.2);
+}
+.clue-red-herring {
+  background:rgba(239,68,68,0.04); border:1px solid rgba(239,68,68,0.15);
+  opacity:.75;
+}
+.clue-card__source {
+  font-family:var(--fm); font-size:10px; color:var(--soft);
+  text-transform:uppercase; letter-spacing:.08em; margin-bottom:4px;
+}
+.clue-card__text { font-size:13px; color:var(--text); line-height:1.5; }
+.clue-card__tag {
+  font-size:10px; margin-top:6px; font-family:var(--fm);
+}
+.clue-evidence .clue-card__tag   { color:var(--green); }
+.clue-red-herring .clue-card__tag { color:var(--red); }
+
+/* Toolbox */
+.detective-toolbox {
+  margin:16px 0; padding:16px;
+  background:var(--s0); border:1px solid var(--border); border-radius:12px;
+}
+.detective-toolbox__title {
+  font-family:var(--fm); font-size:11px; text-transform:uppercase;
+  letter-spacing:.08em; color:var(--soft); margin-bottom:12px;
+}
+.detective-tools { display:flex; flex-wrap:wrap; gap:8px; }
+.detective-tool-btn {
+  padding:8px 14px; border-radius:8px;
+  background:var(--s2); border:1.5px solid var(--border-hi);
+  color:var(--text); font-size:12px; font-family:var(--fm); cursor:pointer;
+  transition:all .2s;
+}
+.detective-tool-btn:hover:not(:disabled) { border-color:var(--gold); color:var(--gold); background:rgba(240,165,0,0.08); }
+.detective-tool-btn.tool-used {
+  border-color:var(--green); color:var(--green);
+  background:rgba(34,197,94,0.08); cursor:default;
+}
+.detective-tool-btn.tool-red-herring {
+  border-color:rgba(239,68,68,0.4); color:var(--faint);
+  background:rgba(239,68,68,0.04); cursor:default; opacity:.7;
+}
+.detective-tool-btn:disabled { cursor:default; }
+
+/* Diagnosis */
+.detective-diagnosis {
+  margin:16px 0; padding:18px;
+  background:rgba(99,102,241,0.06); border:1.5px solid rgba(99,102,241,0.25);
+  border-radius:14px;
+  animation:clueReveal 0.4s var(--ease);
+}
+.detective-diagnosis__title {
+  font-family:var(--fd); font-size:15px; font-weight:700;
+  color:var(--indigo-hi); margin-bottom:14px;
+}
+.detective-diagnosis__opts { display:flex; flex-direction:column; gap:10px; }
+.detective-cause-btn {
+  display:flex; align-items:flex-start; gap:12px;
+  padding:12px 16px; border-radius:10px;
+  background:var(--s2); border:1.5px solid var(--border-hi);
+  color:var(--text); font-size:13px; text-align:left; cursor:pointer;
+  transition:all .2s;
+}
+.detective-cause-btn:hover:not(:disabled) {
+  border-color:var(--indigo); background:rgba(99,102,241,0.1);
+}
+.detective-cause-btn.cause-correct { border-color:var(--green); background:rgba(34,197,94,0.1); color:var(--green); }
+.detective-cause-btn.cause-wrong   { border-color:var(--red); background:rgba(239,68,68,0.08); color:var(--red); }
+.detective-cause-num {
+  width:24px; height:24px; flex-shrink:0; border-radius:50%;
+  background:var(--s3); color:var(--soft);
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; font-weight:700;
+}
+.detective-rating {
+  padding:8px 12px; border-radius:8px;
+  background:rgba(240,165,0,0.06); border:1px solid rgba(240,165,0,0.15);
+}

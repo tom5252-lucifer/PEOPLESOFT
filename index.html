@@ -34,6 +34,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="styles.css"/>
+<link rel="stylesheet" href="pslearn-lab.css"/>
 </head>
 <body>
 <a href="#homepageView" class="skip-link">Skip to main content</a>
@@ -616,7 +617,7 @@
           <div class="lab-mode-card__top-bar" style="background:linear-gradient(90deg,var(--red),var(--amber))"></div>
           <div class="lab-mode-card__icon">🔍</div>
           <div class="lab-mode-card__title">Debug the PeopleCode</div>
-          <div class="lab-mode-card__desc">Spot the bug in real PeopleCode snippets. Click the wrong line and explain what's wrong.</div>
+          <div class="lab-mode-card__desc">Click the buggy line, check your answer, then reveal the exact fix with a before/after diff. Use hint tokens if you're stuck.</div>
           <span class="lab-mode-card__badge badge-live">● Live</span>
         </div>
         <!-- Mode 2: Event Flow -->
@@ -624,7 +625,7 @@
           <div class="lab-mode-card__top-bar" style="background:linear-gradient(90deg,var(--amber),var(--green))"></div>
           <div class="lab-mode-card__icon">⚡</div>
           <div class="lab-mode-card__title">Event Flow Trainer</div>
-          <div class="lab-mode-card__desc">Drag PeopleCode events into the correct sequence. Master the full component lifecycle.</div>
+          <div class="lab-mode-card__desc">A broken event pipeline. Inject the missing event into the correct slot, then simulate to see the flow animate.</div>
           <span class="lab-mode-card__badge badge-live">● Live</span>
         </div>
         <!-- Mode 3: Object Matcher -->
@@ -632,7 +633,7 @@
           <div class="lab-mode-card__top-bar" style="background:linear-gradient(90deg,var(--indigo),var(--cyan))"></div>
           <div class="lab-mode-card__icon">🗂️</div>
           <div class="lab-mode-card__title">Object Matcher</div>
-          <div class="lab-mode-card__desc">Given a scenario, pick the correct PeopleSoft object type — record, component, AE, CI, and more.</div>
+          <div class="lab-mode-card__desc">Drag the scenario sticky note onto the correct PeopleSoft object. Bonus follow-up question after each match.</div>
           <span class="lab-mode-card__badge badge-live">● Live</span>
         </div>
         <!-- Mode 4: Scenario Solver -->
@@ -640,7 +641,7 @@
           <div class="lab-mode-card__top-bar" style="background:linear-gradient(90deg,var(--gold),var(--amber))"></div>
           <div class="lab-mode-card__icon">📋</div>
           <div class="lab-mode-card__title">Scenario Solver</div>
-          <div class="lab-mode-card__desc">Real enterprise problem. Diagnose the root cause from 4 options — just like production support.</div>
+          <div class="lab-mode-card__desc">Detective mode. Investigate enterprise incidents with a toolbox, collect clues, spot red herrings, then file your diagnosis.</div>
           <span class="lab-mode-card__badge badge-live">● Live</span>
         </div>
         <!-- Mode 5: App Designer -->
@@ -681,10 +682,7 @@
       <div class="lab-debug__scenario" id="debugScenario"></div>
       <div class="lab-code-block" id="debugCode"></div>
       <p class="lab-debug__hint" id="debugHint"></p>
-      <div class="lab-debug__actions">
-        <button class="btn btn--gold btn--sm" id="debugCheckBtn" onclick="checkDebugAnswer()" disabled>Check Answer →</button>
-        <button class="btn btn--ghost btn--sm" onclick="nextDebugChallenge()" id="debugNextBtn" style="display:none">Next Challenge →</button>
-      </div>
+      <div id="debugActions" class="lab-debug__actions"></div>
       <div class="lab-result-box" id="debugResult"></div>
     </div>
   </div>
@@ -957,5 +955,6 @@
 
 <script src="pslearn-data.js"></script>
 <script src="pslearn-app.js"></script>
+<script src="pslearn-lab.js"></script>
 </body>
 </html>
