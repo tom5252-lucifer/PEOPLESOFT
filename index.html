@@ -113,7 +113,7 @@
     <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:40px;animation:fade-up .7s ease .4s both">
       <span class="pill pill--green">🌱 Beginner — Live Now</span>
       <span class="pill pill--amber">⚡ Intermediate — Live Now</span>
-      <span class="pill pill--red">🔥 Advanced — Planned</span>
+      <span class="pill pill--red">🔥 Advanced — Live Now</span>
     </div>
     <div class="hero__scroll-hint">scroll to explore <span class="scroll-arrow">↓</span></div>
   </div>
@@ -126,6 +126,8 @@
       <div class="stat-item"><span class="stat-item__number">20</span><span class="stat-item__label">Beginner Topics Live</span></div>
       <div class="stat-item"><span class="stat-item__number">7</span><span class="stat-item__label">Learning Modules</span></div>
       <div class="stat-item"><span class="stat-item__number">10</span><span class="stat-item__label">Intermediate Topics Live</span></div>
+      <div class="stat-item"><span class="stat-item__number">7</span><span class="stat-item__label">Learning Modules</span></div>
+	  <div class="stat-item"><span class="stat-item__number">10</span><span class="stat-item__label">Advance Topics Live</span></div>
       <div class="stat-item"><span class="stat-item__number">7</span><span class="stat-item__label">Learning Modules</span></div>
     </div>
   </div>
@@ -178,70 +180,6 @@
   </div>
 </section>
 
-<!-- LEARNING PATHS -->
-<section class="section" style="position:relative;z-index:1;background:var(--s0);border-top:1px solid var(--border)">
-  <div class="container">
-    <div class="section-header reveal">
-      <div class="section-header__tag">Learning Paths</div>
-      <h2 class="section-header__title">Three Paths. <em>One Goal.</em></h2>
-      <p class="section-header__sub">Start with Foundations — Intermediate and Advanced paths are actively being built.</p>
-    </div>
-    <div class="path-grid">
-      <div class="path-card path-card--b reveal" onclick="openTopic(0)" style="cursor:pointer">
-        <div class="path-card__top-bar"></div><div class="path-card__glow"></div>
-        <span class="path-card__icon">🌱</span>
-        <div class="path-card__level">Beginner — 7 Modules · 20 Topics · Live Now</div>
-        <h3 class="path-card__title">PeopleSoft Foundations</h3>
-        <p class="path-card__desc">No prior experience needed. Learn architecture, PeopleTools, records, pages, PeopleCode basics, PS Query, security, and process scheduling.</p>
-        <div class="path-card__topics">
-          <span class="path-card__topic">Module 1 — History, Intro, PeopleTools, Glossary</span>
-          <span class="path-card__topic">Module 2 — Architecture & Cloud (PIA, OCI, PUM)</span>
-          <span class="path-card__topic">Module 3 — UI, Navigation, Pages, Components</span>
-          <span class="path-card__topic">Module 4 — App Designer, Records, Effective Dating</span>
-          <span class="path-card__topic">Module 5 — PeopleCode Basics & Component Buffer</span>
-          <span class="path-card__topic">Module 6 & 7 — PS Query, Security, Process Monitor</span>
-        </div>
-        <button class="btn btn--gold btn--sm" style="margin-top:8px">Start Beginner Path →</button>
-      </div>
-      <div class="path-card path-card--i reveal" style="transition-delay:.1s">
-        <div class="path-card__top-bar"></div><div class="path-card__glow"></div>
-        <span class="path-card__icon">⚡</span>
-        <div class="path-card__level">Intermediate — In Progress (~60% built)</div>
-        <h3 class="path-card__title">Core Development Skills</h3>
-        <p class="path-card__desc">Application Engine, Component Interface, Integration Broker, BI Publisher, advanced security, Process Scheduler, and Data Mover.</p>
-        <div class="path-card__topics">
-          <span class="path-card__topic">Application Engine — batch framework & Meta-SQL</span>
-          <span class="path-card__topic">Component Interface — programmatic APIs</span>
-          <span class="path-card__topic">Integration Broker — messaging & REST/SOAP</span>
-          <span class="path-card__topic">BI Publisher — formatted PDF/Excel reports</span>
-          <span class="path-card__topic">Advanced Security — row-level, trees, auditing</span>
-        </div>
-        <button class="btn btn--gold btn--sm" style="margin-top:8px" onclick="openTopic(0,true)">Start Intermediate Path →</button>
-      </div>
-      <div class="path-card path-card--a reveal" style="transition-delay:.2s">
-        <div class="path-card__top-bar"></div><div class="path-card__glow"></div>
-        <span class="path-card__icon">🔥</span>
-        <div class="path-card__level">Advanced — Planned</div>
-        <h3 class="path-card__title">Expert-Level Mastery</h3>
-        <p class="path-card__desc">Fluid UI development, Application Packages (OOP), REST/SOAP services, performance tuning, Event Mapping, and Elasticsearch.</p>
-        <div class="path-card__topics">
-          <span class="path-card__topic">Fluid UI — responsive HTML5, tiles & homepages</span>
-          <span class="path-card__topic">Application Packages — OOP in PeopleCode</span>
-          <span class="path-card__topic">REST & SOAP via Integration Broker</span>
-          <span class="path-card__topic">Event Mapping — upgrade-safe customization</span>
-          <span class="path-card__topic">Performance Tuning — trace, SQL, caching</span>
-        </div>
-        <span class="path-card__count" style="display:flex;align-items:center;gap:8px;margin-top:12px">
-          <span style="flex:1;height:4px;background:var(--s3);border-radius:99px;overflow:hidden"><span style="display:block;width:5%;height:100%;background:var(--red);border-radius:99px"></span></span>
-          <span>Planned — Coming Later</span>
-        </span>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-
 <!-- CURRICULUM -->
 <section id="curriculum" class="section--tight curriculum-section">
   <div class="container">
@@ -252,7 +190,7 @@
     <div class="curriculum-tabs reveal">
       <button class="curriculum-tab ab" onclick="switchTab(this,'b')">🌱 Beginner — Live</button>
       <button class="curriculum-tab" onclick="switchTab(this,'i')">⚡ Intermediate — Live</button>
-      <button class="curriculum-tab" onclick="switchTab(this,'a')">🔥 Advanced — Planned</button>
+      <button class="curriculum-tab" onclick="switchTab(this,'a')">🔥 Advanced — Live</button>
     </div>
     <div class="curriculum-panel active" id="panel-b"><div class="topic-grid" id="topics-b"></div></div>
     <div class="curriculum-panel" id="panel-i"><div class="topic-grid" id="topics-i"></div></div>
