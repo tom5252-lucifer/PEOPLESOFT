@@ -107,57 +107,75 @@ function showInterview() { switchView('interviewView'); document.getElementById(
 /* ═══════════════════════════════════════════════
    TOPIC NAVIGATION
 ═══════════════════════════════════════════════ */
-function openTopic(index, isIntermediate) {
+function openTopic(index, pathOrBool) {
+  // pathOrBool: 'b'|false|undefined = beginner, 'i'|true = intermediate, 'a' = advanced
+  const pathKey = pathOrBool===true?'i' : pathOrBool===false||!pathOrBool?'b' : pathOrBool;
   currentTopicIndex = index;
-  currentIsIntermediate = !!isIntermediate;
-  const topicList = isIntermediate ? INTERMEDIATE_TOPICS : TOPICS;
-  visited.add((isIntermediate?'i_':'b_')+index);
-  lastSavedTopic = index; lastSavedIsIntermediate = !!isIntermediate;
-  saveProgress(); showApp(); setNavActive('Learn'); buildSidebar(isIntermediate); renderTopic(index, isIntermediate); updateProgress();
+  currentIsIntermediate = pathKey==='i';
+  const topicList = pathKey==='i' ? INTERMEDIATE_TOPICS : pathKey==='a' ? (typeof ADVANCED_TOPICS!=='undefined'?ADVANCED_TOPICS:[]) : TOPICS;
+  if(!topicList||!topicList.length){console.warn('No topics for path:',pathKey);return;}
+  visited.add(pathKey+'_'+index);
+  lastSavedTopic = index; lastSavedIsIntermediate = pathKey;
+  saveProgress(); showApp(); setNavActive('Learn'); buildSidebar(pathKey); renderTopic(index, pathKey); updateProgress();
   const t = topicList[index];
   const te=document.getElementById('mobileTopicTitle'), ce=document.getElementById('mobileTopicCount');
   if(te) te.textContent=t.title;
   if(ce) ce.textContent=`${String(index+1).padStart(2,'0')}/${topicList.length}`;
   const bc=document.getElementById('desktopTopicBreadcrumb');
-  if(bc) bc.textContent=`${isIntermediate?'Intermediate':'Beginner'} Topic ${index+1}/${topicList.length} — ${t.title}`;
+  if(bc) bc.textContent=`${pathKey==='i'?'Intermediate':pathKey==='a'?'Advanced':'Beginner'} Topic ${index+1}/${topicList.length} — ${t.title}`;
   closeDrawer();
   setTimeout(()=>{ const h=document.querySelector('.section-block__header'); if(h) h.click(); },50);
 }
 
-function buildSidebar(isIntermediate=false, filter='') {
+function buildSidebar(pathKey='b', filter='') {
+  // pathKey: 'b'=beginner, 'i'=intermediate, 'a'=advanced
   const body=document.getElementById('sidebarBody'); body.innerHTML='';
-  const topicList = isIntermediate ? INTERMEDIATE_TOPICS : TOPICS;
-  const pl=document.createElement('div');
-  pl.style.cssText='font-family:var(--fm);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--faint);padding:8px 16px 4px;border-bottom:1px solid var(--border);margin-bottom:4px';
-  pl.textContent = isIntermediate?'⚡ Intermediate Path':'🌱 Beginner Path';
-  body.appendChild(pl);
-  const sb=document.createElement('button');
-  sb.style.cssText='width:100%;padding:8px 16px;background:none;border:none;border-bottom:1px solid var(--border);font-family:var(--fm);font-size:11px;color:var(--indigo-hi);cursor:pointer;text-align:left;margin-bottom:8px';
-  sb.textContent=isIntermediate?'← Switch to Beginner':'→ Switch to Intermediate';
-  sb.onclick=()=>openTopic(0,!isIntermediate); body.appendChild(sb);
+  const topicList = pathKey==='i' ? INTERMEDIATE_TOPICS : pathKey==='a' ? (typeof ADVANCED_TOPICS!=='undefined'?ADVANCED_TOPICS:[]) : TOPICS;
+
+  // 3-path switcher tabs
+  const tabWrap=document.createElement('div');
+  tabWrap.style.cssText='display:flex;gap:4px;padding:8px 12px;border-bottom:1px solid var(--border);margin-bottom:4px';
+  ['b','i','a'].forEach(p=>{
+    const labels={'b':'🌱 Beginner','i':'⚡ Intermediate','a':'🔥 Advanced'};
+    const btn=document.createElement('button');
+    btn.style.cssText=`flex:1;padding:5px 4px;border-radius:6px;border:1.5px solid ${p===pathKey?'var(--gold)':'var(--border)'};background:${p===pathKey?'rgba(240,165,0,0.1)':'none'};color:${p===pathKey?'var(--gold)':'var(--faint)'};font-family:var(--fm);font-size:10px;cursor:pointer;font-weight:${p===pathKey?'700':'400'};transition:all .2s;white-space:nowrap`;
+    btn.textContent=labels[p];
+    btn.title = p==='a'?'Advanced — Coming Soon':'';
+    btn.onclick=()=>{
+      if(p==='a'&&(typeof ADVANCED_TOPICS==='undefined'||!ADVANCED_TOPICS.length)){
+        alert('Advanced topics are coming soon! Check back later.'); return;
+      }
+      openTopic(0, p);
+    };
+    tabWrap.appendChild(btn);
+  });
+  body.appendChild(tabWrap);
   const IC=['#8b5cf6','#8b5cf6','#8b5cf6','#22d3ee','#22d3ee','#ef4444','#f59e0b','#ef4444','#ef4444','#f0a500'];
   const II=['⚙️','⚙️','⚙️','🔗','🔗','🔒','📊','🔒','⚙️','📱'];
   const IN=['Module 8: Batch Dev','Module 8: Batch Dev','Module 8: Batch Dev','Module 9: Integration','Module 9: Integration','Module 10: Security','Module 10: Reporting','Module 10: Security','Module 10: Performance','Module 11: Modern PS'];
+  const AC=['#ef4444','#ef4444','#8b5cf6','#8b5cf6','#22d3ee','#22d3ee','#f0a500','#f0a500','#ef4444','#22d3ee'];
+  const AI=['🎨','📱','📦','🔌','⚡','🔍','📈','🗺️','🔧','☁️'];
+  const AN=['Module 12: Fluid Dev','Module 12: Fluid Dev','Module 13: OOP','Module 13: OOP','Module 14: Integration','Module 14: Integration','Module 15: Advanced Reporting','Module 15: Advanced Reporting','Module 16: Performance','Module 16: Cloud & Upgrades'];
   let lastG='';
   topicList.forEach((topic,idx)=>{
     if(filter&&!topic.title.toLowerCase().includes(filter.toLowerCase())) return;
-    const gLabel=isIntermediate?(IN[idx]||'Intermediate'):(MODULES[topic.module]?.name||'');
-    const icon=isIntermediate?(II[idx]||'📚'):(MODULES[topic.module]?.icon||'📚');
-    const color=isIntermediate?(IC[idx]||'var(--soft)'):(MODULES[topic.module]?.color||'var(--soft)');
+    const gLabel=pathKey==='i'?(IN[idx]||'Intermediate'):pathKey==='a'?(AN[idx]||'Advanced'):(MODULES[topic.module]?.name||'');
+    const icon=pathKey==='i'?(II[idx]||'📚'):pathKey==='a'?(AI[idx]||'📚'):(MODULES[topic.module]?.icon||'📚');
+    const color=pathKey==='i'?(IC[idx]||'var(--soft)'):pathKey==='a'?(AC[idx]||'var(--soft)'):(MODULES[topic.module]?.color||'var(--soft)');
     if(gLabel!==lastG){
       const h=document.createElement('div'); h.className='sidebar__module-header';
       h.innerHTML=`<span>${icon}</span><span style="color:${color}">${gLabel}</span>`;
       body.appendChild(h); lastG=gLabel;
     }
-    const isA=idx===currentTopicIndex&&isIntermediate===currentIsIntermediate;
-    const vk=(isIntermediate?'i_':'b_')+idx;
+    const isA=idx===currentTopicIndex&&pathKey===(lastSavedIsIntermediate||'b');
+    const vk=pathKey+'_'+idx;
     const btn=document.createElement('button');
     btn.className='sidebar__topic'+(isA?' active':'');
     btn.innerHTML=`<span class="sidebar__topic-num">${topic.num}</span><span style="flex:1;text-align:left">${topic.title}</span>${visited.has(vk)&&!isA?'<span style="color:var(--green);font-size:11px">✓</span>':''}`;
     btn.onclick=()=>openTopic(idx,isIntermediate); body.appendChild(btn);
   });
 }
-function filterTopics(val){ buildSidebar(currentIsIntermediate, val); }
+function filterTopics(val){ buildSidebar(lastSavedIsIntermediate||'b', val); }
 
 
 const INTERVIEW_QA_ALL = [
@@ -1101,10 +1119,10 @@ document.addEventListener('keydown', e => {
 
   if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
     e.preventDefault();
-    if (currentTopicIndex < (currentIsIntermediate ? INTERMEDIATE_TOPICS : TOPICS).length - 1) openTopic(currentTopicIndex + 1, currentIsIntermediate);
+    const _kpk=lastSavedIsIntermediate||'b'; const _kl=_kpk==='i'?INTERMEDIATE_TOPICS:_kpk==='a'?(typeof ADVANCED_TOPICS!=='undefined'?ADVANCED_TOPICS:[]):TOPICS; if(currentTopicIndex<_kl.length-1) openTopic(currentTopicIndex+1,_kpk);
   } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
     e.preventDefault();
-    if (currentTopicIndex > 0) openTopic(currentTopicIndex - 1, currentIsIntermediate);
+    if(currentTopicIndex>0) openTopic(currentTopicIndex-1,lastSavedIsIntermediate||'b');
   }
 });
 
@@ -1127,10 +1145,12 @@ function updateProgress() {
 /* ═══════════════════════════════════════════════
    TOPIC RENDERER
 ═══════════════════════════════════════════════ */
-function renderTopic(index, isIntermediate=false) {
-  const topicList = isIntermediate ? INTERMEDIATE_TOPICS : TOPICS;
+function renderTopic(index, pathOrBool='b') {
+  const pathKey = pathOrBool===true?'i' : pathOrBool===false||pathOrBool==='b'||!pathOrBool?'b' : pathOrBool;
+  const topicList = pathKey==='i' ? INTERMEDIATE_TOPICS : pathKey==='a' ? (typeof ADVANCED_TOPICS!=='undefined'?ADVANCED_TOPICS:[]) : TOPICS;
   const topic = topicList[index];
-  const mod = isIntermediate ? {name:"Intermediate",icon:"⚡",color:"#8b5cf6"} : MODULES[topic.module];
+  if(!topic) return;
+  const mod = pathKey==='i' ? {name:"Intermediate",icon:"⚡",color:"#8b5cf6"} : pathKey==='a' ? {name:"Advanced",icon:"🔥",color:"#ef4444"} : MODULES[topic.module];
   const container = document.getElementById('topicContent');
 
   // ── PRE-CHECKLIST (Feature 7) ──

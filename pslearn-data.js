@@ -3327,10 +3327,1568 @@ const GLOSSARY = [
   {term:"Business Unit",cat:"fscm",def:"The primary organizational entity in PeopleSoft — especially in FSCM. Every financial transaction is associated with a Business Unit. Represents a distinct part of an organization that maintains its own financial books."},
   {term:"SetID",cat:"fscm",def:"A code assigned to setup tables that controls which reference data applies to each Business Unit. Multiple Business Units can share the same SetID (and thus the same departments, job codes, etc.) while maintaining separate SetIDs for region-specific data."},
   {term:"TableSet",cat:"fscm",def:"The mechanism that links Business Units to SetIDs. TableSet Controls (PS_SET_CNTRL_TBL) define which SetID each Business Unit uses for each record group. Enables sharing of common reference data while allowing exceptions per Business Unit."},
+
+  /* ── INTERMEDIATE TOPICS QUIZ (30Q) ── */
+  /* Application Engine */
+  {cat:"Application Engine",q:"What is the correct AE Action type to loop through rows from a SQL SELECT?",opts:["Do When","Do Select","Call Section","PeopleCode"],ans:1,exp:"Do Select executes a SELECT and for each returned row runs the child Steps. The most common AE looping pattern for batch processing."},
+  {cat:"Application Engine",q:"What does CommitWork() do in Application Engine?",opts:["Ends the AE program","Commits current DB transaction mid-run without ending AE","Saves the Run Control record","Calls another AE program"],ans:1,exp:"CommitWork() commits current work and saves a checkpoint. Critical for large batch jobs — prevents massive rollback logs and allows restart from that point."},
+  {cat:"Application Engine",q:"Why do Temp Tables have multiple instances (AET, AET1, AET2)?",opts:["For backup purposes","Each parallel AE process uses its own instance preventing data collision","To store different data types","For audit logging"],ans:1,exp:"Parallel AE instances each get their own Temp Table instance. %Table(MYTEMP) resolves differently per instance — preventing data overwrites between concurrent processes."},
+  /* Component Interface */
+  {cat:"Component Interface",q:"Why use Component Interface instead of direct SQL INSERT for employee hire?",opts:["CI is faster than SQL","CI fires all PeopleCode events ensuring business rules and workflow run","CI is required by Oracle license","SQL cannot insert into PS_JOB"],ans:1,exp:"CI fires FieldDefault, PostBuild, SaveEdit, WorkFlow — exactly like an online hire. Direct SQL bypasses all events, risking data integrity and missing downstream triggers."},
+  {cat:"Component Interface",q:"What does setting InteractiveMode = False do on a CI?",opts:["Disables all PeopleCode","Batches validations for faster batch processing — events still fire on Save","Prevents the CI from saving","Disables error handling"],ans:1,exp:"InteractiveMode=False batches field-level validations instead of checking each field individually. All PeopleCode events still fire on Save. Significantly improves batch CI throughput."},
+  /* Integration Broker */
+  {cat:"Integration Broker",q:"What is the difference between Synchronous and Asynchronous IB messaging?",opts:["Sync is always faster","Sync waits for response before continuing — Async sends and continues immediately","Async is more secure","Sync uses REST, Async uses SOAP only"],ans:1,exp:"Synchronous: caller waits for response — like a phone call. Asynchronous: caller continues immediately, message queued — like email. Choose based on whether immediate response is required."},
+  {cat:"Integration Broker",q:"What is the Integration Gateway in PeopleSoft?",opts:["The PeopleCode handler class","Entry point for all inbound messages — routes HTTP requests to Service Operations","The message queue database table","The Node configuration screen"],ans:1,exp:"Integration Gateway is a Java app on the web server receiving all inbound HTTP/HTTPS requests from external systems and routing them to the correct Service Operation in the App Server."},
+  {cat:"Integration Broker",q:"What must you do after a failed async IB message to retry it?",opts:["Restart the App Server","Fix root cause then Resubmit from Integration Broker Monitor — Failed queue","Delete and resend from source system","Restart the Integration Gateway"],ans:1,exp:"IB Monitor → Asynchronous Services → Failed. Fix the root cause (URL, auth, data format), select the failed message, click Resubmit. Messages retry without needing to re-trigger the original transaction."},
+  /* Security */
+  {cat:"Security",q:"How does row-level security filter data for a specific user?",opts:["Through PeopleCode checking user ID on every page","Through a security view JOINing base table with PS_SCRTY_TBL_DEPT filtered by OPRCLASS","Through the Permission List access modes","Through Department Security Tree at runtime directly"],ans:1,exp:"Security views join the base table with PS_SCRTY_TBL_DEPT using %OperatorClass (user's Primary Permission List). The view auto-filters to only rows the user is authorized to see."},
+  {cat:"Security",q:"What must be done after modifying the Department Security Tree?",opts:["Restart the App Server","Rebuild security tables to refresh PS_SCRTY_TBL_DEPT","Clear browser cache","Run the nightly payroll"],ans:1,exp:"The Security Tree is a definition — PS_SCRTY_TBL_DEPT is the physical table security views query. After tree changes, run the rebuild process to populate the table with the new structure."},
+  /* Effective Dating Advanced */
+  {cat:"Effective Dating",q:"A PS Query joining PS_PERSONAL_DATA and PS_JOB returns 15x expected rows. Root cause?",opts:["Wrong join field between records","Missing effective dating on PS_JOB creates near-Cartesian product","PS_PERSONAL_DATA has duplicate rows","Query is using wrong database"],ans:1,exp:"PS_PERSONAL_DATA: 1 row/employee. PS_JOB: 15+ rows/employee (one per job change). Without MAX(EFFDT) criteria: 1 × 15 = 15 rows per employee. Always add effective dating WHERE clause to PS_JOB joins."},
+  {cat:"Effective Dating",q:"What is EFFSEQ and when is it needed?",opts:["Employee sequence number for concurrent jobs","Handles multiple changes on the same EFFDT — first change=0, second=1","A security sequence for audit","The order fields appear on a page"],ans:1,exp:"EFFSEQ handles same-date changes. If two promotions happen on the same date, first row=EFFSEQ 0, second=EFFSEQ 1. Current row = MAX(EFFDT) AND MAX(EFFSEQ) for that date. Both subqueries needed."},
+  /* PS Query Advanced */
+  {cat:"PS Query",q:"What is a Connected Query used for?",opts:["Running two queries simultaneously","Linking parent-child queries where parent output drives child parameters for hierarchical data","Connecting to external databases","Running same query for multiple users"],ans:1,exp:"Connected Queries create parent-child relationships. Parent runs first, then for each parent row the child runs using parent fields as parameters. Ideal for employee + job history master-detail reports."},
+  {cat:"PS Query",q:"What is bursting in BI Publisher?",opts:["Running same report multiple times","Splitting one report and auto-distributing each section to different recipients","Exporting in multiple formats simultaneously","Breaking a large query into smaller chunks"],ans:1,exp:"Bursting splits a single report by a burst key (e.g. EMPLID) and delivers each section to the appropriate recipient automatically. Generate all pay slips in one run, email each employee their own."},
+  /* Data Mover */
+  {cat:"Data Mover",q:"What is the main limitation of Data Mover for data migration?",opts:["It is very slow for large datasets","It bypasses all PeopleCode — business rules, validation, and workflow do not fire","It only works in Bootstrap mode","It cannot handle effective-dated tables"],ans:1,exp:"DMS inserts directly into DB tables without firing PeopleCode events. For reference/setup data this is acceptable. For transactional data (hires, financial transactions) always use Component Interface."},
+  {cat:"Data Mover",q:"What command clears existing rows before a DMS import?",opts:["TRUNCATE_TABLE","CLEAR_ROWS","DELETE_ROWS","REMOVE_DATA"],ans:2,exp:"DELETE_ROWS PS_TABLENAME removes all existing rows before import. This prevents duplicate key errors when re-importing data that already exists in the target environment."},
+  /* Process Scheduler */
+  {cat:"Process Scheduler",q:"What is the first step when diagnosing a slow PeopleSoft page?",opts:["Restart the App Server","Enable SQL trace to identify slow SQL and how many times it executes","Add more server memory","Reduce fields on the page"],ans:1,exp:"SQL trace is the definitive diagnostic tool. It shows every SQL executed with timing and row counts — revealing N+1 queries (SQLExec in RowInit), missing indexes, and missing effective dating."},
+  {cat:"Process Scheduler",q:"How do you create a database index for a PeopleSoft record field?",opts:["Write CREATE INDEX SQL manually","Mark field as Alternate Search Key (A) in App Designer and run Build → Alter Table","Add to the primary key","Configure in PSADMIN"],ans:1,exp:"Marking a field as Alternate Search Key (A) causes PeopleSoft to create a non-unique DB index when you run Build → Alter Table. All index management is through App Designer metadata — no manual SQL."},
+  /* Fluid UI */
+  {cat:"Fluid UI",q:"What is the main difference between Fluid UI and Classic UI?",opts:["Fluid is always faster","Fluid uses responsive HTML5/CSS3 working on mobile/tablet/desktop — Classic uses fixed-width tables for desktop only","Fluid requires a different database","Classic UI has better security"],ans:1,exp:"Fluid UI (PT 8.53+) uses responsive HTML5/CSS3 with Oracle JET — works on any device. Classic uses fixed-width HTML tables designed for desktop only. All new Oracle functionality is Fluid-only."},
+  {cat:"Fluid UI",q:"What is a Tile in PeopleSoft Fluid UI?",opts:["A database partition unit","A clickable card on a Fluid Homepage linking to a component — optionally showing a dynamic badge count","A PeopleCode function for grids","A security object controlling page access"],ans:1,exp:"Tiles are large clickable cards on Fluid Homepages. Each is a CREF with an image and optional badge count (from a PS Query counting pending items). Users click tiles to navigate to components."},
+  /* Architecture Advanced */
+  {cat:"Architecture",q:"What is connection pooling in PeopleSoft App Server?",opts:["Multiple App Server domains running simultaneously","App Server maintains persistent DB connections shared across PSAPPSRV processes","Each user gets a dedicated DB connection","Tuxedo bulletin board memory allocation"],ans:1,exp:"Connection pooling maintains a pool of persistent DB connections shared across PSAPPSRV processes. Individual user requests reuse connections from the pool rather than creating new ones — dramatically improves performance."},
+  {cat:"Architecture",q:"What is PUM (PeopleSoft Update Manager)?",opts:["A performance monitoring utility","Selective patching system using PeopleSoft Image VMs — organizations choose exactly which fixes to apply","Annual bundle patching tool","Database migration utility"],ans:1,exp:"PUM replaced bundle patching (~2014). Oracle releases PS Image VMs with cumulative fixes. Organizations browse available updates, select exactly what to apply, generate a Change Package. Selective adoption without taking untested changes."},
+  /* PeopleCode Advanced */
+  {cat:"PeopleCode",q:"What variable scope persists for the entire component transaction (open to save)?",opts:["Local — current program only","Component — persists entire transaction across all events","Global — entire user session","Record — persists in the database"],ans:1,exp:"Component scope persists for the entire component transaction. Set a value in PostBuild, read it in SaveEdit. Local only lasts one program execution. Global lasts the whole user session — use sparingly."},
+  {cat:"PeopleCode",q:"What is the risk of SQLExec inside a RowInit loop with 200 rows?",opts:["SQL syntax errors","200 separate database calls — classic N+1 performance problem","Buffer overflow","Effective dating issues"],ans:1,exp:"RowInit fires once per row. SQLExec inside RowInit = one DB call per row. 200 rows = 200 DB calls. Fix: pre-fetch all reference data in PostBuild using CreateSQL once, then read from memory in RowInit."},
+  {cat:"PeopleCode",q:"What does SavePreChange fire relative to the database commit?",opts:["After the commit is complete","Just before the DB commit — buffer is final but data not yet written","Before SaveEdit runs","After SavePostChange"],ans:1,exp:"SavePreChange fires just BEFORE the DB commit. Buffer data is final. Last chance to manipulate buffer or create related records before the transaction commits. SavePostChange fires AFTER the commit."},
+  /* Records & Fields Advanced */
+  {cat:"Records & Fields",q:"Why should you never add fields directly to a delivered PeopleSoft record?",opts:["It causes performance issues","Delivered objects are overwritten during upgrades — your field disappears","It violates Oracle licensing","Fields must be added through Security"],ans:1,exp:"Oracle-delivered objects are replaced during upgrades. Fields added to PS_JOB directly = gone after next upgrade. Best practice: create extension record ZZ_JOB_EXT with same keys. Or use Event Mapping (PT 8.55+)."},
+  {cat:"Records & Fields",q:"What is a SubRecord and what is EFFDT_SBR used for?",opts:["A child scroll in a component","Reusable field group embedded in records — EFFDT_SBR contains EFFDT+EFFSEQ used in hundreds of effective-dated records","A security view subtype","A temporary record for batch processing"],ans:1,exp:"SubRecords are reusable field groups. When included in a record, those fields become part of that table. EFFDT_SBR (EFFDT + EFFSEQ) is the standard SubRecord included in virtually every effective-dated record."},
+  /* Real Project Scenarios */
+  {cat:"Real Project Scenario",q:"After an upgrade your customization is gone. What was the root cause?",opts:["Database restore failed","You directly modified a delivered object — Oracle overwrote it during upgrade","Developer accidentally deleted it","Permission List was reset"],ans:1,exp:"Directly modified delivered objects are overwritten when Oracle delivers a new version. Always clone with custom prefix (ZZ_COMPNAME) before modifying, or use Event Mapping (PT 8.55+) for completely upgrade-safe customizations."},
+  {cat:"Real Project Scenario",q:"You need to load 50,000 employee hires from a legacy system. Best approach?",opts:["Direct SQL INSERT into PS_JOB","Data Mover DMS script","Component Interface via Application Engine reading from a staging table","Manual entry by HR team"],ans:2,exp:"CI via AE ensures all business rules fire (FieldDefault, SaveEdit, workflow) for each hire. AE reads from staging table, calls CI per record, logs errors, supports restart. Direct SQL or DMS bypasses all business rules."},
+  {cat:"Real Project Scenario",q:"A user can navigate to a component but Save does nothing — no error shown. Cause?",opts:["Component has no PeopleCode","Permission List grants Display Only access — Save is disabled","Database is in read-only mode","App Server is overloaded"],ans:1,exp:"Display Only access mode in Permission List = read-only. The Save button is hidden or disabled for the user. Fix: change component access mode to Update/Display in the user's Permission List for that component."},
 ];
+
+
+/* ── ADVANCED TOPICS (10) ── */
+const ADVANCED_TOPICS = [
+  {
+    id:"fluid-ui-advanced", module:12, num:"31",
+    title:"Fluid UI Development",
+    level:"advanced",
+    summary:"Build modern responsive PeopleSoft interfaces using Fluid UI — homepages, tiles, Activity Guides, and Fluid components. Everything new Oracle delivers is Fluid-only.",
+    preChecklist:["You completed Fluid UI Basics (Topic 30)","You understand Classic pages and components","You know what a CREF is"],
+    keyPoints:[
+      "Fluid pages use PeopleSoft Page Designer in Fluid mode — completely different controls from Classic",
+      "Group Boxes replace Scroll Areas, Grids use Fluid styling, layout is CSS-based not table-based",
+      "Fluid Homepages are configured via PeopleTools → Portal → Structure and Content",
+      "Activity Guide Composer (PT 8.57+) creates step-by-step wizards without custom PeopleCode",
+      "Related Actions provide right-click context menus on Fluid components linking to related transactions",
+    ],
+    sections:[
+      {title:"Building a Fluid Page",body:`Fluid pages are created in Application Designer just like Classic pages but in Fluid mode.
+
+**Key Fluid page controls:**
+- **Group Box** — replaces Scroll Areas. Set Group Box type to Grid or Free Form
+- **Grid** — the standard multi-row control in Fluid. Supports sorting, filtering, pagination, and responsive hiding of columns on small screens
+- **Fluid Buttons** — styled differently from Classic. Use Push Button/Hyperlink with Fluid style
+- **Responsive Tabs** — tab groups that collapse to a dropdown menu on mobile
+
+**Page layout rules in Fluid:**
+Fluid uses a 12-column fluid grid layout (like Bootstrap). Fields have column spans — EMPLID might take 4 columns, Name might take 8. On mobile, columns stack automatically.
+
+**Setting page properties:**
+In Application Designer → Page Properties → Fluid tab:
+- Enable: Fluid Page checkbox
+- Set fluid page type: Standard, Secondary, Popup
+- Add page-level CSS class for custom styling
+
+**Creating a simple Fluid component:**
+1. Create records (same as Classic)
+2. Create Fluid page — File → New → Page → check "Fluid Page" in properties
+3. Add fields with Group Box containers
+4. Create component, add Fluid page
+5. Create CREF — mark as Fluid content
+6. Add CREF to a Homepage as a Tile`},
+      {title:"Activity Guides",body:`Activity Guides are structured step-by-step workflows guiding users through multi-component processes.
+
+**Use cases:**
+- New hire onboarding (Personal Data → Job Data → Benefits → Documents)
+- Annual open enrollment (Medical → Dental → Vision → Beneficiaries → Confirm)
+- Manager performance review workflow
+- Student admission process
+
+**Activity Guide Composer (PT 8.57+):**
+PeopleTools → Activity Guides → AG Composer
+Low-code tool — no PeopleCode needed for basic flows:
+1. Create AG Template
+2. Add Steps — each step maps to a Fluid component
+3. Configure: required/optional, sequence, assignee
+4. Deploy to users via CREF
+
+**Progress Tracker:**
+Visual step indicator showing: Completed ✓ → Current (highlighted) → Remaining steps
+Renders automatically in the AG left panel — no coding needed.
+
+**Conditional steps:**
+Use AG Composer conditions to show/hide steps based on data. Example: show Benefits step only if employment type = Full Time.
+
+**Performance tip:**
+Each AG step loads a full component. Keep steps focused — don't put 10 fields on one step and 1 on another. Balance the steps for user experience.`},
+      {title:"Related Actions",body:`Related Actions provide context-sensitive navigation — right-click or click a "…" menu on a Fluid component to access related transactions.
+
+**What they replace:**
+Classic UI had Related Content framework. Fluid's Related Actions are cleaner and mobile-friendly.
+
+**Setting up Related Actions:**
+PeopleTools → Portal → Related Actions → Define Related Action Services
+
+1. Create a Related Action Service
+2. Define the trigger (which component, which field/key)
+3. Add target CREFs (components the user can navigate to)
+4. Map key fields (e.g., EMPLID from Job Data maps to EMPLID parameter of Pay Rate Change)
+
+**Example — from Job Data:**
+User views Job Data for employee KR001 → clicks Related Actions icon → sees:
+- View Pay History (opens with EMPLID=KR001)
+- Transfer Employee (opens Transfer component pre-filled)
+- View Benefits (opens with EMPLID=KR001)
+
+**Security:** Related Actions respect component-level security — users only see actions for components they have access to.`},
+      {title:"Fluid Homepages and Tile Configuration",body:`**Homepage configuration:**
+PeopleTools → Portal → Structure and Content → Homepages
+
+Each user can have multiple homepages (role-based):
+- Manager Self Service Homepage
+- Employee Self Service Homepage  
+- HR Administrator Homepage
+
+**Tile setup:**
+1. Create CREF as usual
+2. In CREF → Fluid Properties:
+   - Tile Image: upload SVG/PNG (recommended: 200×200px SVG)
+   - Tile Size: Small / Medium / Large / Extra-Large
+   - Badge Query: PS Query ID for dynamic count badge
+3. Add CREF to Homepage Tile Collection
+
+**Dynamic badge configuration:**
+Badge Query must return a number for the current user:
+\`\`\`sql
+SELECT COUNT(*) FROM PS_PENDING_APPROVALS
+WHERE OPRID = %OperatorId
+AND STATUS = 'P'
+\`\`\`
+Badge appears on the tile when count > 0. Updates on each homepage load.
+
+**Tile Collections:**
+Group related tiles into Collections. Drag to reorder. Users can personalize their homepage (add/remove/reorder tiles) if personalization is enabled.`},
+    ],
+    realWorld:`A manufacturing company with 8,000 employees needed to roll out Manager Self Service on mobile. Classic MSS pages were unusable on phones. Project: created 6 Fluid pages mirroring Classic MSS functionality, Activity Guide for the annual merit review process (4 steps: review salary ranges → enter merit increase → add comments → submit for approval), and Related Actions on the employee search component linking to all common HR transactions. Mobile adoption reached 74% within 3 months — managers approved compensation changes from phones during commutes.`,
+    mistakes:[
+      {title:"Building Fluid without a responsive design test",desc:"Fluid pages that look great on desktop often break on mobile. Test every Fluid page on a phone-sized viewport before deployment. Use Chrome DevTools device emulation. Pay special attention to Grids — they need explicit column hiding configuration for narrow screens."},
+      {title:"Converting Classic pages instead of rebuilding",desc:"There is no automatic Classic-to-Fluid conversion. Attempts to 'wrap' Classic pages in Fluid containers produce ugly non-responsive results. Budget for a rebuild when Fluid is required — it's typically 2-3x the effort of the original Classic page."},
+      {title:"Missing tile security alignment",desc:"Fluid tiles are CREFs — they must have matching Permission List security. A tile visible to a user that points to a component they don't have access to shows the tile but gives Access Denied on click. Always align tile CREF security with the underlying component's Permission List."},
+    ],
+    quiz:[
+      {q:"What replaces Scroll Areas in Fluid page design?",options:["iScripts","Group Boxes set to Grid type","Derived Records","SubPages"],correct:1,explanation:"In Fluid, Group Boxes replace Scroll Areas. Set the Group Box type to Grid for multi-row display or Free Form for flexible layouts. Grids support responsive behavior — columns can hide on narrow screens."},
+      {q:"What is Activity Guide Composer used for?",options:["Creating Fluid page layouts","Building step-by-step guided workflows without custom PeopleCode","Configuring Integration Broker","Managing PS Query access"],correct:1,explanation:"Activity Guide Composer (PT 8.57+) is a low-code tool for creating guided multi-step workflows. Add steps mapping to Fluid components, configure sequence and conditions — no PeopleCode needed for basic flows."},
+      {q:"What does a dynamic badge count on a Fluid tile show?",options:["The tile ID number","A count from a PS Query — e.g. pending approvals for the current user","The component version number","Number of fields on the target page"],correct:1,explanation:"Badge counts come from a PS Query returning a number for the current user. The count appears on the tile — drawing attention when items need action. Common use: pending approvals, unread notifications, open tasks."},
+    ],
+    peopleBooksUrl:"https://docs.oracle.com/cd/F44947_01/pt858pbr3/eng/pt/tflu/",
+  },
+  {
+    id:"application-packages", module:13, num:"32",
+    title:"Application Packages & OOP",
+    level:"advanced",
+    summary:"Application Packages bring object-oriented programming to PeopleCode — classes, inheritance, and encapsulation. Used for Event Mapping handlers, reusable business logic libraries, and clean code architecture.",
+    preChecklist:["You understand PeopleCode fundamentals","You know what an Application Class is conceptually","You completed Component Interface (Topic 23)"],
+    keyPoints:[
+      "Application Packages contain Application Classes — define properties, methods, and constructors",
+      "Supports inheritance (extends), interfaces, and method overriding",
+      "Event Mapping handlers must be Application Classes — this is the primary real-world use case",
+      "Encapsulate reusable logic (validation, integration calls, data lookups) in Application Classes",
+      "Import statement: import PACKAGE_NAME:CLASS_NAME;",
+    ],
+    sections:[
+      {title:"Application Package Basics",body:`**What is an Application Package?**
+A container (namespace) for Application Classes — PeopleSoft's object-oriented programming framework. Created in Application Designer → File → New → Application Package.
+
+**Structure:**
+\`\`\`
+MY_COMPANY:HR_UTILS          ← Package (namespace)
+├── EmployeeValidator         ← Class
+├── DeptLookup               ← Class
+└── IntegrationHelper        ← Class
+\`\`\`
+
+**Creating an Application Class:**
+In App Designer → expand the package → Insert → Application Class
+
+\`\`\`
+class EmployeeValidator
+  method IsValidHire(&emplid As string) Returns boolean;
+  method ValidateDept(&deptid As string, &effdt As date) Returns string;
+end-class;
+
+method IsValidHire
+  /+ &emplid as String +/
+  /+ Returns Boolean +/
+  Local string &name;
+  SQLExec("SELECT LAST_NAME FROM PS_PERSONAL_DATA WHERE EMPLID=:1", &emplid, &name);
+  Return Not None(&name);
+end-method;
+\`\`\`
+
+**Using the class:**
+\`\`\`
+import MY_COMPANY:HR_UTILS:EmployeeValidator;
+Local MY_COMPANY:HR_UTILS:EmployeeValidator &validator;
+&validator = create MY_COMPANY:HR_UTILS:EmployeeValidator();
+If &validator.IsValidHire(&emplid) Then
+  /* proceed */
+End-If;
+\`\`\`
+
+**Why use Application Classes?**
+- Reuse the same logic across 20 different components without copy-pasting code
+- Single fix propagates everywhere instantly
+- Upgrade-safe — your classes are never delivered by Oracle`},
+      {title:"Inheritance and Interfaces",body:`**Inheritance:**
+Application Classes support single inheritance using extends.
+
+\`\`\`
+class BaseValidator
+  method Validate() Returns boolean;
+  method GetError() Returns string;
+end-class;
+
+class HireValidator extends BaseValidator
+  method Validate() Returns boolean;  /* overrides parent */
+end-class;
+
+method Validate
+  /* HireValidator-specific logic */
+  Return JOB.DEPTID.Value <> "";
+end-method;
+\`\`\`
+
+**Interfaces:**
+Define a contract — a class implementing an interface must provide all defined methods.
+
+\`\`\`
+interface IRequestHandler
+  method OnMessage(&MSG As Message) Returns Message;
+end-interface;
+\`\`\`
+Integration Broker handlers implement IRequestHandler — this is why all IB handlers have the same OnMessage method signature.
+
+**Abstract classes:**
+\`\`\`
+class AbstractProcessor
+  abstract method Process();  /* must be implemented by subclass */
+end-class;
+\`\`\`
+
+**When to use inheritance:**
+- Multiple validators that share common logic (base class handles error storage, subclasses handle specific validation)
+- Integration handlers that share setup/teardown logic
+- Report generators with common header/footer logic`},
+      {title:"Event Mapping — Upgrade-Safe Customization",body:`**What is Event Mapping?**
+PeopleTools 8.55+ feature that attaches your Application Class to a delivered component event without touching the delivered object.
+
+**Why it matters:**
+Before Event Mapping: modify JOB_DATA component's PostBuild directly → Oracle upgrade overwrites it → customization lost.
+With Event Mapping: your App Class is mapped to PostBuild → upgrade replaces JOB_DATA → mapping remains → customization survives.
+
+**Setting up Event Mapping:**
+PeopleTools → Portal → Event Mapping → Add/Update Event Mapping
+
+1. Select the delivered component/page/record/field
+2. Select the event (PostBuild, SaveEdit, FieldChange, etc.)
+3. Select your Application Class and method
+4. Set: Pre/Post processing (before or after delivered code runs)
+5. Set: Active checkbox
+
+**Example — Add custom validation to delivered HR component:**
+\`\`\`
+/* MyCompany:HR:CustomValidation Application Class */
+class CustomValidation
+  method OnSaveEdit();
+end-class;
+
+method OnSaveEdit
+  If JOB.ANNUAL_RT.Value > GetMaxSalary(JOB.GRADE.Value) Then
+    Error "Salary exceeds grade maximum.";
+  End-If;
+end-method;
+\`\`\`
+
+Map this to: Component=JOB_DATA, Event=SaveEdit, Type=Pre-Processing.
+
+**Result:** Your Error() fires BEFORE Oracle's delivered SaveEdit code. No delivered code was modified. Next upgrade: mapping survives untouched.`},
+      {title:"Practical Application Class Patterns",body:`**Pattern 1 — Reusable Lookup Library:**
+\`\`\`
+class PSLookup
+  method GetDeptName(&deptid As string, &effdt As date) Returns string;
+  method GetJobCodeTitle(&jobcode As string) Returns string;
+  method GetLocationDescr(&locid As string) Returns string;
+end-class;
+\`\`\`
+Import once, call everywhere. Change the SQL in one place — updates all components.
+
+**Pattern 2 — Integration Wrapper:**
+\`\`\`
+class PayrollIntegration
+  property string EndpointURL;
+  method SendHireNotification(&emplid As string) Returns boolean;
+  method SendTerminationAlert(&emplid As string, &termDate As date) Returns boolean;
+end-class;
+\`\`\`
+All payroll integration logic in one class. Swap the endpoint URL in one property change.
+
+**Pattern 3 — Validation Chain:**
+\`\`\`
+class HireValidationChain
+  method AddValidator(&v As BaseValidator);
+  method RunAll() Returns boolean;
+  method GetErrors() Returns array of string;
+end-class;
+\`\`\`
+Add validators at runtime, run all, collect errors. Clean separation of validation rules.
+
+**Real benefit:** When a business rule changes, you update one Application Class. All 15 components using it are automatically updated. No project, no migration, no regression testing of 15 separate components.`},
+    ],
+    realWorld:`A global HCM implementation had the same employee validation logic copy-pasted across 23 different PeopleCode programs. When a business rule changed (salary grade cap increased), the team had to find and update all 23 occurrences — missing 4 of them, causing inconsistent validation across components. The fix: refactor all validation into a MY_COMPANY:HR_VALIDATE Application Package. One change now propagates to all 23 programs instantly. Event Mapping was used to attach 8 of these validators to delivered Oracle components — all surviving the next PeopleTools upgrade without any rework.`,
+    mistakes:[
+      {title:"Using Global variables instead of Application Class properties",desc:"Storing shared state in Global PeopleCode variables is fragile and causes cross-component bugs. Use Application Class properties instead — they're scoped to the class instance and explicitly passed between methods."},
+      {title:"Putting business logic in PeopleCode events instead of App Classes",desc:"Logic in FieldChange events can't be unit tested or reused. Extract business logic into Application Class methods, call those methods from events. The event becomes a thin wrapper — one line calling the App Class method."},
+    ],
+    quiz:[
+      {q:"What keyword is used to implement inheritance in an Application Class?",options:["implements","inherits","extends","super"],correct:2,explanation:"Application Classes use 'extends' for inheritance: 'class HireValidator extends BaseValidator'. The child class inherits all parent methods and can override them."},
+      {q:"What is Event Mapping used for?",options:["Mapping database fields to page controls","Attaching custom App Class code to delivered component events without modifying the delivered object","Creating event-driven Integration Broker flows","Mapping PS Query fields to BI Publisher templates"],correct:1,explanation:"Event Mapping (PT 8.55+) attaches your Application Class methods to delivered component events. The delivered object is never touched — your code runs before or after delivered code. Completely upgrade-safe."},
+    ],
+    peopleBooksUrl:"https://docs.oracle.com/cd/F44947_01/pt858pbr3/eng/pt/tpcd/",
+  },
+  {
+    id:"rest-soap-services", module:13, num:"33",
+    title:"REST & SOAP Web Services",
+    level:"advanced",
+    summary:"Build and consume REST and SOAP web services in PeopleSoft — exposing PS data via API and integrating with external systems. The foundation of all modern PeopleSoft integrations.",
+    preChecklist:["You completed Integration Broker Basics (Topic 24)","You completed Integration Broker REST & SOAP (Topic 25)","You understand Application Classes"],
+    keyPoints:[
+      "REST Service Operations use URI templates and HTTP verbs (GET/POST/PUT/DELETE)",
+      "SOAP Service Operations auto-generate WSDL — external systems import this to integrate",
+      "Handlers are Application Classes implementing PS_PT:Integration:IRequestHandler",
+      "ConnectorProperties on Nodes control URL, authentication, SSL, and timeout",
+      "Always handle OAuth token refresh — tokens expire, your code must detect and re-authenticate",
+    ],
+    sections:[
+      {title:"Building a REST API in PeopleSoft",body:`**Exposing PeopleSoft data as a REST endpoint:**
+
+**Step 1 — Create the Service:**
+PeopleTools → Integration Broker → Integration Setup → Services → Add New
+Service Name: EMPLOYEE_API
+
+**Step 2 — Create Service Operation:**
+Service → Service Operations → Add
+- Operation name: GET_EMPLOYEE.v1
+- Type: REST (change from default Sync)
+- HTTP Method: GET
+- URI Template: /employees/{EMPLID}
+
+**Step 3 — Create Request/Response Messages:**
+Define the JSON structure. Example response message:
+\`\`\`json
+{
+  "EMPLID": "KR00123",
+  "NAME": "Koushik Ram M",
+  "DEPTID": "IT0001",
+  "JOBCODE": "IT001",
+  "EFFDT": "2026-04-01"
+}
+\`\`\`
+
+**Step 4 — Write Handler PeopleCode:**
+\`\`\`
+import PS_PT:Integration:IRequestHandler;
+
+class GetEmployeeHandler implements PS_PT:Integration:IRequestHandler
+  method OnRequest(&MSG As Message) Returns Message;
+end-class;
+
+method OnRequest
+  /+ &MSG as Message +/
+  /+ Returns Message +/
+  Local Message &response = CreateMessage(Operation.GET_EMPLOYEE_RESP);
+  Local string &emplid = &MSG.URIResourceIndex.GetResourceByName("EMPLID");
+  Local Rowset &rs = &response.GetRowset();
+  SQLExec("SELECT LAST_NAME FROM PS_PERSONAL_DATA WHERE EMPLID=:1", &emplid, &lastName);
+  &rs.GetRow(1).GetRecord(Record.EMPLOYEE_MSG).EMPLID.Value = &emplid;
+  &rs.GetRow(1).GetRecord(Record.EMPLOYEE_MSG).LAST_NAME.Value = &lastName;
+  Return &response;
+end-method;
+\`\`\`
+
+**Step 5 — Create Routing:**
+Routing: Local Node → Service Operation, Inbound
+Active: Yes
+
+**Testing:**
+\`\`\`
+GET https://yourserver/PSIGW/RESTListeningConnector/PS/GET_EMPLOYEE.v1/KR00123
+\`\`\``},
+      {title:"Consuming External REST APIs",body:`**PeopleSoft calling an external REST API:**
+
+**Setup — Configure target Node:**
+1. Create Node for external system
+2. Node Properties → Connector ID: HTTPTARGET
+3. Node Properties → Connector Properties:
+   - PRIMARYURL: https://api.externalsystem.com
+   - HEADER: Authorization = Bearer {token}
+
+**PeopleCode to call external REST API:**
+\`\`\`
+Local Message &request = CreateMessage(Operation.EXTERNAL_PAYROLL_NOTIFY);
+/* Set message content */
+Local Rowset &rs = &request.GetRowset();
+&rs.GetRow(1).GetRecord(Record.PAY_NOTIFY_MSG).EMPLID.Value = &emplid;
+
+/* Synchronous call — waits for response */
+Local Message &response = %IntBroker.SyncRequest(&request);
+
+/* Parse JSON response */
+Local string &jsonStr = &response.GetContentString();
+Local JsonObject &json = CreateJsonObject();
+&json.Parse(&jsonStr);
+Local string &status = &json.GetProperty("status").GetString();
+\`\`\`
+
+**OAuth 2.0 token handling:**
+\`\`\`
+/* Get token first */
+Local Message &tokenReq = CreateMessage(Operation.GET_OAUTH_TOKEN);
+Local Message &tokenResp = %IntBroker.SyncRequest(&tokenReq);
+Local string &token = /* parse from tokenResp */;
+
+/* Store in App Server cache or State Record */
+/* Check expiry before each call — tokens typically expire in 3600 seconds */
+\`\`\``},
+      {title:"SOAP Services Deep Dive",body:`**Consuming an external SOAP service:**
+
+1. Get the external system's WSDL URL
+2. PeopleTools → Integration Broker → Web Services → Consume Web Service
+3. Enter WSDL URL → PeopleSoft auto-creates:
+   - Remote Node with the target URL
+   - Service and Service Operation matching the WSDL
+   - Request/Response messages with correct structure
+
+**Writing the SOAP Handler:**
+\`\`\`
+Local Message &request = CreateMessage(Operation.BENEFITS_ENROLL);
+Local Rowset &rs = &request.GetRowset();
+&rs.GetRow(1).GetRecord(Record.ENROLL_REQ).EMPLID.Value = &emplid;
+&rs.GetRow(1).GetRecord(Record.ENROLL_REQ).PLAN_TYPE.Value = "1";
+
+Local Message &response = %IntBroker.SyncRequest(&request);
+/* Process response */
+\`\`\`
+
+**WS-Security (SOAP authentication):**
+In Node properties → Connector Properties:
+- USERNAME: service account
+- PASSWORD: encrypted password
+- WSSE_AUTH: UsernameToken
+
+PeopleSoft handles SOAP envelope wrapping, WS-Security header injection, and XML parsing automatically. Your PeopleCode works with message Rowsets — not raw SOAP/XML.
+
+**Exposing PeopleSoft as SOAP:**
+WSDL auto-generated at: http://yourserver/PSIGW/PeopleSoftServiceListeningConnector
+External systems import this WSDL to consume your PS services.`},
+      {title:"Integration Monitoring and Troubleshooting",body:`**IB Monitor — daily operational tool:**
+PeopleTools → Integration Broker → Monitor → Integration Monitor
+
+**Sync errors:**
+IB Monitor → Synchronous Services → Error Log
+Each entry shows: timestamp, operation, error message, stack trace.
+Most common: 404 (wrong URL), 401 (auth failure), 500 (external system error), XML parse error (message format mismatch).
+
+**Async queue management:**
+Publication Queue — messages PS sent, awaiting delivery
+Subscription Queue — messages received, awaiting processing
+Failed — messages that errored. Fix and Resubmit here.
+
+**Diagnosing a failed integration:**
+1. Check IB Monitor for the error message
+2. Read the full stack trace — usually pinpoints the exact line
+3. Common causes:
+   - Node URL wrong or system is down (connection refused)
+   - Auth failure (expired password, wrong token)
+   - Message format mismatch (external changed their API)
+   - PeopleCode exception in handler (business rule error)
+4. Fix root cause
+5. IB Monitor → select failed message → Actions → Resubmit
+
+**Logging for debugging:**
+In Handler PeopleCode: WriteToLog(2, "My debug: " | &variable);
+Read in App Server log: domain/LOGS/APPSRV_*.LOG
+
+**Performance tips:**
+- Never use Sync for bulk operations — use Async
+- Monitor queue depth daily — growing queue = performance issue
+- Retry settings: configure max retries and backoff on Node`},
+    ],
+    realWorld:`A university used PeopleSoft HCM with 12 downstream systems (payroll vendor, badge access, LDAP, LMS, benefits vendor, etc.). Integration Broker pub/sub: every hire/transfer/termination published an async EMPLOYEE_CHANGE message. Each downstream system subscribed with their own handler. The badge system went down for 2 days of maintenance — messages queued automatically (2,400 messages) and delivered in sequence when it came back online. Zero data loss, zero manual intervention. The payroll integration used synchronous REST for real-time salary confirmation — if payroll rejects a rate, PS shows the error before saving.`,
+    mistakes:[
+      {title:"Hardcoding Node URLs in Handler PeopleCode",desc:"URLs should be in Node connector properties — not in PeopleCode strings. When moving DEV→QA→PROD, only the Node URL changes. Hardcoded URLs mean code changes at every migration."},
+      {title:"Using Synchronous messaging for bulk operations",desc:"Sync integrations block the PS transaction. If payroll is down and you sync-call it on every hire, all hires fail. Use async for bulk — messages queue and retry automatically when the target recovers."},
+    ],
+    quiz:[
+      {q:"In a REST Service Operation, what defines the URL structure for the endpoint?",options:["Node connector properties","URI Template — e.g. /employees/{EMPLID}","Service Operation name","Handler class name"],correct:1,explanation:"URI Templates define the REST URL pattern. Path parameters like {EMPLID} are accessible in Handler PeopleCode via MSG.URIResourceIndex.GetResourceByName('EMPLID')."},
+      {q:"What happens to async IB messages when the target system is down?",options:["They are lost permanently","They are deleted after 1 hour","They queue in PS and retry automatically when the system recovers","They convert to synchronous messages"],correct:2,explanation:"Async messages queue in PeopleSoft's message tables. They retry based on the Node's retry configuration. When the target recovers, queued messages deliver in sequence — no data loss, no manual intervention needed."},
+    ],
+    peopleBooksUrl:"https://docs.oracle.com/cd/F44947_01/pt858pbr3/eng/pt/tibr/",
+  },
+  {
+    id:"performance-tuning-advanced", module:14, num:"34",
+    title:"Performance Tuning & Debugging",
+    level:"advanced",
+    summary:"Diagnose and fix slow PeopleSoft pages and batch jobs using SQL trace, PeopleCode trace, App Server configuration, and database optimization. The skills that separate junior from senior consultants.",
+    preChecklist:["You completed Process Scheduler & Performance (Topic 29)","You understand PeopleCode events deeply","You know basic SQL and database indexes"],
+    keyPoints:[
+      "SQL trace is the primary tool — shows every SQL with timing and row counts",
+      "PeopleCode trace shows every statement executed — use with SQL trace for complete picture",
+      "N+1 queries (SQLExec in RowInit) are the #1 online performance problem",
+      "Set-based SQL in AE is always faster than row-by-row PeopleCode loops",
+      "App Server PSAPPSRV count, DB connection pool size, and Tuxedo bulletin board are key tuning levers",
+    ],
+    sections:[
+      {title:"SQL Trace Analysis",body:`**Enabling SQL trace:**
+Two methods:
+1. User-level: PeopleTools → Utilities → Debug → Trace SQL (checkbox on current session)
+2. App Server: PSADMIN → Domain → Trace settings → TraceSql flag
+
+**Reading the trace file:**
+Located in: App Server domain/LOGS/ or PS_SERVDIR
+Look for patterns:
+
+**Pattern 1 — High execution count:**
+\`\`\`
+RC=0  Dur=0.001 SQL=SELECT DESCR FROM PS_DEPT_TBL WHERE DEPTID=:1
+RC=0  Dur=0.001 SQL=SELECT DESCR FROM PS_DEPT_TBL WHERE DEPTID=:1
+... (repeated 500 times)
+\`\`\`
+→ SQLExec in RowInit. Fix: pre-fetch in PostBuild.
+
+**Pattern 2 — Long duration single SQL:**
+\`\`\`
+RC=0  Dur=14.832 SQL=SELECT * FROM PS_JOB J, PS_DEPT_TBL D WHERE...
+\`\`\`
+→ Missing index or bad join. Fix: add index, rewrite join.
+
+**Pattern 3 — Full table scan:**
+\`\`\`
+RC=0  Dur=8.441 SQL=SELECT EMPLID FROM PS_JOB WHERE LAST_NAME=:1
+\`\`\`
+→ No index on LAST_NAME. Fix: add Alternate Search Key (A) in App Designer.
+
+**Database-side analysis:**
+Oracle AWR report, v$sql (top SQL by elapsed time), v$session (currently running SQL).
+Ask DBA for execution plan (EXPLAIN PLAN) on slow queries — shows full table scan vs index scan.`},
+      {title:"PeopleCode Performance Patterns",body:`**The N+1 Problem — Most Common Issue:**
+
+Bad (500 DB calls for 500 rows):
+\`\`\`
+/* RowInit on JOB grid */
+Local string &deptName;
+SQLExec("SELECT DESCR FROM PS_DEPT_TBL WHERE DEPTID=:1", DEPTID.Value, &deptName);
+DEPT_NAME_WORK.Value = &deptName;
+\`\`\`
+
+Good (1 DB call total):
+\`\`\`
+/* PostBuild — build lookup map once */
+Component array of string &deptNames;
+Component array of string &deptIds;
+Local SQL &sql = CreateSQL("SELECT DEPTID, DESCR FROM PS_DEPT_TBL WHERE EFFDT=(SELECT MAX(EFFDT)...)");
+While &sql.Fetch(&id, &name)
+  &deptIds.Push(&id); &deptNames.Push(&name);
+End-While; &sql.Close();
+
+/* RowInit — look up from array (no DB call) */
+Local integer &idx = &deptIds.Find(DEPTID.Value);
+If &idx > 0 Then DEPT_NAME_WORK.Value = &deptNames[&idx]; End-If;
+\`\`\`
+
+**Other patterns to avoid:**
+- CreateSQL without .Close() — exhausts DB cursors
+- GetRowset() in a loop unnecessarily — expensive buffer navigation
+- Error() in FieldChange instead of FieldEdit — fires too late, causes unnecessary processing
+- DoSave() in SavePostChange — causes double save, nightmare to debug`},
+      {title:"App Server Tuning",body:`**PSADMIN configuration levers:**
+
+**PSAPPSRV instances:**
+Too few → users get queued, pages feel slow
+Too many → DB connection pool exhausted, server RAM exceeded
+Rule of thumb: 3-5 PSAPPSRV per 50 concurrent users
+Monitor: PSADMIN → Domain Status → shows active/idle PSAPPSRV
+
+**Tuxedo bulletin board:**
+In-memory work queue. If depth grows: more PSAPPSRV needed or transactions are too slow.
+BB_MAXMESSAGES (in psappsrv.ubx) controls queue size.
+
+**DB connection pool:**
+ConnPool_MaxSize in psappsrv.cfg — how many DB connections the pool holds.
+Set to ≥ (number of PSAPPSRV × 2). Too small → connections rejected under load.
+
+**Server cache:**
+App Server caches PeopleTools metadata (record defs, page defs, PeopleCode) in memory.
+Cache invalidated when you: run Build, clear cache utilities, or restart domain.
+Full cache refresh on restart causes initial slowness — warm up server before user load.
+
+**Memory settings:**
+MAXGEN (in Tuxedo config) — max server generations before restart. Prevents memory leaks from long-running processes.
+Set MAXGEN=100 for PSAPPSRV — restarts the process after 100 transactions. Conservative but prevents memory growth.`},
+      {title:"Batch Performance Optimization",body:`**AE batch optimization checklist:**
+
+1. **Indexes on Temp Tables:**
+Every Temp Table field used in WHERE clauses needs an index. Add Alternate Search Key (A) or custom index in App Designer. Without indexes: full scans on every Do Select iteration.
+
+2. **Do Select mode:**
+Re-Select: re-executes SELECT each iteration (use only if source data changes mid-run)
+Select Once: fetches all rows once, iterates in memory. Use for static data. Much faster.
+
+3. **Set-based SQL over loops:**
+\`\`\`
+/* Bad — PeopleCode loop with SQLExec per employee */
+For &i = 1 To &count
+  SQLExec("UPDATE PS_JOB SET FLAG='Y' WHERE EMPLID=:1", &empls[&i]);
+End-For;
+
+/* Good — single set-based UPDATE */
+\`\`\`
+\`\`\`sql
+UPDATE PS_JOB SET PROCESS_FLAG = 'Y'
+WHERE EMPLID IN (SELECT EMPLID FROM PS_MY_STAGE WHERE STATUS = 'READY')
+AND EFFDT = (SELECT MAX(EFFDT) ...)
+\`\`\`
+
+4. **CommitWork frequency:**
+Too rarely: huge rollback segment, catastrophic on failure
+Too often: commit overhead per row
+Sweet spot: every 500-1000 rows
+
+5. **Parallel processing:**
+Split large datasets by EMPLID range or DEPTID across multiple AE instances using Temp Tables.
+
+6. **DB statistics:**
+Outdated stats cause optimizer to choose wrong execution plans. Work with DBA to update stats after large data loads. Critical after data migrations.`},
+    ],
+    realWorld:`A client's month-end journal entry process was taking 11 hours — cutting into the close window. SQL trace analysis: one AE step had a correlated subquery running against a 50M-row table with no index on the correlation field. The query ran 200,000 times (once per journal line). Fix: added a composite index on the correlation fields, changed the AE SQL to use a staging table pre-populated in an earlier step, converted the correlated subquery to a JOIN. Runtime dropped from 11 hours to 38 minutes. Zero code change to business logic — pure SQL optimization.`,
+    mistakes:[
+      {title:"Running SQL trace in PROD continuously",desc:"SQL trace generates massive log files and adds overhead to every transaction. Enable only for specific sessions during diagnosis. In PROD, use targeted user-level trace for a specific problematic transaction — never leave domain-level trace on."},
+      {title:"Optimizing without measuring first",desc:"The most common performance mistake: optimizing the wrong thing. Always run SQL trace first. The bottleneck is almost never where developers guess it is. Data shows SQLExec-in-RowInit is responsible for >60% of PeopleSoft online performance issues."},
+    ],
+    quiz:[
+      {q:"What does a SQL trace showing the same SELECT statement 500 times indicate?",options:["A database bug","SQLExec inside RowInit — classic N+1 performance problem","A network issue","Too many App Server processes"],correct:1,explanation:"Identical SQL repeated N times = SQLExec in a loop. RowInit fires once per grid row — 500 rows = 500 DB calls. Fix: pre-fetch all data in PostBuild using CreateSQL once, then look up from memory in RowInit."},
+      {q:"What is the recommended CommitWork frequency in a large AE batch job?",options:["Every row","Every 500-1000 rows","Only at the end of the entire job","Every 10,000 rows"],correct:1,explanation:"Every row = excessive commit overhead. End of job = massive rollback on failure. Every 500-1000 rows balances overhead vs recovery risk. Also saves a checkpoint enabling restart from that point."},
+    ],
+    peopleBooksUrl:"https://docs.oracle.com/cd/F44947_01/pt858pbr3/eng/pt/tpcs/",
+  },
+  {
+    id:"event-mapping-advanced", module:14, num:"35",
+    title:"Event Mapping & Upgrade-Safe Dev",
+    level:"advanced",
+    summary:"Event Mapping is PeopleSoft's modern customization framework — attach your code to delivered components without touching them. The single most important technique for reducing upgrade cost.",
+    preChecklist:["You completed Application Packages (Topic 32)","You understand PeopleCode events","You know what an upgrade/PUM is"],
+    keyPoints:[
+      "Event Mapping attaches App Class methods to delivered component events — zero modification to delivered objects",
+      "Pre-processing: your code runs BEFORE delivered code. Post-processing: runs AFTER",
+      "Related Content Framework stores the mappings — survives upgrades because it's configuration, not code",
+      "Event Mapping replaces the old 'clone and modify' pattern for all customizations",
+      "Compare and Fix is still needed for true object modifications — Event Mapping handles behavior additions",
+    ],
+    sections:[
+      {title:"How Event Mapping Works",body:`**The old way (upgrade nightmare):**
+1. Customer needs custom validation on JOB_DATA component
+2. Developer opens JOB_DATA in App Designer, adds PeopleCode to SaveEdit
+3. Oracle releases upgrade — JOB_DATA is a delivered object, gets overwritten
+4. Customer's SaveEdit code is gone
+5. Must re-apply customization, test, migrate — every single upgrade
+
+**The Event Mapping way (upgrade-safe):**
+1. Customer needs custom validation on JOB_DATA
+2. Developer creates Application Class: MY_CO:HR:JobDataValidator
+3. Adds method: OnSaveEdit()
+4. Maps it to JOB_DATA component → SaveEdit event via PeopleTools UI
+5. Oracle releases upgrade — JOB_DATA is overwritten
+6. The Event Mapping entry in Related Content Framework is NOT overwritten
+7. Customization survives untouched
+
+**Why this works:**
+Event Mapping entries are stored in PS_EOCF_MAPPING — a customer-owned configuration table. Oracle never delivers to this table. Your mappings are permanent.
+
+**Configuration path:**
+PeopleTools → Portal → Event Mapping → Manage Related Content Service → Add
+Or: PeopleTools → Application Designer → right-click Component → Event Mapping`},
+      {title:"Setting Up Event Mapping",body:`**Step-by-step setup:**
+
+1. **Create Application Class first:**
+\`\`\`
+/* Package: MY_COMPANY:HR_CUSTOM */
+class JobDataCustomizations
+  method OnPostBuild();
+  method OnSaveEdit();
+  method OnFieldChange_Deptid();
+end-class;
+
+method OnPostBuild
+  /* Hide fields not needed for this client */
+  GetField(Field.BUSINESS_UNIT).Visible = False;
+  GetField(Field.SETID).Visible = False;
+end-method;
+
+method OnSaveEdit
+  If JOB.ANNUAL_RT.Value > 1000000 Then
+    Error "Salary requires VP approval.";
+  End-If;
+end-method;
+\`\`\`
+
+2. **Create Event Mapping:**
+PeopleTools → Portal → Event Mapping → Add/Update
+
+| Field | Value |
+|---|---|
+| Service Name | MY_HR_CUSTOMIZATIONS |
+| Package Name | MY_COMPANY:HR_CUSTOM |
+| Class Name | JobDataCustomizations |
+| Method Name | OnPostBuild |
+| Processing Type | Post-Processing |
+
+3. **Map to component:**
+Event Mapping → Map to Component → 
+Select: Component = JOB_DATA, Page = JOB_DATA1, Event = PostBuild
+
+4. **Activate:**
+Set Active = Yes, Save.
+
+**Test immediately** in your environment. If PostBuild errors, check App Class syntax and method signature.`},
+      {title:"Pre vs Post Processing",body:`**Pre-Processing:**
+Your code runs BEFORE Oracle's delivered code for that event.
+
+Use when:
+- Setting up data or variables needed by delivered code
+- Blocking a transaction before delivered code runs (Error() in pre-SaveEdit)
+- Setting field defaults before delivered PostBuild logic reads them
+
+**Post-Processing:**
+Your code runs AFTER Oracle's delivered code.
+
+Use when:
+- Overriding something delivered code set (hide a field delivered code made visible)
+- Triggering downstream actions after delivered logic completes
+- Adding validation after delivered validation passes
+
+**Example — PostBuild:**
+Oracle delivered PostBuild: sets COMPANY default based on operator class.
+Your Post-Processing PostBuild: overrides COMPANY default for specific business units.
+Order: Oracle code runs first → sets COMPANY → your code runs → overrides for specific BUs.
+
+**Stopping delivered code from running:**
+Pre-Processing only. In your pre-processing method:
+\`\`\`
+/* Stop delivered PostBuild from running */
+%This.CancelDeliveredCode = True;  /* valid in some PT versions */
+\`\`\`
+Use sparingly — blocking delivered code can break delivered functionality.`},
+      {title:"Event Mapping Scope Options",body:`Event Mapping can be applied at multiple levels of granularity:
+
+**Component-level mapping:**
+All pages in the component fire your code. Use for:
+- Component-wide validation (SaveEdit)
+- Component-wide initialization (PostBuild)
+
+**Page-level mapping:**
+Only fires when a specific page is active (Activate event).
+Use for: tab-specific initialization, showing/hiding controls on specific tabs.
+
+**Record-field level mapping:**
+Fires for a specific field's events across all components using that record.
+Use for: field-level FieldEdit validation that applies everywhere the field appears.
+
+**Component-field level mapping:**
+Fires for a specific field ONLY in a specific component.
+Use for: component-specific field behavior.
+
+**Choosing the right scope:**
+Start narrow (component-field) and widen only if needed. Wide scope = more places your code fires = higher risk of unintended side effects.
+
+**Disabling a mapping:**
+PeopleTools → Event Mapping → find the mapping → uncheck Active → Save.
+Instantly disables without code change or migration. Useful for emergency rollback.`},
+    ],
+    realWorld:`A financial services firm was spending 3 months on every PeopleSoft upgrade cycle specifically for customization rework — find all modified delivered objects, compare with Oracle's new version, re-apply changes, test. After migrating all 47 customizations to Event Mapping + Application Classes over 6 months: the next upgrade customization rework took 4 days instead of 3 months. ROI was clear within the first upgrade cycle. The pattern also reduced regression testing scope dramatically — Event Mapped customizations are isolated and easier to test independently.`,
+    mistakes:[
+      {title:"Mapping to too many events on one component",desc:"If you map 8 different methods to 8 different events on one component, debugging becomes complex. When something breaks, which of the 8 fired? Document every mapping clearly and keep mappings focused — one mapping per distinct business requirement."},
+      {title:"Using Event Mapping when object modification is actually needed",desc:"Event Mapping adds behavior — it can't add new fields to a page, change field labels, or restructure layout. For structural changes (adding a page, adding a record to a component), you still need to clone the delivered object with a custom prefix and modify the clone."},
+    ],
+    quiz:[
+      {q:"What is the main advantage of Event Mapping over directly modifying delivered components?",options:["It runs faster","Customizations survive upgrades because delivered objects are never touched","It requires less PeopleCode knowledge","Oracle supports it better"],correct:1,explanation:"Event Mapping stores configuration in PS_EOCF_MAPPING — never overwritten by Oracle upgrades. Directly modified delivered objects are overwritten every upgrade. Event Mapping eliminates the upgrade customization rework cycle."},
+      {q:"What does Pre-Processing mean in Event Mapping?",options:["Your code runs after Oracle's delivered code","Your code runs before Oracle's delivered code for that event","Your code replaces Oracle's code","Your code runs on a separate server"],correct:1,explanation:"Pre-Processing: your Event Mapped method runs BEFORE Oracle's delivered code for that event. Post-Processing runs AFTER. Choose based on whether you need to influence what delivered code sees or override what delivered code sets."},
+    ],
+    peopleBooksUrl:"https://docs.oracle.com/cd/F44947_01/pt858pbr3/eng/pt/tpcs/",
+  },
+  {
+    id:"elasticsearch-search-framework", module:15, num:"36",
+    title:"Search Framework & Elasticsearch",
+    level:"advanced",
+    summary:"PeopleSoft Search Framework uses Elasticsearch to provide fast full-text search across all PeopleSoft data. Replace slow component search dialogs with modern keyword search.",
+    preChecklist:["You understand PeopleSoft components and records","You know what a PS Query is","Basic understanding of what a search engine does"],
+    keyPoints:[
+      "Search Framework requires a separate Elasticsearch cluster — not built into PeopleSoft",
+      "Search Definitions define what data gets indexed and how",
+      "Search Categories group related Search Definitions for the search UI",
+      "Global Search Bar (Fluid) uses Search Framework — without it users see no results",
+      "Index must be built and scheduled to keep search results current",
+    ],
+    sections:[
+      {title:"Search Framework Architecture",body:`**What is Search Framework?**
+PeopleSoft's full-text search layer powered by Elasticsearch. Allows users to type "john smith manager IT department" and find relevant employees — vs the old approach of knowing exact EMPLID, DEPTID, etc.
+
+**Architecture:**
+\`\`\`
+Fluid Global Search Bar
+         ↓
+PeopleSoft Search Framework (PeopleTools)
+         ↓
+Elasticsearch Cluster (separate server/OCI service)
+         ↓
+Indexed PS Data (employees, departments, jobs, etc.)
+\`\`\`
+
+**Required components:**
+- Elasticsearch cluster (standalone or Oracle's Search Cloud Service)
+- Integration Broker connection between PS and ES
+- Search Definitions (what to index)
+- Search Categories (how to present results)
+- Scheduled index build/update jobs
+
+**PeopleTools versions:**
+PT 8.52: Search Framework introduced
+PT 8.53+: Global Search Bar in Fluid uses it
+PT 8.55+: Elasticsearch replaces legacy Verity search
+PT 8.57+: Search Framework required for full Fluid functionality`},
+      {title:"Creating Search Definitions",body:`**Search Definition = what gets indexed:**
+
+PeopleTools → Search Framework → Administration → Search Definitions → Add New
+
+**Setup steps:**
+1. **Source Type:** PS Query (most common), Component, or External
+2. **PS Query:** the query that returns records to index
+   - Must return a unique key field (EMPLID, CASE_ID, etc.)
+   - All fields to be searchable must be in the query
+3. **Mapped Fields:**
+   - Title: what appears as the result heading (e.g., "SMITH, JOHN")
+   - Summary: description shown in results
+   - Search attributes: fields users can search/filter on
+4. **Security:** PS Query must use security views so search results respect row-level security
+5. **Action URL:** the component that opens when user clicks a result
+
+**Example — Employee Search Definition:**
+\`\`\`
+Source Query: EMPLOYEE_SEARCH_Q
+Fields:
+  - EMPLID (key, not displayed)
+  - LAST_NAME + FIRST_NAME → Title
+  - DEPTID, JOBCODE, LOCATION → Search attributes
+  - HIRE_DT, EMPL_STATUS → Filters
+Action: Component JOB_DATA with key EMPLID
+\`\`\`
+
+**Building the index:**
+PeopleTools → Search Framework → Administration → Deploy/Delete Search Definitions
+Then: Administration → Schedule Search Index Build`},
+      {title:"Search Categories and Global Search",body:`**Search Category = how results are presented:**
+
+PeopleTools → Search Framework → Administration → Search Categories → Add New
+
+Groups multiple Search Definitions:
+- HR Category: Employee Search + Position Search + Department Search
+- Finance Category: Invoice Search + Vendor Search
+
+**Global Search Bar setup:**
+The Fluid NavBar search icon uses Search Categories.
+PeopleTools → Portal → Global Search Configuration → select Categories to include.
+
+**Configuring search display:**
+In Search Category → Display Settings:
+- Number of results per page
+- Facets (filter sidebar) — e.g., filter by Department, Status, Location
+- Highlighted fields — bold matching keywords in results
+- Sort options — relevance, date, alphabetical
+
+**Faceted search example:**
+User searches "engineer"
+Results panel shows:
+- Left sidebar: filter by Department (IT: 45, Finance: 12), Status (Active: 55, Leave: 2)
+- User clicks IT → results narrow to IT engineers only
+
+This replaces the old "Search by Department" dropdown approach with a modern faceted search experience.`},
+      {title:"Index Management and Maintenance",body:`**Index build types:**
+Full Build: re-indexes everything from scratch. Run: initial setup, after major data migrations.
+Incremental Build: indexes only new/changed rows since last run. Run: daily or hourly.
+
+**Scheduling:**
+PeopleTools → Search Framework → Administration → Schedule Index Build
+Set recurrence: Incremental daily at 2 AM, Full monthly on Sunday 11 PM.
+
+**Monitoring index health:**
+PeopleTools → Search Framework → Administration → Search Designer → Index Status
+Shows: number of indexed documents, last build time, index size, errors.
+
+**Common issues:**
+
+*Search returns no results:*
+1. Index not built — run full index build
+2. Elasticsearch cluster down — check connectivity
+3. IB connection to ES broken — check Integration Gateway
+
+*Results missing recent records:*
+Incremental index hasn't run. Run manual incremental build.
+Or: record not in Search Definition's PS Query — add to query.
+
+*Search results ignore row-level security:*
+Search Definition's PS Query is using base tables instead of security views.
+Fix: update query to use security views — identical to component security approach.
+
+**Elasticsearch cluster management:**
+Monitor via Kibana (ES monitoring UI) or Oracle's Cloud Console.
+Key metrics: heap usage (<80%), index size, query response time (<200ms).
+If heap >80%: add ES nodes or increase heap allocation.`},
+    ],
+    realWorld:`A university with 15,000 employees had users complaining the student/employee search was too slow and required knowing exact IDs. Implementation of Search Framework: indexed employees, students, courses, and departments. Global Search Bar deployed in Fluid. HR coordinators now type partial names or departments and get instant results with faceted filtering. The old search dialog averaged 8 seconds per search. Search Framework: under 300ms. Adoption of Fluid Homepages jumped 40% within a month — the fast search was the feature that convinced users to switch from Classic.`,
+    mistakes:[
+      {title:"Not using security views in Search Definition queries",desc:"If the PS Query in your Search Definition uses PS_JOB instead of PS_JOB_SRCH_VW, search results bypass row-level security — users see employees they shouldn't. Always use the same security views in search queries as you use in component Search Records."},
+      {title:"Only scheduling full index builds",desc:"Full builds on large environments take hours. Daily full build = hours of degraded search during the build window. Use incremental builds daily (run in minutes) with full builds weekly. Incremental keeps results current without the overhead."},
+    ],
+    quiz:[
+      {q:"What technology does PeopleSoft Search Framework use as its search engine?",options:["Oracle Text","Apache Solr","Elasticsearch","PS Query"],correct:2,explanation:"PeopleSoft Search Framework uses Elasticsearch as its underlying search engine from PT 8.55+. Elasticsearch is a separate cluster (server or cloud service) that PeopleSoft connects to via Integration Broker."},
+      {q:"What happens if the Search Definition's PS Query uses base tables instead of security views?",options:["Search is slower","Search results bypass row-level security — users see data they should not","Search returns no results","The index build fails"],correct:1,explanation:"Security views filter results based on the user's row-level security profile. Using base tables (PS_JOB vs PS_JOB_SRCH_VW) in the search query means everyone sees all results regardless of their department security. Always use security views."},
+    ],
+    peopleBooksUrl:"https://docs.oracle.com/cd/F44947_01/pt858pbr3/eng/pt/tpscf/",
+  },
+  {
+    id:"peopletools-upgrades", module:15, num:"37",
+    title:"PeopleTools Upgrades & PUM",
+    level:"advanced",
+    summary:"Managing PeopleSoft upgrades using PUM (PeopleSoft Update Manager) and Change Assistant. How to apply patches selectively, manage customizations, and keep your environment current.",
+    preChecklist:["You understand PeopleSoft architecture","You know what Application Designer projects are","You completed Event Mapping (Topic 35)"],
+    keyPoints:[
+      "PUM replaced bundle patching in 2014 — selective fix adoption via PeopleSoft Images",
+      "Change Assistant automates the apply process — reads Change Package, executes steps",
+      "Compare and Fix is the core upgrade workflow for customized delivered objects",
+      "Always apply to DEV first → test → apply to QA → UAT → PROD",
+      "Critical security fixes can be applied in hours with PUM — no waiting for quarterly bundles",
+    ],
+    sections:[
+      {title:"PUM Architecture",body:`**How PUM works:**
+
+Oracle releases PeopleSoft Images — VirtualBox VMs with all cumulative fixes up to that image date. Images are numbered (Image 47, Image 48, etc.).
+
+**The workflow:**
+1. Download latest PS Image from Oracle Support
+2. Run PS Image locally (or on a server)
+3. Connect your environment to the Image via PUM Home Page (web UI)
+4. Browse available updates: security fixes, functional enhancements, new features
+5. Select what you want to apply
+6. PUM generates a Change Package (zip file with all selected fixes)
+7. Change Assistant applies the Change Package to your environment
+
+**Key advantage over old bundle patching:**
+- Old bundles: take everything in the bundle (200+ fixes) or nothing
+- PUM: cherry-pick exactly what you need (take security fix only, skip UI changes)
+- Critical security fix? Apply in 2 hours. Don't need to test 200 other changes.
+
+**PeopleSoft Image cadence:**
+Oracle releases 3-4 Images per year per product line (HCM, FSCM, etc.).
+Each Image is cumulative — Image 48 includes everything in Image 47 plus new fixes.
+You don't need to apply every Image — apply when you need specific fixes or features.`},
+      {title:"Change Assistant",body:`**Change Assistant is the automation tool that applies Change Packages:**
+Installed on the developer's workstation. Connects to all environments.
+
+**Change Package application steps:**
+Change Assistant reads the package and breaks it into automated steps:
+1. DB Updates — SQL scripts modifying PeopleTools and Application tables
+2. Data Conversion — AE programs transforming existing data to new structures
+3. Application Designer Updates — importing new/updated objects
+4. Manual Steps — steps that require human decision or can't be automated
+5. Build Steps — running App Designer Build on modified records
+
+**Applying a Change Package:**
+1. Change Assistant → File → Open Change Package
+2. Set environment credentials (DEV URL, admin user)
+3. Change Assistant shows all steps with status
+4. Click Run — Change Assistant executes steps automatically
+5. Monitor progress — most steps are automated
+6. Manual steps: Change Assistant stops, shows instructions, waits for you to confirm
+7. After completion: run Application Designer Build on affected records
+
+**Estimated time:**
+Small patch (1-2 fixes): 30-60 minutes
+Medium package (10-20 fixes): 2-4 hours
+Major feature drop: 1-2 days including testing
+
+**Always apply DEV first** — Change Assistant will encounter errors on any environment. Better to discover them in DEV.`},
+      {title:"Compare and Fix",body:`**What is Compare and Fix?**
+The process of reconciling your customizations with Oracle's updated delivered objects after an upgrade.
+
+**The problem:**
+You modified PS_JOBCODE_TBL record in DEV. Oracle's upgrade delivers a new version of PS_JOBCODE_TBL. Your version and Oracle's version now differ — which one goes to PROD?
+
+**The Compare and Fix workflow:**
+1. Apply Change Package to DEV
+2. Application Designer → Tools → Compare and Report
+3. Select your project containing customized objects
+4. Select the target database (where Oracle's new version landed)
+5. Compare runs — shows differences side by side:
+   - Your version vs Oracle's new version
+   - Fields added/removed by Oracle
+   - PeopleCode changes Oracle made
+6. For each difference: choose Take Source, Take Target, or merge manually
+7. Re-test customizations against Oracle's new code
+
+**Types of differences:**
+- Oracle added new fields to a record you customized — merge both
+- Oracle changed PeopleCode you also changed — manually merge logic
+- Oracle added a new page tab — take Oracle's version, re-add your customization
+- Difference is only metadata (descriptions) — usually take Oracle's version
+
+**Using Event Mapping to minimize Compare and Fix:**
+If your customizations are in Application Classes + Event Mapping:
+- Oracle upgrades the delivered component → your mappings survive
+- Zero Compare and Fix needed for that component
+- Only objects you structurally modified need Compare and Fix`},
+      {title:"Upgrade Best Practices",body:`**Golden rules for upgrades:**
+
+**1. Never modify delivered objects directly:**
+Clone first: copy JOB_DATA_COMPONENT → ZZ_JOB_DATA_COMPONENT
+Modify the clone. Delivered object stays clean for upgrades.
+Even better: Event Mapping (no object modification at all).
+
+**2. Document every customization:**
+Maintain a customization register:
+- Object name
+- What was changed
+- Why it was changed
+- Ticket/requirement reference
+This register is essential during Compare and Fix.
+
+**3. Apply patch cycle:**
+DEV → QA → UAT (regression test) → PROD
+Never apply directly to PROD.
+Minimum 2 weeks of UAT for medium patches.
+
+**4. Test critical paths after every patch:**
+Hire → Transfer → Termination
+Pay Rate Change → Payroll Calculation
+Integration Broker flows
+Security — verify users can still access what they should
+
+**5. Use a patch log:**
+Record: Image number applied, date, what was included, who applied, any issues found.
+When something breaks in PROD 3 months later, the patch log tells you exactly what changed.
+
+**6. Security patches = highest priority:**
+Apply critical security fixes within 2 weeks of Oracle's advisory.
+Use PUM to take just the security fix without other changes.
+Test only the security fix in DEV — much faster than full regression.`},
+    ],
+    realWorld:`A hospital PeopleSoft HCM environment hadn't applied patches in 3 years (11 Images behind). When a critical security vulnerability was disclosed, they had to emergency-apply 3 years of patches. The Compare and Fix exercise took 6 weeks because hundreds of delivered objects had been directly modified over the years with no documentation. The lesson: establish a quarterly patching cadence, document all customizations, and use Event Mapping going forward. Their next upgrade (6 months later) took 4 days — they had adopted Event Mapping for new customizations and had a proper patch log.`,
+    mistakes:[
+      {title:"Applying patches directly to PROD without DEV testing",desc:"Change Packages sometimes have unexpected interactions with customizations. Always apply to DEV first — even for 'small' patches. The 1 hour saved by skipping DEV testing is not worth a PROD outage that takes 8 hours to fix."},
+      {title:"Ignoring the customization register",desc:"Without documentation of what was customized and why, Compare and Fix becomes archaeology — examining each difference and trying to remember if it was intentional. A simple spreadsheet tracking every customized object, the reason, and the ticket reference saves enormous time during upgrades."},
+    ],
+    quiz:[
+      {q:"What replaced bundle patching in PeopleSoft (~2014)?",options:["Change Assistant","PeopleSoft Update Manager (PUM) with selective fix adoption","Annual upgrade cycles","Application Designer sync"],correct:1,explanation:"PUM replaced quarterly bundle patching. Instead of taking all fixes in a bundle, organizations download a PS Image, browse available fixes, select exactly what to apply, and generate a targeted Change Package. Critical security fixes can be applied in hours."},
+      {q:"What is Compare and Fix used for in a PeopleSoft upgrade?",options:["Comparing two databases for performance","Reconciling customized delivered objects with Oracle's updated versions","Fixing Elasticsearch index errors","Comparing PS Query results"],correct:1,explanation:"Compare and Fix reconciles your modifications to delivered objects against Oracle's new version from the upgrade. You see both versions side by side and decide: take Oracle's version, keep yours, or manually merge both sets of changes."},
+    ],
+    peopleBooksUrl:"https://docs.oracle.com/cd/F44947_01/pt858pbr3/eng/pt/tpum/",
+  },
+  {
+    id:"advanced-security", module:16, num:"38",
+    title:"Advanced Security & Compliance",
+    level:"advanced",
+    summary:"Enterprise-grade PeopleSoft security — SSO, encryption, audit frameworks, and compliance configurations used in regulated industries (healthcare, finance, government).",
+    preChecklist:["You completed Advanced Security (Topic 26)","You understand Permission Lists and Roles","You know what SSO is conceptually"],
+    keyPoints:[
+      "SSO in PeopleSoft uses PS_TOKEN (PeopleSoft's proprietary token) or SAML for federated identity",
+      "Sensitive data encryption uses PeopleSoft's built-in encryption framework (RC2/3DES/AES)",
+      "Audit framework logs: who changed what, when, old value, new value — stored in PS_AUDIT_* tables",
+      "Data Masking hides sensitive fields (SSN, bank account) based on user role",
+      "SLA and SOX compliance requirements drive most enterprise PeopleSoft security configurations",
+    ],
+    sections:[
+      {title:"Single Sign-On (SSO)",body:`**PeopleSoft SSO options:**
+
+**1. PS_TOKEN (PeopleSoft proprietary SSO):**
+Used when two PeopleSoft systems need seamless navigation.
+User logs into PS System A → navigates to a link that opens PS System B → already authenticated, no second login.
+
+How it works:
+1. PS System A generates a PS_TOKEN (encrypted user identity + timestamp)
+2. Token passed in URL or HTTP header
+3. PS System B validates token against shared secret key
+4. If valid and within time window (default 1 hour): auto-signon
+
+Setup: PeopleTools → Security → SSO → Single Sign-On Configuration
+Both systems must share: Same Node password, Same timestamp tolerance setting
+
+**2. SAML 2.0 / Oracle Access Manager:**
+Modern SSO standard. Corporate Identity Provider (IdP: Okta, Azure AD, Oracle IAM) authenticates user once.
+PS acts as Service Provider (SP) — trusts the IdP assertion.
+
+SAML flow:
+User accesses PS URL → PS redirects to IdP → User authenticates at IdP → IdP sends SAML assertion → PS validates assertion → User logged into PS
+
+Setup requires: SSL certificates, SAML metadata exchange between PS and IdP.
+PeopleTools 8.55+: full SAML 2.0 support built-in.
+
+**3. Lightweight SSO (simpler):**
+HTTP header-based: IdP sets a custom header (e.g., X-PS-USER: JSMITH) after authentication.
+PS reads the header and auto-logs in the user.
+Less secure than SAML but simpler to implement.`},
+      {title:"Encryption and Data Masking",body:`**PeopleSoft Encryption Framework:**
+Built-in encryption for sensitive fields — national IDs, bank accounts, credit cards.
+
+**Setup:**
+PeopleTools → Security → Encryption → Encryption Profiles
+Choose algorithm: RC2, 3DES, or AES (AES-256 recommended for new implementations)
+Assign Encryption Profile to specific record fields in App Designer.
+
+**How it works in practice:**
+- User types SSN: 123-45-6789 on page
+- On save: PeopleSoft encrypts it before storing in DB: A3F9B2C7...
+- DB shows encrypted value — even DBA can't read it
+- On display: PeopleSoft decrypts for authorized users
+- Unauthorized users (no decryption permission): see masked value: ***-**-6789
+
+**Data Masking (PT 8.55+):**
+PeopleTools → Security → Data Masking
+Define masking rules per field per Role/Permission List:
+- Full mask: ****-****
+- Partial mask: ***-**-6789 (show last 4 only)
+- Tokenization: replace with a non-sensitive token
+
+Users with "View Full SSN" Permission List: see full number.
+Users without: see masked version.
+No code change needed — configured in PeopleTools.
+
+**Encryption in Integration Broker:**
+Message content can be encrypted end-to-end.
+WS-Security with XML Encryption: specific SOAP message elements encrypted.
+Prevents sensitive data exposure if messages are intercepted in transit.`},
+      {title:"Audit Framework",body:`**PeopleSoft Audit — what gets logged:**
+Changes to critical tables (PS_JOB, PS_PERSONAL_DATA, salary tables) are logged to PS_AUDIT_* tables.
+
+**Setting up record-level auditing:**
+App Designer → Open Record → Record Properties → Use tab → Audit Enabled
+Choose: Add, Change, Delete, or all three.
+
+PeopleSoft creates: PS_AUDIT_RECORDNAME with columns:
+- AUDIT_OPRID: who made the change
+- AUDIT_STAMP: timestamp of change
+- AUDIT_ACTION: A (Add) / C (Change) / D (Delete)
+- All record fields: showing the OLD value (before change)
+
+**Auditing a specific field change:**
+App Designer → Record → Record Field Properties → Audit field option
+Only logs when this specific field changes — reduces audit table bloat.
+
+**Querying audit tables:**
+\`\`\`sql
+SELECT AUDIT_OPRID, AUDIT_STAMP, AUDIT_ACTION, 
+       ANNUAL_RT AS OLD_SALARY
+FROM PS_AUDIT_JOB
+WHERE EMPLID = 'KR00123'
+AND AUDIT_STAMP >= SYSDATE - 90
+ORDER BY AUDIT_STAMP DESC;
+\`\`\`
+Find: who changed salary, when, and what it was before.
+
+**Component-level audit:**
+PeopleTools → Utilities → Auditing → Component Record Audit
+Audits all save operations on a component — captures complete transaction.
+
+**SOX / Regulatory requirement:**
+Most regulated industries require: who changed what compensation data, when, with what justification.
+PS Audit + comments field + required reason codes on Pay Rate Change = complete compliance trail.`},
+      {title:"Security Compliance Configurations",body:`**Common enterprise security requirements:**
+
+**1. Password policies:**
+PeopleTools → Security → User Profiles → Password Controls
+- Minimum length: 12 characters
+- Complexity: must include uppercase, number, special character
+- Expiry: every 90 days
+- History: cannot reuse last 12 passwords
+- Lockout: lock after 5 failed attempts, unlock after 30 minutes
+
+**2. Inactive user management:**
+Users who haven't logged in for 90 days should be disabled.
+PS doesn't do this automatically — build an AE that queries PS_LASTSIGNON and disables users:
+\`\`\`sql
+UPDATE PSOPRDEFN SET ACCTLOCK = 1
+WHERE LASTSIGNONDTTM < SYSDATE - 90
+AND ACCTLOCK = 0
+AND OPRTYPE <> 'S'  /* don't lock service accounts */
+\`\`\`
+
+**3. Privileged access review:**
+Quarterly review of who has sensitive Permission Lists (ALLPAGES, PTPT1000, HR_ADMIN_SUPER).
+PS Query to extract: all users with Permission List containing keyword 'ADMIN'.
+Export to Excel → HR/Security team reviews → remove excess access.
+
+**4. Service account management:**
+Batch jobs, IB integrations, and external systems use service accounts.
+Requirements:
+- Named accounts: BATCH_PAYROLL, IB_BENEFITS (not generic 'SYSADMIN')
+- No interactive login allowed (set can't login interactively flag)
+- Password in vault (CyberArk, HashiCorp) not in config files
+- Minimum permissions: only what the batch job or integration needs
+
+**5. HIPAA (Healthcare) specifics:**
+Minimum necessary access — users should have access to only the employee data they need for their job function. Implemented via: narrow department security trees + specific record-level Permission Lists.`},
+    ],
+    realWorld:`A healthcare organization was failing their HIPAA security audit. Issues found: 23 users had ALLPAGES permission, SSNs were stored unencrypted in PS_PERSONAL_DATA, no audit trail on benefit enrollment changes, and 47 terminated employees still had active PS accounts. 90-day remediation: enabled AES-256 encryption on SSN and bank account fields, configured data masking for non-HR roles, set up record auditing on PS_HEALTH_BENEFIT and PS_PERSONAL_DATA, built an AE to auto-disable terminated user accounts, removed ALLPAGES from 21 of 23 users. Passed the follow-up audit with zero findings.`,
+    mistakes:[
+      {title:"Giving ALLPAGES permission to business users",desc:"ALLPAGES grants access to all components including developer tools, sensitive HR data, and system administration. This is for system administrators only. Assign only the Permission Lists users actually need. Quarterly access reviews catch ALLPAGES creep."},
+      {title:"Not testing encryption impact on existing reports",desc:"Enabling encryption on an existing field breaks PS Queries and AE programs that compare or filter on that field — encrypted values don't match plaintext search criteria. Plan encryption rollout carefully: update all queries and AE SQL to use decryption functions, test all reports before enabling encryption in PROD."},
+    ],
+    quiz:[
+      {q:"What PeopleSoft mechanism allows seamless navigation between two PS systems without re-login?",options:["SAML assertion","PS_TOKEN (PeopleSoft proprietary SSO token)","Shared Permission List","Common database connection"],correct:1,explanation:"PS_TOKEN is PeopleSoft's proprietary SSO mechanism. System A generates an encrypted token with user identity, passes it to System B which validates it against a shared secret. Modern deployments use SAML 2.0 for SSO with corporate identity providers."},
+      {q:"What does enabling record-level auditing in App Designer create?",options:["A new database trigger","PS_AUDIT_RECORDNAME table logging who changed what, when, and old values","An alert email to administrators","A checkpoint in Application Engine"],correct:1,explanation:"Record-level auditing creates PS_AUDIT_RECORDNAME with AUDIT_OPRID (who), AUDIT_STAMP (when), AUDIT_ACTION (add/change/delete), and the old field values before the change. Essential for SOX, HIPAA, and regulatory compliance."},
+    ],
+    peopleBooksUrl:"https://docs.oracle.com/cd/F44947_01/pt858pbr3/eng/pt/tpcs/",
+  },
+  {
+    id:"advanced-reporting", module:15, num:"39",
+    title:"Advanced Reporting & Analytics",
+    level:"advanced",
+    summary:"Enterprise reporting in PeopleSoft — BI Publisher advanced features, Pivot Grids, PS/nVision, and PeopleSoft Insights (Kibana-based analytics dashboards).",
+    preChecklist:["You completed PS Query Advanced (Topic 27)","You understand BI Publisher basics","You know what a Pivot Table is"],
+    keyPoints:[
+      "Pivot Grids provide interactive drag-and-drop analytics directly in Fluid components",
+      "PS/nVision is Excel-based financial reporting — primary tool for FSCM GL analysis",
+      "PeopleSoft Insights uses Kibana dashboards powered by Elasticsearch data",
+      "BI Publisher bursting can distribute thousands of personalized reports automatically",
+      "Reporting security must mirror component security — use same security views in report queries",
+    ],
+    sections:[
+      {title:"Pivot Grids",body:`**What are Pivot Grids?**
+Interactive analytics components built directly in PeopleSoft Fluid. Users drag and drop dimensions and measures to create their own analysis — like Excel PivotTables but in the browser.
+
+**When to use:**
+- Headcount analysis by department/location/job family
+- Budget vs actual comparisons
+- Leave balance summaries by team
+- Performance rating distributions
+
+**Creating a Pivot Grid:**
+PeopleTools → Pivot Grid → Pivot Grid Wizard
+
+Step 1 — Data Source: select PS Query providing the data
+Step 2 — Pivot Grid Options:
+  - Grid Columns: dimensions (DEPTID, JOBCODE, LOCATION)
+  - Data fields: measures (headcount, avg salary, sum of hours)
+  - Default layout: which field goes to rows, columns, filters
+Step 3 — Display options: chart type (bar, line, pie), colors
+Step 4 — Security: which users can see this grid
+
+**Publishing to a Fluid Homepage:**
+Create a Tile pointing to the Pivot Grid component.
+Add to Homepage Tile Collection.
+Users click the tile to get an interactive analytics dashboard — no IT involvement needed for analysis.
+
+**User interaction:**
+- Drag department to rows, location to columns → see headcount matrix
+- Click a cell → drill down to employee list
+- Apply filter → narrow to specific status or job family
+- Export to Excel with current layout`},
+      {title:"PeopleSoft Insights",body:`**PeopleSoft Insights — Kibana-based dashboards:**
+Introduced in PT 8.57. Pre-built analytics dashboards powered by Elasticsearch.
+
+**What it provides:**
+- HCM Insights: headcount trends, turnover analysis, time-to-fill, diversity metrics
+- FSCM Insights: procurement spend analysis, invoice aging, budget utilization
+- All data comes from Elasticsearch indices built by Search Framework
+
+**Accessing:**
+Fluid Homepage → Insights tile
+Or: PeopleTools → Search Framework → Insights Dashboard
+
+**Pre-built dashboards include:**
+HCM:
+- Workforce Composition (headcount by demographics)
+- Attrition Analysis (terminations over time, reasons)
+- Time & Labor (overtime, absence trends)
+- Compensation Analysis (salary distribution by grade)
+
+FSCM:
+- Payables Aging (invoices by age bucket)
+- Procurement Spend (by supplier, category, BU)
+
+**Customizing Insights:**
+Kibana-based — IT team can create custom visualizations using Kibana tools.
+Add new panels to existing dashboards.
+Create new dashboards for client-specific KPIs.
+
+**Security:**
+Insights dashboards respect PS row-level security via the underlying Elasticsearch indices.`},
+      {title:"PS/nVision for Financial Reporting",body:`**What is PS/nVision?**
+Excel-based reporting tool primarily used in FSCM for General Ledger analysis. Creates Excel spreadsheets with live PeopleSoft data using named ranges and nVision formulas.
+
+**Core concept — Report Layouts:**
+PeopleTools → nVision → Report Layout (Excel file)
+Excel cells contain PS/nVision formulas:
+\`\`\`
+=NVSSCOPE("BUSINESS_UNIT=GBL01") 
+\`\`\`
+These formulas fetch data from PS GL tables when the report is run.
+
+**DrillDown capability:**
+User sees GL summary → double-clicks a cell → PS/nVision drills to journal line detail.
+Drill path: Budget → Department → Account → Journal Entries → Source Documents.
+
+**Report Books:**
+Group multiple nVision layouts into one Report Book.
+Run once — generates 50 Excel tabs (one per department) automatically.
+Used for: monthly management pack, budget vs actual for each cost center.
+
+**Matrix reports:**
+Rows = GL Accounts (4000 - Revenue, 5000 - Expenses, etc.)
+Columns = Periods (Jan, Feb, Mar... Dec, YTD)
+PeopleSoft fills the matrix by fetching PS_LEDGER data for each intersection.
+
+**Scheduling:**
+Process Scheduler → nVision Report Request → run monthly after GL close.
+Output delivered to Report Manager or email.
+
+**Who uses it:**
+Finance controllers, FP&A teams, budget managers. Less common in HCM — that's more PS Query + BI Publisher territory.`},
+      {title:"BI Publisher Advanced Features",body:`**Advanced BIP patterns:**
+
+**1. Sub-templates:**
+Reusable template sections (header/footer/logo) shared across multiple report templates.
+Change the logo once in the sub-template → updates all reports automatically.
+
+**2. Conditional formatting:**
+In Word template using BIP tags:
+\`\`\`
+<?if:SALARY > 100000?>
+  <fo:block color="red"><?SALARY?></fo:block>
+<?else?>
+  <fo:block><?SALARY?></fo:block>
+<?end if?>
+\`\`\`
+Salary over 100K shows in red. Under 100K shows normally.
+
+**3. Repeating groups:**
+\`\`\`
+<?for-each:EMPLOYEE?>
+  <?NAME?> | <?DEPTID?> | <?SALARY?>
+<?end for-each?>
+\`\`\`
+Generates one row per employee from the data source.
+
+**4. Multi-language reports:**
+BIP Translation feature — same template, text translated based on user's language setting.
+Report auto-generates in French for French users, English for English users.
+
+**5. Charts in BIP:**
+Insert chart in Word/Excel template → map data fields to chart axes.
+BIP generates the chart from live data on each run.
+Common: bar chart of headcount by department embedded in HR monthly report.
+
+**6. Performance for large reports:**
+For 100,000+ row reports: use AE data source (Rowset-based) instead of PS Query.
+AE can pre-aggregate and structure data more efficiently than PS Query for complex reports.
+BIP just handles the formatting — keep data preparation in AE.`},
+    ],
+    realWorld:`A retail company's Finance team was spending 3 days every month manually compiling the management pack in Excel from PS/nVision exports. Implementation: PS/nVision Report Book with 24 layouts (one per region × 2 periods), scheduled to run automatically after month-end close, output emailed directly to each regional director via BIP bursting. Month-end reporting time dropped from 3 days to 4 hours (mostly review time). The CFO received the consolidated 50-page PDF automatically — generated and emailed by PeopleSoft with zero human intervention.`,
+    mistakes:[
+      {title:"Not securing Pivot Grid queries",desc:"Pivot Grid data queries must use security views just like component Search Records. A Pivot Grid showing headcount by department without row-level security exposes all employee data to all users. Apply the same PS_JOB_SRCH_VW approach to the Pivot Grid's PS Query."},
+      {title:"Using PS Query as BIP data source for 100K+ row reports",desc:"PS Query has memory limitations and timeouts for very large datasets. For reports processing 100,000+ rows, use an AE program as the BIP data source. AE can handle millions of rows, commit in batches, and structure complex nested data that PS Query can't produce."},
+    ],
+    quiz:[
+      {q:"What is a Pivot Grid in PeopleSoft?",options:["A type of database table","An interactive drag-and-drop analytics component built directly in Fluid PeopleSoft","A PS Query output format","A BI Publisher chart type"],correct:1,explanation:"Pivot Grids are interactive analytics components in Fluid. Users drag dimensions (DEPTID, JOBCODE) and measures (headcount, salary) to create real-time analysis. Like Excel PivotTables but built into PeopleSoft, with drill-down and chart capabilities."},
+      {q:"What is PS/nVision primarily used for?",options:["HCM headcount reporting","General Ledger financial analysis in FSCM — Excel-based with DrillDown","Integration monitoring","Security audit reports"],correct:1,explanation:"PS/nVision is Excel-based financial reporting for FSCM General Ledger analysis. Excel templates contain nVision formulas that fetch GL data. DrillDown allows navigation from summary to journal line detail. Used by Finance/FP&A teams for budget vs actual, month-end close reports."},
+    ],
+    peopleBooksUrl:"https://docs.oracle.com/cd/F44947_01/pt858pbr3/eng/pt/tqry/",
+  },
+  {
+    id:"cloud-and-architecture-advanced", module:16, num:"40",
+    title:"Cloud Architecture & Modern PS",
+    level:"advanced",
+    summary:"PeopleSoft on Oracle Cloud Infrastructure (OCI), DPK deployment automation, Oracle Cloud HCM comparison, and the future direction of the PeopleSoft platform.",
+    preChecklist:["You completed Architecture (Topics in Beginner)","You understand PUM and upgrades","You know what cloud computing is"],
+    keyPoints:[
+      "PeopleSoft runs natively on OCI — same application, cloud infrastructure",
+      "DPK (Deployment Package) automates environment provisioning using Puppet",
+      "Continuous Delivery Update (CDU) model — quarterly feature drops, no big-bang upgrades",
+      "Oracle Cloud HCM (Fusion) is PeopleSoft's SaaS cousin — different product, same company",
+      "Selective Adoption means choosing which new features to activate — Oracle never forces you to take UI changes",
+    ],
+    sections:[
+      {title:"PeopleSoft on OCI",body:`**Oracle Cloud Infrastructure for PeopleSoft:**
+OCI is Oracle's public cloud (like AWS/Azure but Oracle's). PeopleSoft can run entirely on OCI.
+
+**OCI PeopleSoft deployment:**
+\`\`\`
+OCI Infrastructure:
+├── Web Tier: OCI Compute (WebLogic on Linux VMs)
+├── App Tier: OCI Compute (Tuxedo on Linux VMs)  
+├── DB Tier: Oracle Autonomous DB or DB System
+├── Elasticsearch: OCI Elasticsearch Service
+└── Storage: OCI Object Storage (for attachments, reports)
+\`\`\`
+
+**PeopleSoft Cloud Manager:**
+Oracle-provided tool that automates PeopleSoft deployment on OCI.
+- Provisions entire environments (Web, App, DB tiers) with one click
+- Manages lifecycle: start/stop/scale environments on schedule
+- Clone environments for testing in minutes vs days for on-premise
+- Patch management: applies PUM images directly
+
+**Cost advantages on OCI:**
+- Dev/Test environments: run only during business hours, auto-shutdown nights/weekends
+- Scale up before month-end processing, scale down after
+- No hardware purchase, no data center costs
+- Pay-as-you-go for non-production environments
+
+**PeopleSoft on OCI is NOT Fusion/SaaS:**
+Still the same PeopleSoft application you know — PeopleCode, App Designer, Application Engine all work identically. OCI is just where the servers run.`},
+      {title:"DPK Deployment Automation",body:`**What is DPK?**
+Deployment Packages — Puppet-based automation scripts for provisioning PeopleSoft environments.
+Available since PT 8.55. Replaced manual multi-day server setups.
+
+**DPK automates:**
+- OS configuration (Linux user setup, directory structure)
+- WebLogic installation and domain creation
+- Tuxedo installation and App Server domain creation
+- Database client installation
+- PeopleTools installation
+- PeopleSoft application installation
+
+**Typical DPK deployment:**
+\`\`\`bash
+# 1. Download DPK zip files from Oracle Support
+# 2. Extract setup scripts
+./psft-dpk-setup.sh
+
+# 3. Answer prompts for:
+#    - DB hostname, SID, credentials
+#    - Web tier hostname, port
+#    - App tier settings
+
+# 4. Puppet applies all configuration
+# Takes 2-3 hours (vs 2-3 days manual)
+\`\`\`
+
+**DPK customization:**
+Edit Puppet hiera YAML files to adjust:
+- Number of PSAPPSRV processes
+- WebLogic heap settings
+- Custom certificates
+- Environment-specific ports
+
+**DPK for PUM:**
+When applying a PUM patch, use DPK to provision the PS Image environment locally.
+DPK sets up the Image in 2 hours — ready for Change Package generation.
+
+**Who needs DPK knowledge:**
+PeopleSoft administrators and infrastructure teams. Developers less so — but understanding DPK helps when setting up local dev environments.`},
+      {title:"Continuous Delivery and Selective Adoption",body:`**PeopleSoft Continuous Delivery model:**
+Oracle adopted continuous delivery (~2018) alongside PUM.
+Regular drops of new features and functional enhancements — not just fixes.
+
+**How it differs from traditional upgrades:**
+Traditional: PS 8.9 → PS 9.0 → PS 9.1 → PS 9.2 — massive upgrades every few years.
+Continuous Delivery: stay on PS 9.2, receive new features quarterly via PUM Images.
+No more big-bang upgrades. Just ongoing PUM patches.
+
+**Selective Adoption:**
+When Oracle delivers a new feature (e.g., new Fluid timesheet), you CHOOSE when to activate it.
+Features come "off" by default — you activate via feature flag or configuration.
+This means: take the code now (in your PUM patch), activate when your users are ready.
+
+**Example adoption timeline:**
+- Image 45: Oracle delivers new Fluid Absence Request (off by default)
+- Your organization: applies Image 45 in March (code is there, feature is off)
+- HR team: trains on new UI in April
+- May: activate Fluid Absence for pilot group
+- June: activate for all employees
+
+**What this means practically:**
+- Never forced to use a new UI until you're ready
+- Code is always current (patched) even if features are deactivated
+- Upgrade project risk is massively reduced
+- "Oracle forcing ugly UI on our employees" is no longer a thing`},
+      {title:"PeopleSoft vs Oracle Cloud HCM",body:`**Common question: should we move to Oracle Cloud HCM (Fusion)?**
+
+This is a business decision, not a technical one. As a consultant, you need to understand both.
+
+**Oracle Cloud HCM (Fusion):**
+- True SaaS: Oracle hosts, manages, patches everything
+- Automatic quarterly updates — no choice on timing
+- Modern UI from day one (Redwood design system)
+- Limited customization — configuration only, no custom PeopleCode
+- Lower IT overhead (no servers to manage)
+- Higher per-user licensing cost
+- Migration from PeopleSoft: significant effort (data conversion, process retraining)
+
+**PeopleSoft HCM:**
+- On-premise or OCI-hosted: customer controls infrastructure
+- PUM selective adoption — you control timing
+- Deep customization via PeopleCode, App Engine, Event Mapping
+- Lower ongoing licensing (perpetual license model)
+- Higher IT overhead (servers, DBA, patching team)
+- Existing investment: 10-20 years of configuration and customizations
+
+**When clients stay on PeopleSoft:**
+- Heavy customizations that would be impossible to replicate in Fusion
+- Complex regulatory requirements (government, healthcare) needing custom logic
+- Budget constraints — migration costs $5-50M for large organizations
+- Existing team with deep PS expertise
+
+**When clients move to Cloud HCM:**
+- Starting fresh (new company, no legacy)
+- Wanting to reduce IT infrastructure overhead
+- Oracle's standard processes match their business needs
+- Long-term cost vs customization tradeoff favors SaaS
+
+**Your role as PS consultant:**
+Understand both. Many clients ask this question. The honest answer is: it depends on their customization depth, budget, risk tolerance, and long-term IT strategy.`},
+    ],
+    realWorld:`A state government agency with 45,000 employees running PeopleSoft HCM was evaluating Oracle Cloud HCM. Analysis: they had 340 customizations across 89 modified delivered objects, a payroll interface with the state treasurer's office built entirely in custom Application Engine, and compliance requirements unique to state employment law (not covered by standard Cloud HCM). Decision: stay on PeopleSoft, move to OCI, adopt PeopleSoft Cloud Manager for environment management. Result: 40% reduction in infrastructure costs, environment provisioning from 2 weeks to 4 hours, quarterly PUM cadence established. Cloud HCM re-evaluation deferred to when Cloud HCM adds state/local government compliance features.`,
+    mistakes:[
+      {title:"Recommending Cloud HCM migration without a customization audit",desc:"The #1 mistake in PeopleSoft modernization consulting. Always start with a customization audit: how many modified delivered objects, how many custom AE programs, what integrations exist, how complex is the data model. A client with 300 customizations and 20 integrations faces a $15M+ migration. That changes the recommendation entirely."},
+      {title:"Ignoring Selective Adoption in upgrade planning",desc:"Clients often apply a PUM Image and immediately activate all new features — then get complaints about unexpected UI changes. Establish a Selective Adoption policy: document each new feature in the Image, plan activation dates, train users before activation. The code update and the feature activation are separate events."},
+    ],
+    quiz:[
+      {q:"What is Selective Adoption in PeopleSoft Continuous Delivery?",options:["Choosing which employees use PeopleSoft","New features deliver off by default — organizations choose when to activate them","Selecting which PUM fixes to apply","Choosing which modules to license"],correct:1,explanation:"Selective Adoption means Oracle delivers new features in PUM Images but leaves them deactivated by default. Organizations take the code update (in their regular PUM patch) but activate each feature on their own timeline — training users first, activating for pilots, then rolling out broadly."},
+      {q:"What does PeopleSoft Cloud Manager provide?",options:["SaaS migration tooling","Automated PS environment provisioning and lifecycle management on OCI","Oracle Cloud HCM configuration","PeopleSoft licensing management"],correct:1,explanation:"PeopleSoft Cloud Manager is an Oracle tool automating PeopleSoft deployment on OCI. It provisions entire Web/App/DB environments, manages start/stop schedules, enables environment cloning in minutes, and handles PUM patch application — all from a web-based management console."},
+    ],
+    peopleBooksUrl:"https://docs.oracle.com/cd/F44947_01/pt858pbr3/eng/pt/tpum/",
+  },
+];
+
 
 const CURRICULUM_LIST = {
   b: TOPICS.map(t => t.title),
   i: INTERMEDIATE_TOPICS.map(t => t.title),
-  a: ["Fluid UI Development Advanced","Application Packages (OOP)","REST & SOAP Deep Dive","Performance Tuning Advanced","PeopleTools Upgrades","Activity Guides","Event Mapping","Elasticsearch & Search Framework","PeopleCode Debugging","Fluid WorkCenters"],
+  a: ADVANCED_TOPICS.map(t => t.title),
 };
