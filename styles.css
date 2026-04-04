@@ -155,7 +155,7 @@ button{font-family:inherit;cursor:pointer}
 
 /* STATS */
 .stats-bar{position:relative;z-index:1;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:rgba(12,16,32,.7);backdrop-filter:blur(8px);padding:24px 0}
-.stats-bar__grid{display:grid;grid-template-columns:repeat(4,1fr)}
+.stats-bar__grid{display:grid;grid-template-columns:repeat(6,1fr)}
 .stat-item{display:flex;flex-direction:column;align-items:center;gap:4px;padding:16px 24px;border-right:1px solid var(--border)}
 .stat-item:last-child{border-right:none}
 .stat-item__number{font-family:var(--fd);font-size:34px;font-weight:800;line-height:1;letter-spacing:-1.5px;background:linear-gradient(135deg,var(--gold-hi),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
