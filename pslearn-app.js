@@ -172,7 +172,7 @@ function buildSidebar(pathKey='b', filter='') {
     const btn=document.createElement('button');
     btn.className='sidebar__topic'+(isA?' active':'');
     btn.innerHTML=`<span class="sidebar__topic-num">${topic.num}</span><span style="flex:1;text-align:left">${topic.title}</span>${visited.has(vk)&&!isA?'<span style="color:var(--green);font-size:11px">✓</span>':''}`;
-    btn.onclick=()=>openTopic(idx,isIntermediate); body.appendChild(btn);
+    btn.onclick=()=>openTopic(idx,pathKey); body.appendChild(btn);
   });
 }
 function filterTopics(val){ buildSidebar(lastSavedIsIntermediate||'b', val); }
@@ -1264,9 +1264,9 @@ function renderTopic(index, pathOrBool='b') {
 
   // ── MODULE SUMMARY CARD (Feature 11) ──
   // Show when this is the last topic in its module (beginner only)
-  const isLastInModule = !isIntermediate && (
+  const isLastInModule = pathKey==='b' && (
     index === TOPICS.length - 1 ||
-    TOPICS[index + 1].module !== topic.module
+    (TOPICS[index + 1] && TOPICS[index + 1].module !== topic.module)
   );
   if (isLastInModule) {
     const modTopics = TOPICS.filter(t => t.module === topic.module);
@@ -1288,7 +1288,7 @@ function renderTopic(index, pathOrBool='b') {
   /* PREV / NEXT NAVIGATION */
   const prev = index > 0 ? topicList[index - 1] : null;
   const next = index < topicList.length - 1 ? topicList[index + 1] : null;
-  const isIntFlag = isIntermediate ? ', true' : '';
+  const isIntFlag = pathKey!=='b' ? `, '${pathKey}'` : '';
 
   html += `<div class="topic-nav">`;
   if (prev) {
